@@ -27,5 +27,5 @@ Collate:
 RoxygenNote: 5.0.1
 Suggests: testthat,
     covr
-URL: https://github.com/NA/NA
-BugReports: https://github.com/NA/NA/issues
+URL: https://github.com/thomasp85/fiery
+BugReports: https://github.com/thomasp85/fiery/issues
