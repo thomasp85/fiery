@@ -3,7 +3,7 @@ HandlerStack <- R6Class('HandlerStack',
     public = list(
         # Methods
         initialize = function() {
-            private$handleOrder <- new.env(parent = emptyenv())
+            private$handleEnv <- new.env(parent = emptyenv())
         },
         add = function(handler, id, pos = NULL) {
             if (is.null(pos)) {
@@ -28,6 +28,6 @@ HandlerStack <- R6Class('HandlerStack',
     private = list(
         # Data
         handleEnv = NULL,
-        handleOrder = NULL
+        handleOrder = character()
     )
 )
