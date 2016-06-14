@@ -1,66 +1,77 @@
-# Fiery
 
-Fiery is an R package for creating R driven backends for ambituous web apps. It 
-has been created out of a joy in using Shiny to create R based web apps, but a
-need to couple an R server up to a more powerful framework for creating the 
-client side logic and UI. This also means that Fiery is strickly concerned with
-the backend side of the web app. Users will need to get aquianted with HTML, CSS
-and JavaScript, but I firmly believe that being introduced to these technologies
-have never harmed anyone. Fiery is not a competitor to Shiny in any way. For 
-probably 99% of all use cases, Shiny will be the better and easier choice. For
-the last 1% though, where the complexity of the app makes Shiny's UI model 
-unwieldy, this might be just what is needed.
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+fiery
+=====
 
-## The fiery server
-The server model in fiery is based on 3 main entities. The router handles 
-incoming requests, the model handles data logic and the actions sends respones
-back to the client. Each run loop consists of message handling, model resolving
-and firing of actions, after which queued up responses are send. Actions can be 
-triggered both during message handling and model resolving, but will always be 
-the last to run.
+[![Travis-CI Build Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/fiery)](http://cran.r-project.org/package=fiery) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/fiery)](http://cran.r-project.org/package=fiery) [![Coverage Status](https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg)](https://codecov.io/github/thomasp85/fiery?branch=master)
 
-> Take note that Fiery does not try to by an R equivalent of Django or Ruby on 
-Rails or other massive back-end frameworks. It is not designed to be a full
-back-end MVC and should not be used as such.
+Fiery is a flexible and lighweight framework for building web servers in R. It is relatively unoppinionated about how you chose to build your server logic and supports any use case, from serving static files to being used as a base for a model-view-controller based setup.
 
-### The router
-The router takes in requests from the client and direct them towards the correct
-handler. The router containes a list of routes, each of which can also contain
-additional routes. The nesting corresponds to a resource URL so a request for 
-the resource *'blog/posts/comment'* will be directed to the router at 
-blog$posts$comment. Each router have methods corresponding to the different 
-message types, such as GET, POST, PUT etc. If a handler is not specified the
-router will automatically send a 405 error back. If a router is not existing for
-a requested ressource the router will automatically return a 404 error. Apart
-from this it is the responsibility of the different handlers to flag errors if 
-they occur. Static ressources (pictures etc.) can be handled by the StaticRouter
-subclass. StaticRouters can have standard routers attached and will only look 
-for static content if there is no subrouter corresponding to the resource. The
-root router (corresponding to the '/' ressource) is created automatically as a 
-StaticRouter looking for content on the specified server root.
+### The shiny elephant in the room
 
-### The model
-Fiery was initially concieved out of a wish to couple Ember based frontends to
-an R driven backend. Because of this, Fiery's object model is heavily inspired by
-the API of Ember.Object. The server logic is build up by adding properties and
-computed properties that can be bound to other properties as well as triggering
-actions. Overall this model vaguely resembling the reactive model in Shiny, but
-is way more declarative. Computed properties are only dependant on other values
-if it has been explicitly stated (reverse of Shiny, where you need to explicitly
-state if a value is not bound using `isolate()`). Furthermore computed 
-properties are eagerly evaluate unless they are explicetly stated as lazy. In
-Shiny reactives are only evaluated if they are needed and it is necessary to use
-an observer. Computed properties can be set to recalculate at specific interval,
-much like `invalidateLater()` works within a reactive environment in Shiny.
+Before going any further I will briefly address what most people are thinking of when they think R+web: [Shiny](https://github.com/rstudio/shiny):
 
-# Single- and multisession support
-Fiery servers can run in both a single and multisession mode. In multisession
-mode each client gets their own model object that defines their current state. 
-This works much like in Shiny when you start an app - the current R process is
-blocked and each session is walled from each others. On the contrary, when the
-server runs in singlesession mode, each session acces the same model. 
-Furthermore the R session is not blocked and the user is free to manipulate the
-model from R as well. Upon stopping a singlesession server, the current model is
-returned and can be fed into a new session to restore the state. Singlesession
-mode is generally only useful/advicable for local running apps, rather than apps
-accessible over the world wide web.
+*Is this a competing framework to Shiny?*
+In a way, yes. Any package that provides functionality for creating web applications in R will be competing for the developers who wish to make web apps. This is of course reinforced by the name of the package, which is a gently jab at Shiny. But mostly no. I believe Shiny and Fiery will appeal to vastly different use cases, in the same way as automakers and motorbike makers are in theory competing for the customers who wish to acquire the means to transport themselves, but would never be seen as truly competing.
+
+*So what is so different about Fiery?*
+Without falling too much into the trap of defining a project by how it differs from another, there are some very clear differences in approach between Fiery and Shiny.
+
+-   Shiny uses magic to make everything work from R, Fiery lets you do all the hard work.
+-   Shiny wants the main app-logic to be server-side, Fiery don't care what you do.
+-   Shiny uses a reactive model to define the app-logic, Fiery don't care what you do (see a pattern emerge).
+-   Shiny wants you to use [htmltools](https://github.com/rstudio/htmltools) to build the html, Fiery really don't care what you use.
+
+From the above it is quite clear that Fiery to a higher degree gives you the choice and responsibility of building up your app at the cost of higher complexity, but with the goal of giving you more power over what you can do.
+
+*So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*
+Now we're getting somewhere! httpuv is sitting in the bottom of the stack for both Shiny and Fiery, but where Shiny build an elaborate, oppinionated and complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to running a httpuv based web server. You could say that Fiery "sits between" httpuv and Shiny, and that Shiny (or an alternative framework) could in theory be build on top of Fiery.
+
+The Fiery way
+-------------
+
+Fiery is an event-based framework where the server has a lifecycle, with events being triggered at specific points during the cycle. Handlers can be attached to events and will get called once the event is triggered. New events can be defined and be triggered by other handlers or manually.
+
+Enough talk - lets see how it works:
+
+``` r
+library(fiery)
+
+# Create a new app
+app <- Fire$new()
+
+# Add a handler to the 'request' event
+app$on('request', function(server, ...) {
+    list(
+        status = 200L,
+        headers = list('Content-Type' = 'text/html'),
+        content = 'Fight Fire With Fire!'
+    )
+})
+#> [1] "2df011d9-2d34-4dbc-8bd3-73f4e67e14db"
+```
+
+The code above tells the app to return the text `Fight Fire With Fire!` everytime an HTTP request is recieved. You can see that the `on` method returns a string. This string uniquely identifies the added handler and can be used to remove it again using the `off` method.
+
+Let's do something with websockets too:
+
+``` r
+app$on('message', function(server, ...) {
+    server$trigger('my-very-own-event', ...)
+})
+#> [1] "51166458-5278-4cff-a8bb-9780fad7f37b"
+```
+
+What is happening? We've just triggered a custom event is what happened. The effect of this is quite undramatic as no handlers has been attached to this event yet but this is about to change:
+
+``` r
+app$on('my-very-own-event', function(...) {
+    message('You\'ve got a message')
+    flush.console()
+})
+#> [1] "d36356c0-137c-48b6-b31a-9392548ed629"
+```
+
+When we run this we will get a message in the console everytime someone sends a WebSocket message.
+
+More to come...
