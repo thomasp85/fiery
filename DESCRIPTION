@@ -1,0 +1,31 @@
+Package: fiery
+Type: Package
+Title: A Lightweight and Flexible Web Framework
+Version: 0.1.0
+Date: 2016-06-14
+Authors@R: c(
+    person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
+    )
+Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
+Description: fiery is a very flexible framework for building the server side
+    logic in R. It is unoppinionated when it comes to how HTTP and WebSocket
+    requests are handled and supports all levels of app complexity; from serving
+    static content to full-blown dynamic web-apps. Fiery does not hold your hand
+    as much as e.g. the shiny package does, but instead sets you free to create
+    your web app the way you want.
+License: GPL (>=2)
+Imports:
+    R6,
+    assertthat,
+    httpuv,
+    uuid,
+    utils
+Collate:
+    'HandlerStack.R'
+    'Fire.R'
+    'fiery-package.R'
+RoxygenNote: 5.0.1
+Suggests: testthat,
+    covr
+URL: https://github.com/NA/NA
+BugReports: https://github.com/NA/NA/issues
