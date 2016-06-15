@@ -1,4 +1,5 @@
 #' @importFrom R6 R6Class
+#' @importFrom assertthat is.string is.count assert_that
 HandlerStack <- R6Class('HandlerStack',
     public = list(
         # Methods
@@ -6,13 +7,19 @@ HandlerStack <- R6Class('HandlerStack',
             private$handleEnv <- new.env(parent = emptyenv())
         },
         add = function(handler, id, pos = NULL) {
+            assert_that(
+                is.string(id),
+                is.function(handler)
+            )
             if (is.null(pos)) {
                 pos <- length(private$handleOrder)
+                assert_that(is.count(pos))
             }
             assign(id, handler, envir = private$handleEnv)
             private$handleOrder <- append(private$handleOrder, id, after = pos)
         },
         remove = function(id) {
+            assert_that(is.string(id))
             ind <- which(private$handleOrder == id)
             if (length(ind) != 0) {
                 private$handleOrder <- private$handleOrder[-ind]

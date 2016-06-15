@@ -36,7 +36,7 @@ NULL
 #' }
 #' 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat is.string is.count is.number is.scalar has_args
+#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
@@ -87,6 +87,10 @@ Fire <- R6Class('Fire',
             self$extinguish()
         },
         on = function(event, handler, pos = NULL) {
+            assert_that(
+                is.string(event),
+                is.function(handler)
+            )
             handlerId <- UUIDgenerate()
             private$handlerMap[[handlerId]] <- event
             private$add_handler(event, handler, pos, handlerId)
@@ -94,11 +98,13 @@ Fire <- R6Class('Fire',
             handlerId
         },
         off = function(handlerId) {
+            assert_that(is.string(handlerId))
             private$remove_handler(handlerId)
             private$handlerMap[[handlerId]] <- NULL
             self
         },
         trigger = function(event, ...) {
+            assert_that(is.string(event))
             if (event %in% private$privateTriggers) {
                 warning(event, ' and other protected events cannot be triggered', call. = FALSE)
             } else {
@@ -111,10 +117,12 @@ Fire <- R6Class('Fire',
             self
         },
         set_data = function(name, value) {
+            assert_that(is.string(name))
             assign(name, value, envir = private$data)
             self
         },
         get_data = function(name) {
+            assert_that(is.string(name))
             private$data[[name]]
         },
         time = function(expr, delay, loop = FALSE) {
@@ -127,7 +135,7 @@ Fire <- R6Class('Fire',
             stop('Asynchronous evaluation is not yet implemented')
         },
         set_client_id_converter = function(converter) {
-            has_args(converter, 'request')
+            assert_that(has_args(converter, 'request'))
             private$client_id <- converter
             
             self
@@ -136,26 +144,23 @@ Fire <- R6Class('Fire',
     active = list(
         host = function(address) {
             if (missing(address)) return(private$HOST)
-            is.string(address)
-            is.scalar(address)
+            assert_that(is.string(address))
             private$HOST <- address
         },
         port = function(n) {
             if (missing(n)) return(private$PORT)
-            is.count(n)
-            is.scalar(n)
+            assert_that(is.count(n))
             private$PORT <- n
         },
         refreshRate = function(rate) {
             if (missing(rate)) return(private$REFRESHRATE)
-            is.number(rate)
-            is.scalar(rate)
+            assert_that(is.number(rate))
             private$REFRESHRATE <- rate
         },
         triggerDir = function(dir) {
             if (missing(dir)) return(private$TRIGGERDIR)
             if (!is.null(dir)) {
-                is.dir(dir)
+                assert_that(is.dir(dir))
             }
             private$TRIGGERDIR <- dir
         }
@@ -182,6 +187,11 @@ Fire <- R6Class('Fire',
         
         # Methods
         run = function(block = TRUE, resume = FALSE, showcase = FALSE, ...) {
+            assert_that(
+                is.flag(block),
+                is.flag(resume),
+                is.flag(showcase)
+            )
             if (!private$running) {
                 private$running <- TRUE
                 private$p_trigger('start', server = self, ...)
@@ -317,8 +327,10 @@ Fire <- R6Class('Fire',
         },
         send_ws = function(message, id) {
             if (!is.raw(message)) {
-                is.string(message)
-                is.scalar(message)
+                assert_that(
+                    is.string(message),
+                    is.scalar(message)
+                )
             }
             private$websockets[[id]]$send(message)
         },
