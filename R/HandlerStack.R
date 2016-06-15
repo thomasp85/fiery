@@ -12,11 +12,14 @@ HandlerStack <- R6Class('HandlerStack',
                 is.function(handler)
             )
             if (is.null(pos)) {
-                pos <- length(private$handleOrder)
+                pos <- length(private$handleOrder) + 1
+            } else {
                 assert_that(is.count(pos))
+                if (pos < 1) pos <- 1
+                pos <- min(c(pos, length(private$handleOrder) + 1))
             }
             assign(id, handler, envir = private$handleEnv)
-            private$handleOrder <- append(private$handleOrder, id, after = pos)
+            private$handleOrder <- append(private$handleOrder, id, after = pos - 1)
         },
         remove = function(id) {
             assert_that(is.string(id))
