@@ -12,9 +12,11 @@ Fiery is a flexible and lighweight framework for building web servers in R. It i
 Before going any further I will briefly address what most people are thinking of when they think R+web: [Shiny](https://github.com/rstudio/shiny):
 
 *Is this a competing framework to Shiny?*
+
 In a way, yes. Any package that provides functionality for creating web applications in R will be competing for the developers who wish to make web apps. This is of course reinforced by the name of the package, which is a gently jab at Shiny. But mostly no. I believe Shiny and Fiery will appeal to vastly different use cases, in the same way as automakers and motorbike makers are in theory competing for the customers who wish to acquire the means to transport themselves, but would never be seen as truly competing.
 
 *So what is so different about Fiery?*
+
 Without falling too much into the trap of defining a project by how it differs from another, there are some very clear differences in approach between Fiery and Shiny.
 
 -   Shiny uses magic to make everything work from R, Fiery lets you do all the hard work.
@@ -25,6 +27,7 @@ Without falling too much into the trap of defining a project by how it differs f
 From the above it is quite clear that Fiery to a higher degree gives you the choice and responsibility of building up your app at the cost of higher complexity, but with the goal of giving you more power over what you can do.
 
 *So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*
+
 Now we're getting somewhere! httpuv is sitting in the bottom of the stack for both Shiny and Fiery, but where Shiny build an elaborate, oppinionated and complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to running a httpuv based web server. You could say that Fiery "sits between" httpuv and Shiny, and that Shiny (or an alternative framework) could in theory be build on top of Fiery.
 
 The Fiery way
@@ -48,7 +51,7 @@ app$on('request', function(server, ...) {
         content = 'Fight Fire With Fire!'
     )
 })
-#> [1] "2df011d9-2d34-4dbc-8bd3-73f4e67e14db"
+#> [1] "6d1b0d33-90bb-46c8-b041-e7d4dc71d72e"
 ```
 
 The code above tells the app to return the text `Fight Fire With Fire!` everytime an HTTP request is recieved. You can see that the `on` method returns a string. This string uniquely identifies the added handler and can be used to remove it again using the `off` method.
@@ -59,7 +62,7 @@ Let's do something with websockets too:
 app$on('message', function(server, ...) {
     server$trigger('my-very-own-event', ...)
 })
-#> [1] "51166458-5278-4cff-a8bb-9780fad7f37b"
+#> [1] "c3fe7b19-1888-4381-913a-36040046fabc"
 ```
 
 What is happening? We've just triggered a custom event is what happened. The effect of this is quite undramatic as no handlers has been attached to this event yet but this is about to change:
@@ -69,7 +72,7 @@ app$on('my-very-own-event', function(...) {
     message('You\'ve got a message')
     flush.console()
 })
-#> [1] "d36356c0-137c-48b6-b31a-9392548ed629"
+#> [1] "c859a7c4-98f8-4f11-93cc-067a060b4df2"
 ```
 
 When we run this we will get a message in the console everytime someone sends a WebSocket message.

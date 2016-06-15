@@ -29,7 +29,8 @@ model-view-controller based setup.
 Before going any further I will briefly address what most people are thinking of
 when they think R+web: [Shiny](https://github.com/rstudio/shiny):
 
-*Is this a competing framework to Shiny?*  
+*Is this a competing framework to Shiny?*
+
 In a way, yes. Any package that provides functionality for creating web 
 applications in R will be competing for the developers who wish to make web 
 apps. This is of course reinforced by the name of the package, which is a gently
@@ -38,7 +39,8 @@ different use cases, in the same way as automakers and motorbike makers are in
 theory competing for the customers who wish to acquire the means to transport 
 themselves, but would never be seen as truly competing.
 
-*So what is so different about Fiery?*  
+*So what is so different about Fiery?*
+
 Without falling too much into the trap of defining a project by how it differs
 from another, there are some very clear differences in approach between Fiery 
 and Shiny.
@@ -56,7 +58,8 @@ From the above it is quite clear that Fiery to a higher degree gives you the
 choice and responsibility of building up your app at the cost of higher 
 complexity, but with the goal of giving you more power over what you can do.
 
-*So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*  
+*So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*
+
 Now we're getting somewhere! httpuv is sitting in the bottom of the stack for
 both Shiny and Fiery, but where Shiny build an elaborate, oppinionated and 
 complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to
