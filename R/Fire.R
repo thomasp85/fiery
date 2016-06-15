@@ -336,7 +336,7 @@ Fire <- R6Class('Fire',
         },
         close_ws = function(id) {
             private$websockets[[id]]$close()
-            rm(id, envir = private$websockets)
+            rm(list = id, envir = private$websockets)
         },
         open_browser = function() {
             url <- paste0('http://', private$HOST, ':', private$PORT, '/')

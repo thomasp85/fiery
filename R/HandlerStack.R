@@ -23,7 +23,7 @@ HandlerStack <- R6Class('HandlerStack',
             ind <- which(private$handleOrder == id)
             if (length(ind) != 0) {
                 private$handleOrder <- private$handleOrder[-ind]
-                rm(id, envir = private$handleEnv)
+                rm(list = id, envir = private$handleEnv)
             }
         },
         dispatch = function(...) {
