@@ -27,9 +27,11 @@ HandlerStack <- R6Class('HandlerStack',
             }
         },
         dispatch = function(...) {
-            lapply(private$handleOrder, function(id) {
+            res <- lapply(private$handleOrder, function(id) {
                 private$handleEnv[[id]](...)
             })
+            names(res) <- private$handleOrder
+            res
         },
         length = function() {
             length(private$handleOrder)
