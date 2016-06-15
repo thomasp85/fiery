@@ -46,7 +46,7 @@ test_that('Inserting at position works', {
     stack$add(str, 'str')
     stack$add(sum, 'sum')
     
-    stack$add(min, 'min', -4)
+    stack$add(min, 'min', 1)
     expect_equal(stack$position('min'), 1)
     
     stack$add(max, 'max', 100)
