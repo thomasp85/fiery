@@ -30,6 +30,17 @@ HandlerStack <- R6Class('HandlerStack',
             lapply(private$handleOrder, function(id) {
                 private$handleEnv[[id]](...)
             })
+        },
+        length = function() {
+            length(private$handleOrder)
+        },
+        contains = function(id) {
+            assert_that(is.character(id))
+            !is.na(self$position(id))
+        },
+        position = function(id) {
+            assert_that(is.character(id))
+            match(id, private$handleOrder)
         }
     ),
     private = list(
