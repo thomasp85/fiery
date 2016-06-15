@@ -2,10 +2,11 @@
 
 export(Fire)
 importFrom(R6,R6Class)
+importFrom(assertthat,assert_that)
 importFrom(assertthat,has_args)
 importFrom(assertthat,is.count)
+importFrom(assertthat,is.dir)
 importFrom(assertthat,is.number)
-importFrom(assertthat,is.scalar)
 importFrom(assertthat,is.string)
 importFrom(httpuv,service)
 importFrom(httpuv,startDaemonizedServer)

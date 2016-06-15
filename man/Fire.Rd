@@ -5,13 +5,10 @@
 \alias{Fire}
 \title{Generate a New App Object}
 \format{An object of class \code{R6ClassGenerator} of length 24.}
-\usage{
-Fire
-}
 \description{
 The Fire generator creates a new 'Fire'-object, which is the the class 
 containing all app logic. The class is based on the R6 oo-system and is thus
-reference based with methods and data attached to each object, in contrast to
+reference-based with methods and data attached to each object, in contrast to
 the more well known S3 and S4 systems.
 }
 \section{Fields}{
