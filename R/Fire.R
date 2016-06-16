@@ -259,12 +259,21 @@ Fire <- R6Class('Fire',
         request_logic = function(req) {
             id <- private$client_id(req)
             args <- unlist(private$p_trigger('before-request', server = self, id = id, request = req))
-            args <- modifyList(args, list(
-                event = 'request',
-                server = self,
-                id = id,
-                request = req
-            ))
+            if (is.null(args)) {
+                args <- list(
+                    event = 'request',
+                    server = self,
+                    id = id,
+                    request = req
+                )
+            } else {
+                args <- modifyList(args, list(
+                    event = 'request',
+                    server = self,
+                    id = id,
+                    request = req
+                ))
+            }
             response <- tail(do.call(private$p_trigger, args), 1)[[1]]
             private$p_trigger('after-request', server = self, id = id, request = req, response = response)
             response
