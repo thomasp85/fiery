@@ -67,55 +67,98 @@ running a httpuv based web server. You could say that Fiery "sits between"
 httpuv and Shiny, and that Shiny (or an alternative framework) could in theory 
 be build on top of Fiery.
 
-## The Fiery way
-Fiery is an event-based framework where the server has a lifecycle, with events
-being triggered at specific points during the cycle. Handlers can be attached to
-events and will get called once the event is triggered. New events can be 
-defined and be triggered by other handlers or manually.
+## How to install this
+Currently fiery exists on GitHub only and should be installed using devtools:
 
-Enough talk - lets see how it works:
+```r
+if (!require(devtools)) {
+    install.packages('devtools')
+}
+devtools::install_github('thomasp85/fiery')
+```
+
+A CRAN submission is intended eventually though...
+
+## Design
+Fiery is designed around a clear server life-cycle with events being triggered
+at specific points during the life-cycle that will call the handlers attached to
+these events. In addition to the life-cycle events, it is possible to trigger 
+custom events and attach handlers to these as well. Fiery is designed with 
+modularity in mind so that plugins can be developed for different tasks and 
+mixed and matched to suit the specific project. The first plugin is [routr](https://github.com/thomasp85/routr), which I'm developing in parallel 
+and which provides powerful routing of HTTP requests and WebSocket messages.
+
+## A minimal example
+Following is a very *Hello World*-ish example of a fiery app, that showcases 
+some of the different life-cycle events:
 
 ```{r}
 library(fiery)
 
-# Create a new app
+# Create a New App
 app <- Fire$new()
+app$port <- 4689
 
-# Add a handler to the 'request' event
+# Setup the data everytime it starts
+app$on('start', function(server, ...) {
+    server$set_data('visits', 0)
+    server$set_data('cycles', 0)
+})
+
+# Count the number of cycles (internal loops)
+app$on('cycle-start', function(server, ...) {
+    server$set_data('cycles', server$get_data('cycles') + 1)
+})
+
+# Count the number of requests
+app$on('before-request', function(server, ...) {
+    server$set_data('visits', server$get_data('visits') + 1)
+})
+
+# Handle requests
 app$on('request', function(server, ...) {
     list(
         status = 200L,
         headers = list('Content-Type' = 'text/html'),
-        content = 'Fight Fire With Fire!'
+        body = paste('This is indeed a test. You are number', server$get_data('visits'))
     )
 })
-```
 
-The code above tells the app to return the text `Fight Fire With Fire!` 
-everytime an HTTP request is recieved. You can see that the `on` method returns
-a string. This string uniquely identifies the added handler and can be used to
-remove it again using the `off` method.
-
-Let's do something with websockets too:
-
-```{r}
-app$on('message', function(server, ...) {
-    server$trigger('my-very-own-event', ...)
-})
-```
-
-What is happening? We've just triggered a custom event is what happened. The 
-effect of this is quite undramatic as no handlers has been attached to this 
-event yet but this is about to change:
-
-```{r}
-app$on('my-very-own-event', function(...) {
-    message('You\'ve got a message')
+# Show number of requests in the console
+app$on('after-request', function(server, ...) {
+    message(server$get_data('visits'))
     flush.console()
 })
+
+# Terminate the server after 100 cycles
+app$on('cycle-end', function(server, ...) {
+    if (server$get_data('cycles') > 50) {
+        message('Ending...')
+        flush.console()
+        server$extinguish()
+    }
+})
+
+# Be polite
+app$on('end', function(server) {
+    message('Goodbye')
+    flush.console()
+})
+
+app$ignite(showcase = TRUE)
 ```
 
-When we run this we will get a message in the console everytime someone sends a
-WebSocket message.
+In general much of the logic will happen in the `request` and `message` handlers
+and you are free to ignore the other life-cycle events if they are not needed.
 
-More to come...
+## Feedback
+I would love some feedback on this - open an issue or reach out to me on 
+[twitter](https://twitter.com/thomasp85). This is still a work-in-progress so if
+you want to influence the overall design, this is the moment to shout out.
+
+## Roadmap
+Fiery is intended to be minimal and lightweight so many features will be 
+delegated to plugins. On top of my list for fiery features are infrastructure 
+that allows for delayed, timed and asynchronous code execution, as well as
+getting 100% code coverage...
+
