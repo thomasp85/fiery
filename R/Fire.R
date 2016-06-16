@@ -310,7 +310,7 @@ Fire <- R6Class('Fire',
                 NULL
             }
         },
-        external_trigger = function() {
+        external_triggers = function() {
             if (is.null(private$TRIGGERDIR)) return()
             
             triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
