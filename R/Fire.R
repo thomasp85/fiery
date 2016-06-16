@@ -95,7 +95,7 @@ Fire <- R6Class('Fire',
             private$handlerMap[[handlerId]] <- event
             private$add_handler(event, handler, pos, handlerId)
             
-            handlerId
+            invisible(handlerId)
         },
         off = function(handlerId) {
             assert_that(is.string(handlerId))

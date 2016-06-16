@@ -28,7 +28,7 @@ HandlerStack <- R6Class('HandlerStack',
                 private$handleOrder <- private$handleOrder[-ind]
                 handler <- private$handleEnv[[id]]
                 rm(list = id, envir = private$handleEnv)
-                handler
+                invisible(handler)
             }
         },
         dispatch = function(...) {
