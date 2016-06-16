@@ -60,16 +60,16 @@ Fire <- R6Class('Fire',
             }
         },
         ignite = function(block = TRUE, showcase = FALSE, ...) {
-            private$run(block = block, showcase = FALSE, ...)
+            private$run(block = block, showcase = showcase, ...)
         },
         start = function(block = TRUE, showcase = FALSE, ...) {
-            self$ignite(block = block, showcase = FALSE, ...)
+            self$ignite(block = block, showcase = showcase, ...)
         },
         reignite = function(block = TRUE, showcase = FALSE, ...) {
-            private$run(block = block, resume = TRUE, showcase = FALSE, ...)
+            private$run(block = block, resume = TRUE, showcase = showcase, ...)
         },
         resume = function(block = TRUE, showcase = FALSE, ...) {
-            self$reignite(block = block, showcase = FALSE, ...)
+            self$reignite(block = block, showcase = showcase, ...)
         },
         extinguish = function() {
             if (private$running) {
