@@ -158,7 +158,7 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
     
     # Extra
     extra <- list(...)
-    for (i in extra) {
+    for (i in names(extra)) {
         assign(i, extra[[i]], envir = rook)
     }
     
