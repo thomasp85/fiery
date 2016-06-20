@@ -19,13 +19,16 @@ Imports:
     assertthat,
     httpuv,
     uuid,
-    utils
+    utils,
+    stringi
 Collate:
     'HandlerStack.R'
     'Fire.R'
+    'fake_request.R'
     'fiery-package.R'
 RoxygenNote: 5.0.1
-Suggests: testthat,
+Suggests:
+    testthat,
     covr
 URL: https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues
