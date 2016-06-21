@@ -1,3 +1,4 @@
+#' @include aaa.R
 #' @include HandlerStack.R
 NULL
 
