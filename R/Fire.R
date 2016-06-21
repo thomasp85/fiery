@@ -156,8 +156,8 @@ Fire <- R6Class('Fire',
         },
         trigger = function(event, ...) {
             assert_that(is.string(event))
-            if (event %in% private$privateTriggers) {
-                warning(event, ' and other protected events cannot be triggered', call. = FALSE)
+            if (private$running && event %in% private$privateTriggers) {
+                stop(event, ' and other protected events cannot be triggered while running', call. = FALSE)
             } else {
                 private$p_trigger(event, ...)
             }
