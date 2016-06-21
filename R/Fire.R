@@ -231,7 +231,7 @@ Fire <- R6Class('Fire',
     private = list(
         # Data
         HOST = '0.0.0.0',
-        PORT = 80,
+        PORT = 8080,
         REFRESHRATE = 0.001,
         TRIGGERDIR = NULL,
         
