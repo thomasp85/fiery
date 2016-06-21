@@ -245,6 +245,7 @@ Fire <- R6Class('Fire',
         handlers = NULL,
         handlerMap = list(),
         websockets = NULL,
+        server = NULL,
         client_id = NULL,
         
         
