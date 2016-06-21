@@ -330,6 +330,7 @@ Fire <- R6Class('Fire',
             response
         },
         header_logic = function(req) {
+            id <- private$client_id(req)
             private$p_trigger('header', server = self, id = id, request = req)
         },
         websocket_logic = function(ws) {
