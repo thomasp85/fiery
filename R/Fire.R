@@ -190,6 +190,21 @@ Fire <- R6Class('Fire',
             private$client_id <- converter
             
             self
+        },
+        test_request = function(request) {
+            private$request_logic(request)
+        },
+        test_header = function(request) {
+            private$header_logic(request)
+        },
+        test_message = function(request, binary, message, withClose = TRUE) {
+            id <- private$client_id(request)
+            message_fun <- private$message_logic(id, request)
+            message_fun(binary, message)
+            if (withClose) {
+                close_fun <- private$close_ws_logic(id, request)
+                close_fun()
+            }
         }
     ),
     active = list(
