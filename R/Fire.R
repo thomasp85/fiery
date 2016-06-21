@@ -386,7 +386,7 @@ Fire <- R6Class('Fire',
             if (!is.null(private$handlers[[event]])) {
                 private$handlers[[event]]$dispatch(...)
             } else {
-                NULL
+                `names<-`(list(), character())
             }
         },
         external_triggers = function() {
