@@ -151,3 +151,91 @@ test_that('lifecycle events get fired', {
     app$remove_data('events')
     expect_equal(reigniteResNoBlock, c('start', 'resume', 'end'))
 })
+
+test_that('request events fire', {
+    app <- Fire$new()
+    request <- fake_request('http://www.example.com')
+    
+    app$on('before-request', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'before'))
+        list(test = 4)
+    })
+    app$on('request', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'during'))
+        server$set_data('passed_args', list(...)$test)
+        list(status = 200)
+    })
+    app$on('after-request', function(server, response, ...) {
+        server$set_data('events', c(server$get_data('events'), 'after'))
+        server$set_data('passed_response', response)
+    })
+    response <- app$test_request(request)
+    
+    expect_equal(app$get_data('events'), c('before', 'during', 'after'))
+    expect_equal(app$get_data('passed_args'), 4)
+    expect_equal(app$get_data('passed_response'), response)
+})
+
+test_that('message events fire', {
+    app <- Fire$new()
+    request <- fake_request('http://www.example.com')
+    
+    app$on('before-message', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'before'))
+        list(test = 4, message = 'test2')
+    })
+    app$on('message', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'during'))
+        server$set_data('passed_args', list(...)[c('test', 'message')])
+    })
+    app$on('after-message', function(server, response, ...) {
+        server$set_data('events', c(server$get_data('events'), 'after'))
+    })
+    app$test_message(request, FALSE, 'test')
+    
+    expect_equal(app$get_data('events'), c('before', 'during', 'after'))
+    expect_equal(app$get_data('passed_args'), list(test = 4, message = 'test2'))
+})
+
+test_that('header event fire', {
+    app <- Fire$new()
+    request <- fake_request('http://www.example.com')
+    
+    app$on('header', function(server, ...) {
+        server$set_data('header', TRUE)
+    })
+    app$test_header(request)
+    expect_true(app$get_data('header'))
+})
+
+test_that('non-implemented methods are errors', {
+    app <- Fire$new()
+    
+    expect_error(app$async())
+    expect_error(app$time())
+    expect_error(app$delay())
+})
+
+test_that('ignite is blocked during run', {
+    app <- Fire$new()
+    
+    app$ignite(block = FALSE)
+    expect_warning(app$ignite(), 'Server is already running and cannot be started')
+    app$extinguish()
+})
+
+test_that('external triggers are fired', {
+    app <- Fire$new()
+    
+    dir <- tempdir()
+    app$triggerDir <- dir
+    
+    app$on('test', function(server, ...) {
+        server$set_data('ext_args', list(...))
+        server$extinguish()
+    })
+    saveRDS(4, file.path(dir, 'testfail.rds'))
+    saveRDS(list(test = 'test'), file.path(dir, 'test.rds'))
+    expect_warning(app$ignite(), 'External triggers must be an rds file containing a list')
+    expect_equal(list(test = 'test'), app$get_data('ext_args'))
+})
