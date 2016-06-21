@@ -171,6 +171,10 @@ Fire <- R6Class('Fire',
             assert_that(is.string(name))
             private$data[[name]]
         },
+        remove_data = function(name) {
+            assert_that(is.string(name))
+            rm(list = name, envir = private$data)
+        },
         time = function(expr, delay, loop = FALSE) {
             stop('Timed evaluation is not yet implemented')
         },
