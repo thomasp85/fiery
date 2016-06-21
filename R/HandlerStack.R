@@ -1,3 +1,6 @@
+#' @include aaa.R
+NULL
+
 #' @importFrom R6 R6Class
 #' @importFrom assertthat is.string is.count assert_that
 HandlerStack <- R6Class('HandlerStack',

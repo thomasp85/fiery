@@ -1,3 +1,6 @@
+#' @include aaa.R
+NULL
+
 #' A Class mimicking InputStream from httpuv
 #' 
 #' @importFrom R6 R6Class

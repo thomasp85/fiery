@@ -22,6 +22,7 @@ Imports:
     utils,
     stringi
 Collate:
+    'aaa.R'
     'HandlerStack.R'
     'Fire.R'
     'fake_request.R'
