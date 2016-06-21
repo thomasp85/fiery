@@ -75,6 +75,8 @@ test_that('Content gets assigned', {
     expect_null(req$rook.input$close())
     
     expect_is(req$rook.errors, 'ErrorStreamFake')
+    expect_null(req$rook.errors$cat())
+    expect_null(req$rook.errors$flush())
     
     req <- fake_request('http://www.example.com', content = 'Multiple\nlines\nof content')
     expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
@@ -87,6 +89,6 @@ test_that('Content gets assigned', {
 })
 
 test_that('ellipsis gets assigned', {
-    req <- fake_request('http://www.example.com', fiery_version = '0.1.0')
-    expect_equal(req$fiery_version, '0.1.0')
+    req <- fake_request('http://www.example.com', fiery.version = '0.1.0')
+    expect_equal(req$fiery.version, '0.1.0')
 })
