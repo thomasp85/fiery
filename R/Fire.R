@@ -322,7 +322,13 @@ Fire <- R6Class('Fire',
         },
         request_logic = function(req) {
             id <- private$client_id(req)
-            args <- unlist(private$p_trigger('before-request', server = self, id = id, request = req))
+            args <- unlist(
+                unname(
+                    private$p_trigger('before-request', server = self, id = id, 
+                                      request = req)
+                ), 
+                recursive = FALSE
+            )
             if (is.null(args)) {
                 args <- list(
                     event = 'request',
@@ -355,7 +361,14 @@ Fire <- R6Class('Fire',
         },
         message_logic = function(id, request) {
             function(binary, msg) {
-                args <- unlist(private$p_trigger('before-message', server = self, id = id, binary = binary, message = msg, request = request))
+                args <- unlist(
+                    unname(
+                        private$p_trigger('before-message', server = self, 
+                                          id = id, binary = binary, 
+                                          message = msg, request = request)
+                    ),
+                    recursive = FALSE
+                )
                 args <- modifyList(list(binary = binary, message = msg), args)
                 args <- modifyList(args, list(
                     event = 'message',
