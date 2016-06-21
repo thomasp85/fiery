@@ -412,9 +412,14 @@ Fire <- R6Class('Fire',
                 event <- sub('\\.rds$', '', basename(triggerFiles[nextFile]), ignore.case = TRUE)
                 args <- readRDS(triggerFiles[nextFile])
                 unlink(triggerFiles[nextFile])
-                args$event <- event
-                do.call(private$p_trigger, args)
-                
+                if (!is.list(args)) {
+                    warning('External triggers must be an rds file containing a list', call. = FALSE)
+                    flush.console()
+                } else {
+                    args$event <- event
+                    args$server <- self
+                    do.call(private$p_trigger, args)
+                }
                 triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
             }
         },
