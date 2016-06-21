@@ -280,7 +280,7 @@ Fire <- R6Class('Fire',
                 private$open_browser()
             }
             
-            while(TRUE) {
+            while (TRUE) {
                 private$p_trigger('cycle-start', server = self)
                 service()
                 private$external_triggers()
