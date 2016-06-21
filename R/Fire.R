@@ -157,7 +157,7 @@ Fire <- R6Class('Fire',
             if (event %in% private$privateTriggers) {
                 stop(event, ' and other protected events cannot be triggered while running', call. = FALSE)
             } else {
-                private$p_trigger(event, ...)
+                private$p_trigger(event, server = self, ...)
             }
         },
         attach = function(plugin, ...) {
