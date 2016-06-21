@@ -25,10 +25,10 @@ test_that('handlers can be added, triggered and removed', {
 test_that('protected events cannot be triggered', {
     app <- Fire$new()
     
-    protected <- c('start', 'resume', 'end', 'cycle-start', 'header', 
-                   'before-request', 'request', 'after-request', 
-                   'before-message', 'message', 'after-message',
-                   'websocket-closed')
+    protected <- c('start', 'resume', 'end', 'cycle-start', 
+                   'cycle-end', 'header', 'before-request', 'request', 
+                   'after-request', 'before-message', 'message', 
+                   'after-message', 'websocket-closed')
     
     for (i in protected) {
         expect_error(app$trigger(i))
