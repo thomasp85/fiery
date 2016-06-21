@@ -1,8 +1,103 @@
 context("Fire")
 
-## TODO: Rename context
-## TODO: Add more tests
+test_that('handlers can be added, triggered and removed', {
+    app <- Fire$new()
+    
+    triggerRes <- app$trigger('test')
+    expect_is(triggerRes, 'list')
+    expect_length(triggerRes, 0)
+    expect_named(triggerRes, character())
+    
+    id1 <- app$on('test', function(...) 10)
+    triggerRes <- app$trigger('test')
+    expect_is(triggerRes, 'list')
+    expect_length(triggerRes, 1)
+    expect_named(triggerRes, id1)
+    expect_equal(triggerRes[[1]], 10)
+    
+    app$off(id1)
+    triggerRes <- app$trigger('test')
+    expect_is(triggerRes, 'list')
+    expect_length(triggerRes, 0)
+    expect_named(triggerRes, character())
+})
 
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that('protected events cannot be triggered', {
+    app <- Fire$new()
+    
+    protected <- c('start', 'resume', 'end', 'cycle-start', 'header', 
+                   'before-request', 'request', 'after-request', 
+                   'before-message', 'message', 'after-message',
+                   'websocket-closed')
+    
+    for (i in protected) {
+        expect_error(app$trigger(i))
+    }
+})
+
+test_that('data can be set, get and removed', {
+    app <- Fire$new()
+    expect_null(app$get_data('test'))
+    testdata <- list(a = 1, b = 1:10, c = letters[6:10])
+    app$set_data('test', testdata)
+    expect_equal(app$get_data('test'), testdata)
+    expect_error(app$get_data(1))
+    expect_error(app$get_data(c('test', 'test2')))
+    app$remove_data('test')
+    expect_null(app$get_data('test'))
+})
+
+test_that('plugins are being attached', {
+    app <- Fire$new()
+    app$set_data('test', 10)
+    plugin <- list(
+        onAttach = function(server, extraPar) {
+            server$get_data('test') + extraPar
+        }
+    )
+    attachResult <- app$attach(plugin, 15)
+    expect_equal(attachResult, 25)
+})
+
+test_that('id converter can be set and gets called', {
+    app <- Fire$new()
+    app$on('request', function(server, id, ...) {
+        server$set_data('id', id)
+    })
+    request <- fake_request('http://www.example.com', REMOTE_ADDR = '127.0.0.1')
+    app$test_request(request)
+    expect_equal(app$get_data('id'), client_to_id(request))
+    
+    app$set_client_id_converter(function(request) {
+        10
+    })
+    app$test_request(request)
+    expect_equal(app$get_data('id'), 10)
+    
+    expect_error(app$set_client_id_converter('test'))
+    expect_error(app$set_client_id_converter(function(test) {10}))
+})
+
+test_that('active bindings work', {
+    app <- Fire$new()
+    expect_error(app$host <- 10)
+    expect_error(app$host <- letters[1:3])
+    app$host <- 'test'
+    expect_equal(app$host, 'test')
+    
+    expect_error(app$port <- 'test')
+    expect_error(app$port <- 1.5)
+    app$port <- 10
+    expect_equal(app$port, 10)
+    
+    expect_error(app$refreshRate <- 'test')
+    expect_error(app$refreshRate <- 1:5)
+    app$refreshRate <- 10.5
+    expect_equal(app$refreshRate, 10.5)
+    
+    expect_error(app$triggerDir <- 'test')
+    expect_error(app$triggerDir <- 1:5)
+    dir <- tempdir()
+    app$triggerDir <- dir
+    expect_equal(app$triggerDir, dir)
 })
