@@ -337,22 +337,28 @@ Fire <- R6Class('Fire',
             id <- private$client_id(ws$request)
             assign(id, ws, envir = private$websockets)
             
-            ws$onMessage(function(binary, msg) {
-                args <- unlist(private$p_trigger('before-message', server = self, id = id, binary = binary, message = msg, request = ws$request))
+            ws$onMessage(private$message_logic(id, ws$request))
+            ws$onClose(private$close_ws_logic(id, ws$request))
+        },
+        message_logic = function(id, request) {
+            function(binary, msg) {
+                args <- unlist(private$p_trigger('before-message', server = self, id = id, binary = binary, message = msg, request = request))
                 args <- modifyList(list(binary = binary, message = msg), args)
                 args <- modifyList(args, list(
                     event = 'message',
                     server = self,
                     id = id,
-                    request = ws$request
+                    request = request
                 ))
                 do.call(private$p_trigger, args)
                 
-                private$p_trigger('after-message', server = self, id = id, binary = args$binary, message = args$message, request = ws$request)
-            })
-            ws$onClose(function() {
-                private$p_trigger('websocket-closed', server = self, id = id, request = ws$request)
-            })
+                private$p_trigger('after-message', server = self, id = id, binary = args$binary, message = args$message, request = request)
+            }
+        },
+        close_ws_logic = function(id, request) {
+            function() {
+                private$p_trigger('websocket-closed', server = self, id = id, request = request)
+            }
         },
         add_handler = function(event, handler, pos, id) {
             if (is.null(private$handlers[[event]])) {
