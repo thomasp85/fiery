@@ -151,7 +151,6 @@ Fire <- R6Class('Fire',
             assert_that(is.string(handlerId))
             private$remove_handler(handlerId)
             private$handlerMap[[handlerId]] <- NULL
-            self
         },
         trigger = function(event, ...) {
             assert_that(is.string(event))
@@ -160,16 +159,13 @@ Fire <- R6Class('Fire',
             } else {
                 private$p_trigger(event, ...)
             }
-            self
         },
         attach = function(plugin, ...) {
             plugin$onAttach(self, ...)
-            self
         },
         set_data = function(name, value) {
             assert_that(is.string(name))
             assign(name, value, envir = private$data)
-            self
         },
         get_data = function(name) {
             assert_that(is.string(name))
@@ -187,8 +183,6 @@ Fire <- R6Class('Fire',
         set_client_id_converter = function(converter) {
             assert_that(has_args(converter, 'request'))
             private$client_id <- converter
-            
-            self
         },
         test_request = function(request) {
             private$request_logic(request)
