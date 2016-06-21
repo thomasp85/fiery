@@ -130,7 +130,7 @@ app$on('after-request', function(server, ...) {
     flush.console()
 })
 
-# Terminate the server after 100 cycles
+# Terminate the server after 50 cycles
 app$on('cycle-end', function(server, ...) {
     if (server$get_data('cycles') > 50) {
         message('Ending...')
