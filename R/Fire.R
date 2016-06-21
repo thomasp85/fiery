@@ -107,9 +107,7 @@ Fire <- R6Class('Fire',
             private$data <- new.env(parent = emptyenv())
             private$handlers <- new.env(parent = emptyenv())
             private$websockets <- new.env(parent = emptyenv())
-            private$client_id <- function(request) {
-                paste0('ID_', request$REMOTE_ADDR, '_', request$REMOTE_PORT)
-            }
+            private$client_id <- client_to_id
         },
         ignite = function(block = TRUE, showcase = FALSE, ...) {
             private$run(block = block, showcase = showcase, ...)
