@@ -101,3 +101,51 @@ test_that('active bindings work', {
     app$triggerDir <- dir
     expect_equal(app$triggerDir, dir)
 })
+
+test_that('lifecycle events get fired', {
+    app <- Fire$new()
+    app$on('start', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'start'))
+    })
+    app$on('resume', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'resume'))
+    })
+    app$on('cycle-start', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'cycle-start'))
+    })
+    app$on('cycle-end', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'cycle-end'))
+        server$extinguish()
+    })
+    app$on('end', function(server, ...) {
+        server$set_data('events', c(server$get_data('events'), 'end'))
+    })
+    app$ignite()
+    igniteRes <- app$get_data('events')
+    app$remove_data('events')
+    app$start()
+    startRes <- app$get_data('events')
+    app$remove_data('events')
+    app$reignite()
+    reigniteRes <- app$get_data('events')
+    app$remove_data('events')
+    app$resume()
+    resumeRes <- app$get_data('events')
+    app$remove_data('events')
+    
+    expect_equal(igniteRes, startRes)
+    expect_equal(igniteRes, c('start', 'cycle-start', 'cycle-end', 'end'))
+    expect_equal(reigniteRes, resumeRes)
+    expect_equal(reigniteRes, c('start', 'resume', 'cycle-start', 'cycle-end', 'end'))
+    
+    app$ignite(block = FALSE)
+    app$stop()
+    igniteResNoBlock <- app$get_data('events')
+    app$remove_data('events')
+    expect_equal(igniteResNoBlock, c('start', 'end'))
+    app$reignite(block = FALSE)
+    app$extinguish()
+    reigniteResNoBlock <- app$get_data('events')
+    app$remove_data('events')
+    expect_equal(reigniteResNoBlock, c('start', 'resume', 'end'))
+})
