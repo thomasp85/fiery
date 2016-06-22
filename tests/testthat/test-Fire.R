@@ -248,3 +248,15 @@ test_that('websockets are attached, and removed', {
     expect_message(app$test_websocket(fake_request('http://www.example.com'), 'test'), 'test')
     expect_true(app$get_data('send'))
 })
+
+test_that('showcase opens a browser', {
+    oldopt <- options(browser = function(url) message('Open browser'))
+    
+    app <- Fire$new()
+    app$on('cycle-end', function(server, ...) server$extinguish())
+    
+    expect_message(app$ignite(showcase = TRUE), 'Open browser')
+    expect_message(app$ignite(showcase = TRUE, block = FALSE), 'Open browser')
+    app$extinguish()
+    options(oldopt)
+})
