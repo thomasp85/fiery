@@ -239,3 +239,12 @@ test_that('external triggers are fired', {
     expect_warning(app$ignite(), 'External triggers must be an rds file containing a list')
     expect_equal(list(test = 'test'), app$get_data('ext_args'))
 })
+
+test_that('websockets are attached, and removed', {
+    app <- Fire$new()
+    
+    app$on('send', function(server, ...) {server$set_data('send', TRUE)})
+    expect_null(app$get_data('send'))
+    expect_message(app$test_websocket(fake_request('http://www.example.com'), 'test'), 'test')
+    expect_true(app$get_data('send'))
+})
