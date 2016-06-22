@@ -446,7 +446,12 @@ Fire <- R6Class('Fire',
                     is.scalar(message)
                 )
             }
-            private$websockets[[id]]$send(message)
+            if (missing(id) || is.null(id)) {
+                id <- ls(envir = private$websockets)
+            }
+            for (i in id) {
+                private$websockets[[i]]$send(message)
+            }
         },
         close_ws = function(id) {
             private$websockets[[id]]$close()
