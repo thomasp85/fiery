@@ -28,7 +28,7 @@ test_that('protected events cannot be triggered', {
     protected <- c('start', 'resume', 'end', 'cycle-start', 
                    'cycle-end', 'header', 'before-request', 'request', 
                    'after-request', 'before-message', 'message', 
-                   'after-message', 'websocket-closed')
+                   'after-message', 'websocket-closed', 'send')
     
     for (i in protected) {
         expect_error(app$trigger(i))

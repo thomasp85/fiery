@@ -160,6 +160,10 @@ Fire <- R6Class('Fire',
                 private$p_trigger(event, server = self, ...)
             }
         },
+        send = function(message, id) {
+            private$send_ws(message, id)
+            private$p_trigger('send', server = self, message = message, id = id)
+        },
         attach = function(plugin, ...) {
             plugin$onAttach(self, ...)
         },
@@ -252,7 +256,7 @@ Fire <- R6Class('Fire',
         privateTriggers = c('start', 'resume', 'end', 'cycle-start', 
                             'cycle-end', 'header', 'before-request', 'request', 
                             'after-request', 'before-message', 'message', 
-                            'after-message', 'websocket-closed'),
+                            'after-message', 'websocket-closed', 'send'),
         data = NULL,
         handlers = NULL,
         handlerMap = list(),
