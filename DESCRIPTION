@@ -20,11 +20,13 @@ Imports:
     httpuv,
     uuid,
     utils,
-    stringi
+    stringi,
+    future
 Collate:
     'aaa.R'
     'HandlerStack.R'
     'Fire.R'
+    'FutureStack.R'
     'fake_request.R'
     'fiery-package.R'
 RoxygenNote: 5.0.1
