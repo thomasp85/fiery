@@ -97,7 +97,6 @@ library(fiery)
 
 # Create a New App
 app <- Fire$new()
-app$port <- 4689
 
 # Setup the data everytime it starts
 app$on('start', function(server, ...) {
@@ -159,6 +158,6 @@ you want to influence the overall design, this is the moment to shout out.
 ## Roadmap
 Fiery is intended to be minimal and lightweight so many features will be 
 delegated to plugins. On top of my list for fiery features are infrastructure 
-that allows for delayed, timed and asynchronous code execution, as well as
-getting 100% code coverage...
+that allows for delayed, timed and asynchronous code execution, as well as 
+including some small plugins for standard functionality
 

@@ -59,7 +59,6 @@ library(fiery)
 
 # Create a New App
 app <- Fire$new()
-app$port <- 4689
 
 # Setup the data everytime it starts
 app$on('start', function(server, ...) {
@@ -92,7 +91,7 @@ app$on('after-request', function(server, ...) {
     flush.console()
 })
 
-# Terminate the server after 100 cycles
+# Terminate the server after 50 cycles
 app$on('cycle-end', function(server, ...) {
     if (server$get_data('cycles') > 50) {
         message('Ending...')
@@ -109,6 +108,7 @@ app$on('end', function(server) {
 
 app$ignite(showcase = TRUE)
 #> 1
+#> 2
 #> Ending...
 #> Goodbye
 ```
@@ -123,4 +123,4 @@ I would love some feedback on this - open an issue or reach out to me on [twitte
 Roadmap
 -------
 
-Fiery is intended to be minimal and lightweight so many features will be delegated to plugins. On top of my list for fiery features are infrastructure that allows for delayed, timed and asynchronous code execution, as well as getting 100% code coverage...
+Fiery is intended to be minimal and lightweight so many features will be delegated to plugins. On top of my list for fiery features are infrastructure that allows for delayed, timed and asynchronous code execution, as well as including some small plugins for standard functionality
