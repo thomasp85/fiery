@@ -37,7 +37,7 @@ NULL
 #' }
 #' 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag
+#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag has_name
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
@@ -176,6 +176,13 @@ Fire <- R6Class('Fire',
             plugin$onAttach(self, ...)
             invisible(NULL)
         },
+        header = function(name, value) {
+            assert_that(is.string(name))
+            if (missing(value)) return(private$headers[[name]])
+            if (!is.null(value)) assert_that(is.string(value))
+            private$headers[[name]] <- value
+            invisible(NULL)
+        },
         set_data = function(name, value) {
             assert_that(is.string(name))
             assign(name, value, envir = private$data)
@@ -279,6 +286,7 @@ Fire <- R6Class('Fire',
                             'after-request', 'before-message', 'message', 
                             'after-message', 'websocket-closed', 'send'),
         data = NULL,
+        headers = list(),
         handlers = NULL,
         handlerMap = list(),
         websockets = NULL,
@@ -386,6 +394,11 @@ Fire <- R6Class('Fire',
                 ))
             }
             response <- tail(do.call(private$p_trigger, args), 1)[[1]]
+            if (is.null(response)) response <- notFound
+            if (!(is.list(response) && all(has_name(response, c('status', 'headers', 'body'))))) {
+                response <- serverError
+            }
+            response$headers <- modifyList(private$headers, response$headers)
             private$p_trigger('after-request', server = self, id = id, request = req, response = response)
             response
         },
