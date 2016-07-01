@@ -260,3 +260,22 @@ test_that('showcase opens a browser', {
     app$extinguish()
     options(oldopt)
 })
+
+test_that('global headers are assigned and used', {
+    app <- Fire$new()
+    app$header('X-Powered-By', 'fiery')
+    app$header('X-XSS-Protection', '1; mode=block')
+    app$on('request', function(...) {
+        list(
+            status = 200L,
+            headers = list(),
+            body = 'test'
+        )
+    })
+    response <- app$test_request(fake_request('www.example.com'))
+    expect_equal(response$headers, list('X-Powered-By' = 'fiery', 'X-XSS-Protection' = '1; mode=block'))
+    app$header('X-XSS-Protection', NULL)
+    response <- app$test_request(fake_request('www.example.com'))
+    expect_equal(response$headers, list('X-Powered-By' = 'fiery'))
+    expect_equal(app$header('X-Powered-By'), 'fiery')
+})
