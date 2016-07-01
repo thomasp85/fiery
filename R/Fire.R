@@ -111,12 +111,14 @@ Fire <- R6Class('Fire',
         },
         ignite = function(block = TRUE, showcase = FALSE, ...) {
             private$run(block = block, showcase = showcase, ...)
+            invisible(NULL)
         },
         start = function(block = TRUE, showcase = FALSE, ...) {
             self$ignite(block = block, showcase = showcase, ...)
         },
         reignite = function(block = TRUE, showcase = FALSE, ...) {
             private$run(block = block, resume = TRUE, showcase = showcase, ...)
+            invisible(NULL)
         },
         resume = function(block = TRUE, showcase = FALSE, ...) {
             self$reignite(block = block, showcase = showcase, ...)
@@ -132,6 +134,7 @@ Fire <- R6Class('Fire',
                     private$quitting <- TRUE
                 }
             }
+            invisible(NULL)
         },
         stop = function() {
             self$extinguish()
@@ -151,6 +154,7 @@ Fire <- R6Class('Fire',
             assert_that(is.string(handlerId))
             private$remove_handler(handlerId)
             private$handlerMap[[handlerId]] <- NULL
+            invisible(NULL)
         },
         trigger = function(event, ...) {
             assert_that(is.string(event))
@@ -163,13 +167,16 @@ Fire <- R6Class('Fire',
         send = function(message, id) {
             private$send_ws(message, id)
             private$p_trigger('send', server = self, message = message, id = id)
+            invisible(NULL)
         },
         attach = function(plugin, ...) {
             plugin$onAttach(self, ...)
+            invisible(NULL)
         },
         set_data = function(name, value) {
             assert_that(is.string(name))
             assign(name, value, envir = private$data)
+            invisible(NULL)
         },
         get_data = function(name) {
             assert_that(is.string(name))
@@ -178,6 +185,7 @@ Fire <- R6Class('Fire',
         remove_data = function(name) {
             assert_that(is.string(name))
             rm(list = name, envir = private$data)
+            invisible(NULL)
         },
         time = function(expr, delay, loop = FALSE) {
             stop('Timed evaluation is not yet implemented')
@@ -191,6 +199,7 @@ Fire <- R6Class('Fire',
         set_client_id_converter = function(converter) {
             assert_that(has_args(converter, 'request'))
             private$client_id <- converter
+            invisible(NULL)
         },
         test_request = function(request) {
             private$request_logic(request)
