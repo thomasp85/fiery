@@ -98,7 +98,7 @@ TimeStack <- R6Class('TimeStack',
             private$clear(id, force = TRUE)
         },
         reset = function() {
-            for(id in private$ids) {
+            for (id in private$ids) {
                 private$futures[[id]]$at <- Sys.time() + private$futures[[id]]$after
             }
         }
