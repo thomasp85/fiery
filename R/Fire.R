@@ -108,6 +108,9 @@ Fire <- R6Class('Fire',
             private$handlers <- new.env(parent = emptyenv())
             private$websockets <- new.env(parent = emptyenv())
             private$client_id <- client_to_id
+            private$DELAY <- DelayStack$new()
+            private$TIME <- TimeStack$new()
+            private$ASYNC <- AsyncStack$new()
         },
         ignite = function(block = TRUE, showcase = FALSE, ...) {
             private$run(block = block, showcase = showcase, ...)
@@ -187,14 +190,23 @@ Fire <- R6Class('Fire',
             rm(list = name, envir = private$data)
             invisible(NULL)
         },
-        time = function(expr, delay, loop = FALSE) {
-            stop('Timed evaluation is not yet implemented')
+        time = function(expr, then, after, loop = FALSE) {
+            private$TIME$add(expr, then, after, loop)
+        },
+        remove_time = function(id) {
+            private$TIME$add(id)
         },
         delay = function(expr, then) {
-            stop('Delayed evaluation is not yet implemented')
+            private$DELAY$add(expr, then)
+        },
+        remove_delay = function(id) {
+            private$DELAY$add(id)
         },
         async = function(expr, then) {
-            stop('Asynchronous evaluation is not yet implemented')
+            private$ASYNC$add(expr, then)
+        },
+        remove_async = function(id) {
+            private$ASYNC$add(id)
         },
         set_client_id_converter = function(converter) {
             assert_that(has_args(converter, 'request'))
@@ -273,6 +285,9 @@ Fire <- R6Class('Fire',
         server = NULL,
         client_id = NULL,
         
+        DELAY = NULL,
+        TIME = NULL,
+        ASYNC = NULL,
         
         # Methods
         run = function(block = TRUE, resume = FALSE, showcase = FALSE, ...) {
@@ -283,6 +298,7 @@ Fire <- R6Class('Fire',
             )
             if (!private$running) {
                 private$running <- TRUE
+                private$TIME$reset()
                 private$p_trigger('start', server = self, ...)
                 if (resume) {
                     private$p_trigger('resume', server = self, ...)
