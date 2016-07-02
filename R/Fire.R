@@ -346,6 +346,9 @@ Fire <- R6Class('Fire',
                 private$p_trigger('cycle-start', server = self)
                 service()
                 private$external_triggers()
+                private$DELAY$eval(server = self)
+                private$TIME$eval(server = self)
+                private$ASYNC$eval(server = self)
                 private$p_trigger('cycle-end', server = self)
                 if (private$quitting) {
                     private$quitting <- FALSE
