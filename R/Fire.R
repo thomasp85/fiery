@@ -30,10 +30,23 @@ NULL
 #'  \item{\code{on(event, handler, pos = NULL)}}{Add a handler function to to an event at the given position in the handler stack. Returns a string uniquely identifying the handler}
 #'  \item{\code{off(handlerId)}}{Remove the handler tied to the given id}
 #'  \item{\code{trigger(event, ...)}}{Triggers an event passing the additional arguments to the potential handlers}
+#'  \item{\code{send(message, id)}}{Sends a websocket message to the client with the given id, or to all connected clients if id is missing}
 #'  \item{\code{attach(plugin, ...)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{onAttach} method}
+#'  \item{\code{header(name, value)}}{Add a global header to the server that will be set on all responses}
 #'  \item{\code{set_data(name, value)}}{Adds data to the servers internal data store}
 #'  \item{\code{get_data(name)}}{Extracts data from the internal data store}
+#'  \item{\code{remove_data(name)}}{Removes the data with the given name from the internal data store}
+#'  \item{\code{time(expr, then, after, loop = FALSE)}}{Add a timed evaluation that will be evaluated after the given number of seconds, potentially repeating if loop=TRUE. After the expression has evaluated the 'then' function will get called with the result of the expression and the server object as arguments.}
+#'  \item{\code{remove_time(id)}}{Removes the timed evaluation identified by the id (returned when adding the evaulation)}
+#'  \item{\code{delay(expr, then)}}{As time except the expr is evaluated immediately at the end of the loop cycle}
+#'  \item{\code{remove_delay(id)}}{Removes the delayed evaluation identified by the id}
+#'  \item{\code{async(expr, then)}}{As delay and time except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
+#'  \item{\code{remove_async(id)}}{Removes the async evaluation identified by the id. The evaluation is not necessarily stopped but the then function will not get called.}
 #'  \item{\code{set_client_id_converter(converter)}}{Sets the function that converts an HTTP request into a specific client id}
+#'  \item{\code{test_request(request)}}{Test the result of recieving a specific HTTP request}
+#'  \item{\code{test_header(request)}}{Test the result of recieving a specific HTTP header}
+#'  \item{\code{test_message(request, binary, message, withClose = TRUE)}}{Test the result of recieving a message over websocket and potentially closing the connection afterwards}
+#'  \item{\code{test_websocket(request, message)}}{Test the result of sending a message over websocket}
 #' }
 #' 
 #' @importFrom R6 R6Class
