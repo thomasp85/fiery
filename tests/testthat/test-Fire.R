@@ -52,11 +52,11 @@ test_that('plugins are being attached', {
     app$set_data('test', 10)
     plugin <- list(
         onAttach = function(server, extraPar) {
-            server$get_data('test') + extraPar
+            server$on('test', function(...){10 + extraPar})
         }
     )
-    attachResult <- app$attach(plugin, 15)
-    expect_equal(attachResult, 25)
+    app$attach(plugin, 15)
+    expect_equal(app$trigger('test')[[1]], 25)
 })
 
 test_that('id converter can be set and gets called', {
@@ -208,13 +208,13 @@ test_that('header event fire', {
     expect_true(app$get_data('header'))
 })
 
-test_that('non-implemented methods are errors', {
-    app <- Fire$new()
-    
-    expect_error(app$async())
-    expect_error(app$time())
-    expect_error(app$delay())
-})
+# test_that('non-implemented methods are errors', {
+#     app <- Fire$new()
+#     
+#     expect_error(app$async())
+#     expect_error(app$time())
+#     expect_error(app$delay())
+# })
 
 test_that('ignite is blocked during run', {
     app <- Fire$new()
