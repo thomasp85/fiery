@@ -208,13 +208,106 @@ test_that('header event fire', {
     expect_true(app$get_data('header'))
 })
 
-# test_that('non-implemented methods are errors', {
-#     app <- Fire$new()
-#     
-#     expect_error(app$async())
-#     expect_error(app$time())
-#     expect_error(app$delay())
-# })
+test_that('futures can be added and called', {
+    app <- Fire$new()
+
+    app$delay({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    })
+    app$on('cycle-end', function(server, ...) {
+        server$extinguish()
+    })
+    expect_message(app$ignite(), '10')
+    
+    id <- app$delay({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    })
+    app$on('cycle-end', function(server, ...) {
+        server$extinguish()
+    })
+    app$remove_delay(id)
+    expect_silent(app$ignite())
+    
+    app <- Fire$new()
+    app$time({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    }, 1)
+    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('cycle-end', function(server, ...) {
+        cycle <- server$get_data('count')
+        if (cycle > 100) {
+            server$extinguish()
+        } else {
+            server$set_data('count', cycle + 1)
+        }
+    })
+    expect_message(app$ignite(), '10')
+    
+    app <- Fire$new()
+    id <- app$time({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    }, 1)
+    app$remove_time(id)
+    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('cycle-end', function(server, ...) {
+        cycle <- server$get_data('count')
+        if (cycle > 100) {
+            server$extinguish()
+        } else {
+            server$set_data('count', cycle + 1)
+        }
+    })
+    expect_silent(app$ignite())
+    
+    app <- Fire$new()
+    app$async({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    })
+    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('cycle-end', function(server, ...) {
+        cycle <- server$get_data('count')
+        if (cycle > 100) {
+            server$extinguish()
+        } else {
+            server$set_data('count', cycle + 1)
+        }
+    })
+    expect_message(app$ignite(), '10')
+    
+    app <- Fire$new()
+    id <- app$async({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    })
+    app$remove_async(id)
+    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('cycle-end', function(server, ...) {
+        cycle <- server$get_data('count')
+        if (cycle > 100) {
+            server$extinguish()
+        } else {
+            server$set_data('count', cycle + 1)
+        }
+    })
+    expect_silent(app$ignite())
+})
 
 test_that('ignite is blocked during run', {
     app <- Fire$new()
