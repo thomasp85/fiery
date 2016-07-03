@@ -7,9 +7,9 @@ Authors@R: c(
     person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
     )
 Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
-Description: fiery is a very flexible framework for building the server side
-    logic in R. It is unoppinionated when it comes to how HTTP and WebSocket
-    requests are handled and supports all levels of app complexity; from serving
+Description: A very flexible framework for building server side logic in R. The 
+    framework is unoppinionated when it comes to how HTTP requests and WebSocket
+    messages are handled and supports all levels of app complexity; from serving
     static content to full-blown dynamic web-apps. Fiery does not hold your hand
     as much as e.g. the shiny package does, but instead sets you free to create
     your web app the way you want.
