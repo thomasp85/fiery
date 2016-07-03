@@ -12,8 +12,10 @@ FutureStack <- R6Class('FutureStack',
         initialize = function() {
             private$futures <- new.env(parent = emptyenv())
         },
-        add = function(expr, then, ...) {
-            expr <- substitute(expr)
+        add = function(expr, then, ..., substituted = FALSE) {
+            if (!substituted) {
+                expr <- substitute(expr)
+            }
             id <- UUIDgenerate()
             private$futures[[id]] <- private$make_future(expr, then, ...)
             private$ids <- append(private$ids, id)

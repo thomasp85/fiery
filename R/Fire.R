@@ -211,22 +211,22 @@ Fire <- R6Class('Fire',
             invisible(NULL)
         },
         time = function(expr, then, after, loop = FALSE) {
-            private$TIME$add(expr, then, after, loop)
+            private$TIME$add(substitute(expr), then, after, loop, substituted = TRUE)
         },
         remove_time = function(id) {
-            private$TIME$add(id)
+            private$TIME$remove(id)
         },
         delay = function(expr, then) {
-            private$DELAY$add(expr, then)
+            private$DELAY$add(substitute(expr), then, substituted = TRUE)
         },
         remove_delay = function(id) {
-            private$DELAY$add(id)
+            private$DELAY$remove(id)
         },
         async = function(expr, then) {
-            private$ASYNC$add(expr, then)
+            private$ASYNC$add(substitute(expr), then, substituted = TRUE)
         },
         remove_async = function(id) {
-            private$ASYNC$add(id)
+            private$ASYNC$remove(id)
         },
         set_client_id_converter = function(converter) {
             assert_that(has_args(converter, 'request'))
