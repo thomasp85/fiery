@@ -86,6 +86,7 @@ test_that('Content gets assigned', {
     
     req <- fake_request('http://www.example.com', content = c('Multiple', 'lines', 'of content'))
     expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
+    req$rook.input$close()
 })
 
 test_that('ellipsis gets assigned', {
