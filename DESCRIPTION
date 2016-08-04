@@ -1,14 +1,14 @@
 Package: fiery
 Type: Package
 Title: A Lightweight and Flexible Web Framework
-Version: 0.2.0
-Date: 2016-07-02
+Version: 0.2.2
+Date: 2016-08-04
 Authors@R: c(
     person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
     )
 Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
 Description: A very flexible framework for building server side logic in R. The 
-    framework is unoppinionated when it comes to how HTTP requests and WebSocket
+    framework is unopinionated when it comes to how HTTP requests and WebSocket
     messages are handled and supports all levels of app complexity; from serving
     static content to full-blown dynamic web-apps. Fiery does not hold your hand
     as much as e.g. the shiny package does, but instead sets you free to create
