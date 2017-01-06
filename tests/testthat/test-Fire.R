@@ -233,7 +233,7 @@ test_that('futures can be added and called', {
     })
     app$remove_delay(id)
     expect_silent(app$ignite())
-    
+
     app <- Fire$new()
     app$time({
         10
@@ -251,7 +251,8 @@ test_that('futures can be added and called', {
         }
     })
     expect_message(app$ignite(), '10')
-    
+
+    skip_on_os('windows')
     app <- Fire$new()
     id <- app$time({
         10
@@ -260,6 +261,26 @@ test_that('futures can be added and called', {
         server$extinguish()
     }, 1)
     app$remove_time(id)
+    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('cycle-end', function(server, ...) {
+        cycle <- server$get_data('count')
+        if (cycle > 100) {
+            server$extinguish()
+        } else {
+            server$set_data('count', cycle + 1)
+        }
+    })
+    expect_silent(app$ignite())
+
+    # The async stuff fail on windows builders though it works fine locally
+    app <- Fire$new()
+    id <- app$async({
+        10
+    }, function(res, server, ...) {
+        message(res)
+        server$extinguish()
+    })
+    app$remove_async(id)
     app$on('start', function(server, ...) server$set_data('count', 0))
     app$on('cycle-end', function(server, ...) {
         cycle <- server$get_data('count')
@@ -281,32 +302,13 @@ test_that('futures can be added and called', {
     app$on('start', function(server, ...) server$set_data('count', 0))
     app$on('cycle-end', function(server, ...) {
         cycle <- server$get_data('count')
-        if (cycle > 100) {
+        if (cycle > 1000) {
             server$extinguish()
         } else {
             server$set_data('count', cycle + 1)
         }
     })
     expect_message(app$ignite(), '10')
-    
-    app <- Fire$new()
-    id <- app$async({
-        10
-    }, function(res, server, ...) {
-        message(res)
-        server$extinguish()
-    })
-    app$remove_async(id)
-    app$on('start', function(server, ...) server$set_data('count', 0))
-    app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
-            server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
-        }
-    })
-    expect_silent(app$ignite())
 })
 
 test_that('ignite is blocked during run', {

@@ -1,3 +1,8 @@
+# fiery 0.2.2
+
+* Changed default host to 127.0.0.1
+* Fixed test errors on windows builders
+
 # fiery 0.2.0
 
 * Added `fake_request` to generate fake, rook-compliant, request objects. Useful
