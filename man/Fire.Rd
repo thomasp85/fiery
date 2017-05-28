@@ -52,6 +52,7 @@ the more well known S3 and S4 systems.
  \item{\code{test_websocket(request, message)}}{Test the result of sending a message over websocket}
 }
 }
+
 \examples{
 # Create a New App
 app <- Fire$new()
@@ -109,4 +110,3 @@ app$ignite(showcase = TRUE)
 
 }
 \keyword{datasets}
-
