@@ -1,7 +1,11 @@
+# fiery 0.2.2-9000
+
+* DelayStack uses `sequential` futures with `lazy = TRUE` because previously used `lazy` futures are deprecated
+
 # fiery 0.2.2
 
 * Changed default host to 127.0.0.1
-* Fixed test errors on windows builders
+* Fixed test errors on Windows builders
 
 # fiery 0.2.0
 

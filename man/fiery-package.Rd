@@ -17,4 +17,7 @@ greater effect.
 \seealso{
 \code{\link{Fire}} for the main approach to build your server logic
 }
+\author{
+\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com}
 
+}

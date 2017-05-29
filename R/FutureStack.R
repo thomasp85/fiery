@@ -43,6 +43,7 @@ FutureStack <- R6Class('FutureStack',
         ids = character(),
         futures = NULL,
         catcher = 'future',
+        lazy = FALSE,
         
         # Methods
         make_future = function(expr, then, ...) {
@@ -52,7 +53,8 @@ FutureStack <- R6Class('FutureStack',
                 assert_that(is.function(then))
             }
             list(
-                expr = do.call(private$catcher, list(expr = expr)),
+                expr = do.call(private$catcher,
+                               list(expr = expr, lazy = private$lazy)),
                 then = then,
                 ...
             )
@@ -73,12 +75,13 @@ FutureStack <- R6Class('FutureStack',
 )
 
 #' @importFrom R6 R6Class
-#' @importFrom future lazy
+#' @importFrom future sequential
 #' 
 DelayStack <- R6Class('DelayStack',
     inherit = FutureStack,
     private = list(
-        catcher = 'lazy'
+        catcher = 'sequential',
+        lazy = TRUE
     )
 )
 
