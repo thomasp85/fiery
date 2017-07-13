@@ -50,7 +50,7 @@ NULL
 #' }
 #' 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag has_name
+#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag has_name is.error
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
@@ -185,9 +185,30 @@ Fire <- R6Class('Fire',
             private$p_trigger('send', server = self, message = message, id = id)
             invisible(NULL)
         },
-        attach = function(plugin, ...) {
-            plugin$onAttach(self, ...)
+        attach = function(plugin, ..., force = FALSE) {
+            name <- plugin$name
+            assert_that(is.string(name))
+            
+            if (!force && self$has_plugin(name)) {
+                stop('The ', name, ' plugin is already loaded. Use `force = TRUE` to reapply it.', call. = FALSE)
+            }
+            requires <- plugin$require
+            if (!is.null(requires)) {
+                assert_that(is.character(requires))
+                exists <- vapply(requires, self$has_plugin, logical(1))
+                if (!all(exists)) {
+                    stop('The ', name, ' plugin requires the following plugins: ', paste(requires[!exists], collapse = ', '), '.', call. = FALSE)
+                }
+            }
+            has_error <- try(plugin$onAttach(self, ...), silent = TRUE)
+            if (is.error(has_error)) {
+                stop('The ', name, 'plugin failed to attach with the following error: ', has_error, call. = FALSE)
+            }
+            private$add_plugin(plugin, name)
             invisible(NULL)
+        },
+        has_plugin = function(name) {
+            name %in% names(private$pluginList)
         },
         header = function(name, value) {
             assert_that(is.string(name))
@@ -283,6 +304,12 @@ Fire <- R6Class('Fire',
                 assert_that(is.dir(dir))
             }
             private$TRIGGERDIR <- dir
+        },
+        plugins = function(plugin) {
+            if (!missing(plugin)) {
+                stop('Use the `attach` method to add plugins', call. = FALSE)
+            }
+            private$pluginList
         }
     ),
     private = list(
@@ -302,6 +329,7 @@ Fire <- R6Class('Fire',
         headers = list(),
         handlers = NULL,
         handlerMap = list(),
+        pluginList = list(),
         websockets = NULL,
         server = NULL,
         client_id = NULL,
@@ -465,6 +493,9 @@ Fire <- R6Class('Fire',
         remove_handler = function(id) {
             event <- private$handlerMap[[id]]
             private$handlers[[event]]$remove(id)
+        },
+        add_plugin = function(plugin, name) {
+            private$pluginList$name <- plugin
         },
         p_trigger = function(event, ...) {
             if (!is.null(private$handlers[[event]])) {
