@@ -520,10 +520,11 @@ Fire <- R6Class('Fire',
                 recursive = FALSE
             )
             response <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
-            if (is.null(response) || length(response) == 0) {
-                response <- notFound
-            } else {
+            if (length(response) != 0) {
                 response <- tail(response, 1)[[1]]
+            }
+            if (is.null(response)) {
+                response <- notFound
             }
             if (!(is.list(response) && all(has_name(response, c('status', 'headers', 'body'))))) {
                 response <- serverError

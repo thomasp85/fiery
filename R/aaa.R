@@ -28,11 +28,11 @@ client_to_id <- function(request) {
 #' 
 notFound <- list(
     status = 404L,
-    headers = list(),
+    headers = list('Content-Type' = 'text/plain'),
     body = ''
 )
 serverError <- list(
     status = 500L,
-    headers = list(),
+    headers = list('Content-Type' = 'text/plain'),
     body = ''
 )
