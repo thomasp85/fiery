@@ -160,9 +160,9 @@ test_that('request events fire', {
         server$set_data('events', c(server$get_data('events'), 'before'))
         list(test = 4)
     })
-    app$on('request', function(server, ...) {
+    app$on('request', function(server, arg_list, ...) {
         server$set_data('events', c(server$get_data('events'), 'during'))
-        server$set_data('passed_args', list(...)$test)
+        server$set_data('passed_args', arg_list$test)
         list(status = 200)
     })
     app$on('after-request', function(server, response, ...) {
@@ -184,9 +184,9 @@ test_that('message events fire', {
         server$set_data('events', c(server$get_data('events'), 'before'))
         list(test = 4, message = 'test2')
     })
-    app$on('message', function(server, ...) {
+    app$on('message', function(server, message, arg_list, ...) {
         server$set_data('events', c(server$get_data('events'), 'during'))
-        server$set_data('passed_args', list(...)[c('test', 'message')])
+        server$set_data('passed_args', list(test = arg_list$test, message = message))
     })
     app$on('after-message', function(server, response, ...) {
         server$set_data('events', c(server$get_data('events'), 'after'))

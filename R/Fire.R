@@ -396,23 +396,12 @@ Fire <- R6Class('Fire',
                 ), 
                 recursive = FALSE
             )
-            if (is.null(args)) {
-                args <- list(
-                    event = 'request',
-                    server = self,
-                    id = id,
-                    request = req
-                )
+            response <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
+            if (is.null(response) || length(response) == 0) {
+                response <- notFound
             } else {
-                args <- modifyList(args, list(
-                    event = 'request',
-                    server = self,
-                    id = id,
-                    request = req
-                ))
+                response <- tail(response, 1)[[1]]
             }
-            response <- tail(do.call(private$p_trigger, args), 1)[[1]]
-            if (is.null(response)) response <- notFound
             if (!(is.list(response) && all(has_name(response, c('status', 'headers', 'body'))))) {
                 response <- serverError
             }
@@ -422,7 +411,12 @@ Fire <- R6Class('Fire',
         },
         header_logic = function(req) {
             id <- private$client_id(req)
-            private$p_trigger('header', server = self, id = id, request = req)
+            response <- private$p_trigger('header', server = self, id = id, request = req)
+            if (length(response) == 0) {
+                NULL
+            } else {
+                tail(response, 1)[[1]]
+            }
         },
         websocket_logic = function(ws) {
             id <- private$client_id(ws$request)
@@ -441,16 +435,13 @@ Fire <- R6Class('Fire',
                     ),
                     recursive = FALSE
                 )
-                args <- modifyList(list(binary = binary, message = msg), args)
-                args <- modifyList(args, list(
-                    event = 'message',
-                    server = self,
-                    id = id,
-                    request = request
-                ))
-                do.call(private$p_trigger, args)
+                if ('binary' %in% names(args)) binary <- args$binary
+                if ('message' %in% names(args)) msg <- args$message
+                args <- modifyList(args, list(binary = NULL, message = NULL))
                 
-                private$p_trigger('after-message', server = self, id = id, binary = args$binary, message = args$message, request = request)
+                private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args)
+                
+                private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request)
             }
         },
         close_ws_logic = function(id, request) {
