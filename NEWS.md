@@ -1,6 +1,15 @@
-# fiery 0.2.2-9000
+# fiery 0.2.3.9000
 
-* DelayStack uses `sequential` futures with `lazy = TRUE` because previously used `lazy` futures are deprecated
+* `Fire$new()` now takes a port and host argument to set these fields on 
+  initialisation. (fixes #5)
+* Results from before-request and before-message events are now passed on to the
+  request and message handlers as a list in the `arg_list` argument rather than
+  as single arguments.
+
+# fiery 0.2.3
+
+* DelayStack uses `sequential` futures with `lazy = TRUE` because previously 
+  used `lazy` futures are deprecated
 
 # fiery 0.2.2
 
