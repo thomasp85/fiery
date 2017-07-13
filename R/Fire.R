@@ -116,7 +116,9 @@ NULL
 Fire <- R6Class('Fire',
     public = list(
         # Methods
-        initialize = function() {
+        initialize = function(host = '127.0.0.1', port = 8080) {
+            self$host <- host
+            self$port <- port
             private$data <- new.env(parent = emptyenv())
             private$handlers <- new.env(parent = emptyenv())
             private$websockets <- new.env(parent = emptyenv())
