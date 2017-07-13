@@ -21,7 +21,8 @@ Imports:
     uuid,
     utils,
     stringi,
-    future
+    future,
+    later
 Collate:
     'aaa.R'
     'HandlerStack.R'

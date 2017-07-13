@@ -54,6 +54,7 @@ NULL
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
+#' @importFrom later later
 #' 
 #' @export
 #' @docType class
@@ -383,6 +384,19 @@ Fire <- R6Class('Fire',
             
             if (showcase) {
                 private$open_browser()
+            }
+            
+            private$allowing_cycle()
+        },
+        allowing_cycle = function() {
+            if (private$running) {
+                private$p_trigger('cycle-start', server = self)
+                private$external_triggers()
+                private$DELAY$eval(server = self)
+                private$TIME$eval(server = self)
+                private$ASYNC$eval(server = self)
+                private$p_trigger('cycle-end', server = self)
+                later(private$allowing_cycle(), self$refreshRate)
             }
         },
         request_logic = function(req) {
