@@ -1,8 +1,8 @@
 Package: fiery
 Type: Package
 Title: A Lightweight and Flexible Web Framework
-Version: 0.2.2-9000
-Date: 2017-05-28
+Version: 0.2.3
+Date: 2017-06-26
 Authors@R: c(
     person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
     )
