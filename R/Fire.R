@@ -614,7 +614,7 @@ Fire <- R6Class('Fire',
             private$handlers[[event]]$remove(id)
         },
         add_plugin = function(plugin, name) {
-            private$pluginList$name <- plugin
+            private$pluginList[[name]] <- plugin
         },
         p_trigger = function(event, ...) {
             if (!is.null(private$handlers[[event]])) {
