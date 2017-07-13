@@ -200,7 +200,7 @@ test_that('message events fire', {
 test_that('header event fire', {
     app <- Fire$new()
     request <- fake_request('http://www.example.com')
-    
+    expect_true(is.null(app$test_header(request)))
     app$on('header', function(server, ...) {
         server$set_data('header', TRUE)
     })
