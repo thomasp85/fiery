@@ -140,7 +140,6 @@ test_that('lifecycle events get fired', {
     expect_equal(reigniteRes, resumeRes)
     expect_equal(reigniteRes, c('start', 'resume', 'cycle-start', 'cycle-end', 'cycle-start', 'cycle-end', 'end'))
     
-    app$remove_data('events')
     app$ignite(block = FALSE)
     Sys.sleep(2)
     expect_message(later::run_now(), 'Cannot stop server from within a non-blocking event cycle')
