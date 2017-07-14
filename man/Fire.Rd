@@ -40,6 +40,7 @@ object is desired, use the \code{clone()} method.
  \item{\code{port}}{An integer giving the port number the server should listen on (defaults to 8080L)}
  \item{\code{refreshRate}}{The interval in seconds between run cycles when running a blocking server (defaults to 0.001)}
  \item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to NULL)}
+ \item{\code{plugins}}{A named list of the already attached plugins. Static - can only be modified using the \code{attach()} method.}
 }
 }
 
@@ -56,7 +57,8 @@ object is desired, use the \code{clone()} method.
  \item{\code{off(handlerId)}}{Remove the handler tied to the given id}
  \item{\code{trigger(event, ...)}}{Triggers an event passing the additional arguments to the potential handlers}
  \item{\code{send(message, id)}}{Sends a websocket message to the client with the given id, or to all connected clients if id is missing}
- \item{\code{attach(plugin, ...)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{onAttach} method}
+ \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{onAttach} method and a \code{name} and \code{require} field. Plugins can only get attached once unless \code{force = TRUE}}
+ \item{\code{has_plugin(name)}}{Check whether a plugin with the given name has been attached}
  \item{\code{header(name, value)}}{Add a global header to the server that will be set on all responses}
  \item{\code{set_data(name, value)}}{Adds data to the servers internal data store}
  \item{\code{get_data(name)}}{Extracts data from the internal data store}
