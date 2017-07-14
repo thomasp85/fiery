@@ -241,13 +241,11 @@ test_that('futures can be added and called', {
         message(res)
         server$extinguish()
     }, 1)
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_message(app$ignite(), '10')
@@ -261,13 +259,11 @@ test_that('futures can be added and called', {
         server$extinguish()
     }, 1)
     app$remove_time(id)
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_silent(app$ignite())
@@ -281,13 +277,11 @@ test_that('futures can be added and called', {
         server$extinguish()
     })
     app$remove_async(id)
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_silent(app$ignite())
@@ -299,13 +293,11 @@ test_that('futures can be added and called', {
         message(res)
         server$extinguish()
     })
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 1000) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_message(app$ignite(), '10')
