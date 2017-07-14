@@ -109,6 +109,7 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #' @importFrom assertthat assert_that is.scalar
 #' 
 #' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' req <- fake_request(
