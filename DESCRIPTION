@@ -24,7 +24,6 @@ Imports:
     future,
     later,
     stats
->>>>>>> master
 Collate:
     'aaa.R'
     'HandlerStack.R'
