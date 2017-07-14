@@ -10,14 +10,37 @@ NULL
 #' the more well known S3 and S4 systems.
 #' 
 #' @usage NULL
+#' @format NULL
+#' 
+#' @section Initialization:
+#' A new 'Fire'-object is initialized using the \code{new()} method on the 
+#' generator:
+#' 
+#' \strong{Usage}
+#' \tabular{l}{
+#'  \code{app <- Fire$new(host = '127.0.0.1', port = 8080L)}
+#' }
+#' 
+#' \strong{Arguments}
+#' \tabular{lll}{
+#'  \code{host} \tab  \tab A string overriding the default host (see the Fields section below)\cr
+#'  \code{port} \tab  \tab An integer overriding the default port (see the Fields section below)
+#' }
+#' 
+#' \emph{Copying}
+#' 
+#' As 'Fire' objects are using reference semantics new copies of an app cannot
+#' be made simply be assigning it to a new variable. If a true copy of a 'Fire'
+#' object is desired, use the \code{clone()} method.
 #' 
 #' @section Fields:
 #' \describe{
-#'  \item{\code{host}}{A string giving a valid IPv4 address owned by the server, or '0.0.0.0' (the default) to listen on all addresses}
-#'  \item{\code{port}}{An integer giving the port number the server should listen on (defaults to 80L)}
+#'  \item{\code{host}}{A string giving a valid IPv4 address owned by the server, or '0.0.0.0' to listen on all addresses. The default is '127.0.0.1'}
+#'  \item{\code{port}}{An integer giving the port number the server should listen on (defaults to 8080L)}
 #'  \item{\code{refreshRate}}{The interval in seconds between run cycles when running a blocking server (defaults to 0.001)}
 #'  \item{\code{refreshRateNB}}{The interval in seconds between run cycles when running a non-bocking server (defaults to 1)}
 #'  \item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to NULL)}
+#'  \item{\code{plugins}}{A named list of the already attached plugins. Static - can only be modified using the \code{attach()} method.}
 #' }
 #' 
 #' @section Methods:
@@ -32,7 +55,8 @@ NULL
 #'  \item{\code{off(handlerId)}}{Remove the handler tied to the given id}
 #'  \item{\code{trigger(event, ...)}}{Triggers an event passing the additional arguments to the potential handlers}
 #'  \item{\code{send(message, id)}}{Sends a websocket message to the client with the given id, or to all connected clients if id is missing}
-#'  \item{\code{attach(plugin, ...)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{onAttach} method}
+#'  \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{onAttach} method and a \code{name} and \code{require} field. Plugins can only get attached once unless \code{force = TRUE}}
+#'  \item{\code{has_plugin(name)}}{Check whether a plugin with the given name has been attached}
 #'  \item{\code{header(name, value)}}{Add a global header to the server that will be set on all responses}
 #'  \item{\code{set_data(name, value)}}{Adds data to the servers internal data store}
 #'  \item{\code{get_data(name)}}{Extracts data from the internal data store}
@@ -44,26 +68,127 @@ NULL
 #'  \item{\code{async(expr, then)}}{As delay and time except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 #'  \item{\code{remove_async(id)}}{Removes the async evaluation identified by the id. The evaluation is not necessarily stopped but the then function will not get called.}
 #'  \item{\code{set_client_id_converter(converter)}}{Sets the function that converts an HTTP request into a specific client id}
-#'  \item{\code{test_request(request)}}{Test the result of recieving a specific HTTP request}
-#'  \item{\code{test_header(request)}}{Test the result of recieving a specific HTTP header}
-#'  \item{\code{test_message(request, binary, message, withClose = TRUE)}}{Test the result of recieving a message over websocket and potentially closing the connection afterwards}
-#'  \item{\code{test_websocket(request, message)}}{Test the result of sending a message over websocket}
+#'  \item{\code{clone()}}{Create a copy of the full 'Fire' object and return that}
+#' }
+#' 
+#' @section Events:
+#' fiery is using an event-based model to allow you to program the logic. During
+#' the lifecycle of an app a range of different events will be triggered and it
+#' is possible to add event handlers to these using the \code{on()} method. An 
+#' event handler is simply a function that will get called every time an event 
+#' is fired. Apart from the predefined lifecycle events it is also possible to 
+#' trigger custom events using the \code{trigger()} method. Manual triggering of
+#' lifecycle events is not allowed.
+#' 
+#' Following is a list of all lifecycle events:
+#' 
+#' \describe{
+#'  \item{start}{Will trigger once when the app is started but before it is 
+#'  running. The handlers will recieve the app itself as the \code{server} 
+#'  argument as well as any argument passed on from the \code{ignite()} method. 
+#'  Any return value is discarded.}
+#'  \item{resume}{Will trigger once after the start event if the app has been
+#'  started using the \code{reignite()} method. The handlers will recieve the 
+#'  app itself as the \code{server} argument as well as any argument passed on 
+#'  from the \code{reignite()} method. Any return value is discarded.}
+#'  \item{end}{Will trigger once after the app is stopped. The handlers will 
+#'  recieve the app itself as the \code{server} argument. Any return value is 
+#'  discarded.}
+#'  \item{cycle-start}{Will trigger in the beginning of each loop, before the 
+#'  request queue is flushed. The handlers will recieve the app itself as the 
+#'  \code{server} argument. Any return value is discarded.}
+#'  \item{cycle-end}{Will trigger in the end of each loop, after the 
+#'  request queue is flushed and all delayed, timed, and asynchronous calls have
+#'  been executed. The handlers will recieve the app itself as the \code{server} 
+#'  argument. Any return value is discarded.}
+#'  \item{header}{Will trigger everytime a the header of a request is recieved. 
+#'  The return value of the last called handler is used to determine if further
+#'  processing of the request will be done. If the return value is \code{NULL}
+#'  the request will continue on to normal processing. If the return value is a
+#'  response this will be send back and the connection will be closed without
+#'  retrieving the payload. The handlers will recieve the app itself as the 
+#'  \code{server} argument, the client id as the \code{id} argument and the 
+#'  request object as the \code{request} argument}
+#'  \item{before-request}{Will trigger prior to handling of a request (that is, 
+#'  every time a request is recieved unless it is short-circuited by the header
+#'  handlers). The return values of the handlers will be passed on to the request
+#'  handlers and can thus be used to inject data into the request handlers (e.g.
+#'  session specific data). The handlers will recieve the app itself as the 
+#'  \code{server} argument, the client id as the \code{id} argument and the 
+#'  request object as the \code{request} argument}
+#'  \item{request}{Will trigger after the before-request event. This is where 
+#'  the main request handling is done. The return value of the last handler is
+#'  send back to the client as response. If no handler is reqistered a 404 error
+#'  is returned automatically. If the return value is not a valid response,
+#'  a 500 server error is returned instead. The handlers will recieve the app 
+#'  itself as the \code{server} argument, the client id as the \code{id} 
+#'  argument, the request object as the \code{request} argument, and the list of 
+#'  values created by the before-event handlers as the \code{arg_list} argument.}
+#'  \item{after-request}{Will trigger after the request event. This can be used
+#'  to inspect the response (but not modify it) before it is send to the client. 
+#'  The handlers will recieve the app itself as the \code{server} argument, the 
+#'  client id as the \code{id} argument, the request object as the 
+#'  \code{request} argument, and the response as the \code{response} argument. 
+#'  Any return value is discarded.}
+#'  \item{before-message}{This event is triggered when a websocket message is
+#'  recieved. As with the before-request event the return values of the handlers
+#'  are passed on to the message handlers. Specifically if a 'binary' and 
+#'  'message' value is returned they will override the original values in the
+#'  message and after-message handler arguments. This can e.g. be used to decode 
+#'  the message once before passing it through the message handlers. The 
+#'  before-message handlers will recieve the app itself as the \code{server} 
+#'  argument, the client id as the \code{id} argument, a flag indicating whether 
+#'  the message is binary as the \code{binary} argument, the message itself as 
+#'  the \code{message} argument, and the request object used to establish the 
+#'  connection with the client as the \code{request} argument.}
+#'  \item{message}{This event is triggered after the before-message event and is
+#'  used for the primary websocket message handling. As with the request event,
+#'  the handlers for the message event recieves the return values from the 
+#'  before-message handlers which can be used to e.g. inject session specific
+#'  data. The message handlers will recieve the app itself as the \code{server} 
+#'  argument, the client id as the \code{id} argument, a flag indicating whether 
+#'  the message is binary as the \code{binary} argument, the message itself as 
+#'  the \code{message} argument, the request object used to establish the 
+#'  connection with the client as the \code{request} argument, and the values
+#'  returned by the before-message handlers as the \code{arg_list} argument. 
+#'  Contrary to the request event the return values of the handlers are ignored
+#'  as websocket communication is bidirectional}
+#'  \item{after-message}{This event is triggered after the message event. It is
+#'  provided more as an equivalent to the after-request event than out of 
+#'  necessity as there is no final response to inspect and handler can thus just
+#'  as well be atached to the message event. For clear division of server logic 
+#'  message specific handlers should be attached to the message event, whereas 
+#'  general handlers should, if possible, be attached to the after-message 
+#'  event. The after-message handlers will recieve the app itself as the 
+#'  \code{server} argument, the client id as the \code{id} argument, a flag 
+#'  indicating whether the message is binary as the \code{binary} argument, the 
+#'  message itself as the \code{message} argument, and the request object used 
+#'  to establish the connection with the client as the \code{request} argument.}
+#'  \item{send}{This event is triggered after a websocket message is send to a 
+#'  client. The handlers will recieve the app itself as the \code{server} 
+#'  argument, the client id as the \code{id} argument and the send message as 
+#'  the \code{message} argument. Any return value is discarded.}
+#'  \item{websocket-closed}{This event will be triggered every time a websocket
+#'  connection is closed. The handlers will recieve the app itself as the 
+#'  \code{server} argument, the client id as the \code{id} argument and request
+#'  used to establish the closed connection as the \code{request} argument. Any 
+#'  return value is discarded.}
 #' }
 #' 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag has_name
+#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag has_name is.error
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
 #' @importFrom later later
+#' @importFrom stats setNames
 #' 
 #' @export
 #' @docType class
 #' 
 #' @examples 
 #' # Create a New App
-#' app <- Fire$new()
-#' app$port <- 4689
+#' app <- Fire$new(port = 4689)
 #' 
 #' # Setup the data everytime it starts
 #' app$on('start', function(server, ...) {
@@ -118,7 +243,9 @@ NULL
 Fire <- R6Class('Fire',
     public = list(
         # Methods
-        initialize = function() {
+        initialize = function(host = '127.0.0.1', port = 8080) {
+            self$host <- host
+            self$port <- port
             private$data <- new.env(parent = emptyenv())
             private$handlers <- new.env(parent = emptyenv())
             private$websockets <- new.env(parent = emptyenv())
@@ -189,12 +316,33 @@ Fire <- R6Class('Fire',
         },
         send = function(message, id) {
             private$send_ws(message, id)
-            private$p_trigger('send', server = self, message = message, id = id)
+            private$p_trigger('send', server = self, id = id, message = message)
             invisible(NULL)
         },
-        attach = function(plugin, ...) {
-            plugin$onAttach(self, ...)
+        attach = function(plugin, ..., force = FALSE) {
+            name <- plugin$name
+            assert_that(is.string(name))
+            
+            if (!force && self$has_plugin(name)) {
+                stop('The ', name, ' plugin is already loaded. Use `force = TRUE` to reapply it.', call. = FALSE)
+            }
+            requires <- plugin$require
+            if (!is.null(requires)) {
+                assert_that(is.character(requires))
+                exists <- vapply(requires, self$has_plugin, logical(1))
+                if (!all(exists)) {
+                    stop('The ', name, ' plugin requires the following plugins: ', paste(requires[!exists], collapse = ', '), '.', call. = FALSE)
+                }
+            }
+            has_error <- try(plugin$onAttach(self, ...), silent = TRUE)
+            if (is.error(has_error)) {
+                stop('The ', name, ' plugin failed to attach with the following error: ', has_error, call. = FALSE)
+            }
+            private$add_plugin(plugin, name)
             invisible(NULL)
+        },
+        has_plugin = function(name) {
+            name %in% names(private$pluginList)
         },
         header = function(name, value) {
             assert_that(is.string(name))
@@ -295,6 +443,12 @@ Fire <- R6Class('Fire',
                 assert_that(is.dir(dir))
             }
             private$TRIGGERDIR <- dir
+        },
+        plugins = function(plugin) {
+            if (!missing(plugin)) {
+                stop('Use the `attach` method to add plugins', call. = FALSE)
+            }
+            private$pluginList
         }
     ),
     private = list(
@@ -316,6 +470,7 @@ Fire <- R6Class('Fire',
         headers = list(),
         handlers = NULL,
         handlerMap = list(),
+        pluginList = list(),
         websockets = NULL,
         server = NULL,
         client_id = NULL,
@@ -425,23 +580,13 @@ Fire <- R6Class('Fire',
                 ), 
                 recursive = FALSE
             )
-            if (is.null(args)) {
-                args <- list(
-                    event = 'request',
-                    server = self,
-                    id = id,
-                    request = req
-                )
-            } else {
-                args <- modifyList(args, list(
-                    event = 'request',
-                    server = self,
-                    id = id,
-                    request = req
-                ))
+            response <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
+            if (length(response) != 0) {
+                response <- tail(response, 1)[[1]]
             }
-            response <- tail(do.call(private$p_trigger, args), 1)[[1]]
-            if (is.null(response)) response <- notFound
+            if (is.null(response)) {
+                response <- notFound
+            }
             if (!(is.list(response) && all(has_name(response, c('status', 'headers', 'body'))))) {
                 response <- serverError
             }
@@ -451,7 +596,12 @@ Fire <- R6Class('Fire',
         },
         header_logic = function(req) {
             id <- private$client_id(req)
-            private$p_trigger('header', server = self, id = id, request = req)
+            response <- private$p_trigger('header', server = self, id = id, request = req)
+            if (length(response) == 0) {
+                NULL
+            } else {
+                tail(response, 1)[[1]]
+            }
         },
         websocket_logic = function(ws) {
             id <- private$client_id(ws$request)
@@ -470,16 +620,13 @@ Fire <- R6Class('Fire',
                     ),
                     recursive = FALSE
                 )
-                args <- modifyList(list(binary = binary, message = msg), args)
-                args <- modifyList(args, list(
-                    event = 'message',
-                    server = self,
-                    id = id,
-                    request = request
-                ))
-                do.call(private$p_trigger, args)
+                if ('binary' %in% names(args)) binary <- args$binary
+                if ('message' %in% names(args)) msg <- args$message
+                args <- modifyList(args, list(binary = NULL, message = NULL))
                 
-                private$p_trigger('after-message', server = self, id = id, binary = args$binary, message = args$message, request = request)
+                private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args)
+                
+                private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request)
             }
         },
         close_ws_logic = function(id, request) {
@@ -497,11 +644,14 @@ Fire <- R6Class('Fire',
             event <- private$handlerMap[[id]]
             private$handlers[[event]]$remove(id)
         },
+        add_plugin = function(plugin, name) {
+            private$pluginList[[name]] <- plugin
+        },
         p_trigger = function(event, ...) {
             if (!is.null(private$handlers[[event]])) {
                 private$handlers[[event]]$dispatch(...)
             } else {
-                `names<-`(list(), character())
+                setNames(list(), character())
             }
         },
         external_triggers = function() {
