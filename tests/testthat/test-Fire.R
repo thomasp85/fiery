@@ -218,7 +218,7 @@ test_that('message events fire', {
 test_that('header event fire', {
     app <- Fire$new()
     request <- fake_request('http://www.example.com')
-    
+    expect_true(is.null(app$test_header(request)))
     app$on('header', function(server, ...) {
         server$set_data('header', TRUE)
     })
@@ -259,18 +259,15 @@ test_that('futures can be added and called', {
         message(res)
         server$extinguish()
     }, 1)
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_message(app$ignite(), '10')
 
-    skip_on_os('windows')
     app <- Fire$new()
     id <- app$time({
         10
@@ -279,18 +276,16 @@ test_that('futures can be added and called', {
         server$extinguish()
     }, 1)
     app$remove_time(id)
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_silent(app$ignite())
 
-    # The async stuff fail on windows builders though it works fine locally
+    skip_on_os('windows') # The async stuff fail on windows builders though it works fine locally
     app <- Fire$new()
     id <- app$async({
         10
@@ -299,13 +294,11 @@ test_that('futures can be added and called', {
         server$extinguish()
     })
     app$remove_async(id)
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 100) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_silent(app$ignite())
@@ -317,13 +310,11 @@ test_that('futures can be added and called', {
         message(res)
         server$extinguish()
     })
-    app$on('start', function(server, ...) server$set_data('count', 0))
+    app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
-        cycle <- server$get_data('count')
-        if (cycle > 1000) {
+        start <- server$get_data('time')
+        if (Sys.time() - start > 2) {
             server$extinguish()
-        } else {
-            server$set_data('count', cycle + 1)
         }
     })
     expect_message(app$ignite(), '10')
