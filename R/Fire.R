@@ -16,6 +16,7 @@ NULL
 #'  \item{\code{host}}{A string giving a valid IPv4 address owned by the server, or '0.0.0.0' (the default) to listen on all addresses}
 #'  \item{\code{port}}{An integer giving the port number the server should listen on (defaults to 80L)}
 #'  \item{\code{refreshRate}}{The interval in seconds between run cycles when running a blocking server (defaults to 0.001)}
+#'  \item{\code{refreshRateNB}}{The interval in seconds between run cycles when running a non-bocking server (defaults to 1)}
 #'  \item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to NULL)}
 #' }
 #' 
@@ -143,10 +144,15 @@ Fire <- R6Class('Fire',
         extinguish = function() {
             if (private$running) {
                 if (!is.null(private$server)) {
-                    private$running <- FALSE
-                    private$p_trigger('end', server = self)
-                    stopDaemonizedServer(private$server)
-                    private$server <- NULL
+                    if (private$nb_cycle) {
+                        message('Cannot stop server from within a non-blocking event cycle')
+                        flush.console()
+                    } else {
+                        private$running <- FALSE
+                        private$p_trigger('end', server = self)
+                        stopDaemonizedServer(private$server)
+                        private$server <- NULL
+                    }
                 } else {
                     private$quitting <- TRUE
                 }
@@ -278,6 +284,11 @@ Fire <- R6Class('Fire',
             assert_that(is.number(rate))
             private$REFRESHRATE <- rate
         },
+        refreshRateNB = function(rate) {
+            if (missing(rate)) return(private$REFRESHRATENB)
+            assert_that(is.number(rate))
+            private$REFRESHRATENB <- rate
+        },
         triggerDir = function(dir) {
             if (missing(dir)) return(private$TRIGGERDIR)
             if (!is.null(dir)) {
@@ -291,9 +302,11 @@ Fire <- R6Class('Fire',
         HOST = '127.0.0.1',
         PORT = 8080,
         REFRESHRATE = 0.001,
+        REFRESHRATENB = 1,
         TRIGGERDIR = NULL,
         
         running = FALSE,
+        nb_cycle = FALSE,
         quitting = FALSE,
         privateTriggers = c('start', 'resume', 'end', 'cycle-start', 
                             'cycle-end', 'header', 'before-request', 'request', 
@@ -390,13 +403,17 @@ Fire <- R6Class('Fire',
         },
         allowing_cycle = function() {
             if (private$running) {
+                private$nb_cycle <- TRUE # To hinder stopDeamonizedServer from crashing session
                 private$p_trigger('cycle-start', server = self)
                 private$external_triggers()
                 private$DELAY$eval(server = self)
                 private$TIME$eval(server = self)
                 private$ASYNC$eval(server = self)
                 private$p_trigger('cycle-end', server = self)
-                later(private$allowing_cycle(), self$refreshRate)
+                private$nb_cycle <- FALSE
+                later(function() {
+                    private$allowing_cycle()
+                }, private$REFRESHRATENB)
             }
         },
         request_logic = function(req) {
