@@ -329,7 +329,7 @@ Fire <- R6Class('Fire',
             }
             has_error <- try(plugin$onAttach(self, ...), silent = TRUE)
             if (is.error(has_error)) {
-                stop('The ', name, 'plugin failed to attach with the following error: ', has_error, call. = FALSE)
+                stop('The ', name, ' plugin failed to attach with the following error: ', has_error, call. = FALSE)
             }
             private$add_plugin(plugin, name)
             invisible(NULL)

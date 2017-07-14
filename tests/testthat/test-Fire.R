@@ -58,6 +58,7 @@ test_that('plugins are being attached', {
     expect_error(app$attach(plugin, 15))
     plugin$name <- 'plugin'
     app$attach(plugin, 15)
+    expect_error(app$attach(plugin, 10))
     expect_equal(app$trigger('test')[[1]], 25)
     plugin2 <- list(
         onAttach = function(...) {message('test')},
@@ -67,6 +68,13 @@ test_that('plugins are being attached', {
     expect_error(app$attach(plugin2))
     plugin2$require <- 'plugin'
     expect_message(app$attach(plugin2), 'test')
+    expect_equal(plugin, app$plugins$plugin)
+    expect_error(app$plugins$test <- plugin)
+    plugin3 <- list(
+        onAttach = function(...) {stop('test')},
+        name = 'plugin3'
+    )
+    expect_error(app$attach(plugin3), 'The plugin3 plugin failed to attach with the following error:')
 })
 
 test_that('id converter can be set and gets called', {
