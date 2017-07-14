@@ -22,6 +22,7 @@ Imports:
     utils,
     stringi,
     future,
+    later,
     stats
 Collate:
     'aaa.R'
