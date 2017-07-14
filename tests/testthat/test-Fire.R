@@ -113,6 +113,11 @@ test_that('active bindings work', {
     app$refreshRate <- 10.5
     expect_equal(app$refreshRate, 10.5)
     
+    expect_error(app$refreshRateNB <- 'test')
+    expect_error(app$refreshRateNB <- 1:5)
+    app$refreshRateNB <- 10.5
+    expect_equal(app$refreshRateNB, 10.5)
+    
     expect_error(app$triggerDir <- 'test')
     expect_error(app$triggerDir <- 1:5)
     dir <- tempdir()
