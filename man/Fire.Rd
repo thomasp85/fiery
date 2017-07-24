@@ -39,6 +39,7 @@ object is desired, use the \code{clone()} method.
  \item{\code{host}}{A string giving a valid IPv4 address owned by the server, or '0.0.0.0' to listen on all addresses. The default is '127.0.0.1'}
  \item{\code{port}}{An integer giving the port number the server should listen on (defaults to 8080L)}
  \item{\code{refreshRate}}{The interval in seconds between run cycles when running a blocking server (defaults to 0.001)}
+ \item{\code{refreshRateNB}}{The interval in seconds between run cycles when running a non-bocking server (defaults to 1)}
  \item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to NULL)}
  \item{\code{plugins}}{A named list of the already attached plugins. Static - can only be modified using the \code{attach()} method.}
 }

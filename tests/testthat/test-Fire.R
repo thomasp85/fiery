@@ -21,7 +21,21 @@ test_that('handlers can be added, triggered and removed', {
     expect_length(triggerRes, 0)
     expect_named(triggerRes, character())
 })
-
+test_that('Fire objects are printed', {
+    app <- Fire$new()
+    app$attach(list(
+        name = 'test',
+        onAttach = function(...) {}
+    ))
+    app$on('start', function(...){})
+    app$on('request', function(...){})
+    app$on('request', function(...){})
+    
+    expect_output(print(app), 'A fiery webserver')
+    expect_output(print(app), 'Plugins attached: test')
+    expect_output(print(app), 'start: 1')
+    expect_output(print(app), 'request: 2')
+})
 test_that('protected events cannot be triggered', {
     app <- Fire$new()
     

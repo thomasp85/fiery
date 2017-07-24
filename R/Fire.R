@@ -254,19 +254,40 @@ Fire <- R6Class('Fire',
             private$TIME <- TimeStack$new()
             private$ASYNC <- AsyncStack$new()
         },
-        ignite = function(block = TRUE, showcase = FALSE, ...) {
+        print = function(...) {
+            cat('\U0001f525 A fiery webserver\n')
+            cat('\U0001f525  \U0001f4a5   \U0001f4a5   \U0001f4a5\n')
+            plugins <- paste(names(private$pluginList), collapse = ', ')
+            if (plugins == '') plugins <- 'none'
+            cat('\U0001f525 Plugins attached: ', plugins, '\n', sep = '')
+            handlers <- lapply(private$handlers, function(x) x$length())
+            if (length(handlers) == 0) {
+                cat('\U0001f525 Event handlers added: none\n')
+            } else {
+                cat('\U0001f525 Event handlers added\n')
+                order <- match(names(handlers), private$privateTriggers)
+                order[is.na(order)] <- seq_len(sum(is.na(order))) + max(order, na.rm = TRUE)
+                handlers <- handlers[order(order)]
+                name_length <- max(max(nchar(names(handlers))), 20)
+                names(handlers) <- sprintf(paste0('%', name_length, 's'), names(handlers))
+                for(i in names(handlers)) cat('\U0001f525 ', i, ': ', handlers[[i]], '\n', sep = '')
+            }
+        },
+        ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
+            if (!silent) message('Fire started at ', self$host, ':', self$port)
             private$run(block = block, showcase = showcase, ...)
             invisible(NULL)
         },
-        start = function(block = TRUE, showcase = FALSE, ...) {
-            self$ignite(block = block, showcase = showcase, ...)
+        start = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
+            self$ignite(block = block, showcase = showcase, ..., silent = silent)
         },
-        reignite = function(block = TRUE, showcase = FALSE, ...) {
+        reignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
+            if (!silent) message('Fire restarted at ', self$host, ':', self$port)
             private$run(block = block, resume = TRUE, showcase = showcase, ...)
             invisible(NULL)
         },
-        resume = function(block = TRUE, showcase = FALSE, ...) {
-            self$reignite(block = block, showcase = showcase, ...)
+        resume = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
+            self$reignite(block = block, showcase = showcase, ..., silent = silent)
         },
         extinguish = function() {
             if (private$running) {
@@ -462,10 +483,10 @@ Fire <- R6Class('Fire',
         running = FALSE,
         nb_cycle = FALSE,
         quitting = FALSE,
-        privateTriggers = c('start', 'resume', 'end', 'cycle-start', 
-                            'cycle-end', 'header', 'before-request', 'request', 
-                            'after-request', 'before-message', 'message', 
-                            'after-message', 'websocket-closed', 'send'),
+        privateTriggers = c('start', 'resume', 'cycle-start', 'header', 
+                            'before-request', 'request', 'after-request', 
+                            'before-message', 'message', 'after-message', 
+                            'websocket-closed', 'send', 'cycle-end', 'end'),
         data = NULL,
         headers = list(),
         handlers = NULL,
