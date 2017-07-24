@@ -271,7 +271,7 @@ test_that('futures can be added and called', {
         server$extinguish()
     })
     app$remove_delay(id)
-    expect_silent(app$ignite())
+    expect_silent(app$ignite(silent = TRUE))
 
     app <- Fire$new()
     app$time({
@@ -304,7 +304,7 @@ test_that('futures can be added and called', {
             server$extinguish()
         }
     })
-    expect_silent(app$ignite())
+    expect_silent(app$ignite(silent = TRUE))
 
     skip_on_os('windows') # The async stuff fail on windows builders though it works fine locally
     app <- Fire$new()
@@ -322,7 +322,7 @@ test_that('futures can be added and called', {
             server$extinguish()
         }
     })
-    expect_silent(app$ignite())
+    expect_silent(app$ignite(silent = TRUE))
     
     app <- Fire$new()
     app$async({
