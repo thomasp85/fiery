@@ -227,7 +227,7 @@ test_that('message events fire', {
     
     app$on('before-message', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'before'))
-        list(test = 4, message = 'test2')
+        list(test = 4, message = 'test2', binary = FALSE)
     })
     app$on('message', function(server, message, arg_list, ...) {
         server$set_data('events', c(server$get_data('events'), 'during'))
