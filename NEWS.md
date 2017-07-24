@@ -5,6 +5,7 @@
 * Results from before-request and before-message events are now passed on to the
   request and message handlers as a list in the `arg_list` argument rather than
   as single arguments.
+* The host and port are now advertised when a server is started/resumed (#11)
 * Fire objects now has a print method (#12)
 
 # fiery 0.2.3
