@@ -72,6 +72,7 @@ test_that('Content gets assigned', {
     expect_equal(req$rook.input$read_lines(), character())
     expect_equal(req$rook.input$read(), raw())
     expect_null(req$rook.input$rewind())
+    expect_equal(req$rook.input$read(l == 0), raw())
     expect_null(req$rook.input$close())
     
     expect_is(req$rook.errors, 'ErrorStreamFake')

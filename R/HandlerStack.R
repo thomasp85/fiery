@@ -18,7 +18,6 @@ HandlerStack <- R6Class('HandlerStack',
                 pos <- length(private$handleOrder) + 1
             } else {
                 assert_that(is.count(pos))
-                if (pos < 1) pos <- 1
                 pos <- min(c(pos, length(private$handleOrder) + 1))
             }
             assign(id, handler, envir = private$handleEnv)
