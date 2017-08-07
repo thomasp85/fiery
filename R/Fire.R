@@ -55,7 +55,7 @@ NULL
 #'  \item{\code{off(handlerId)}}{Remove the handler tied to the given id}
 #'  \item{\code{trigger(event, ...)}}{Triggers an event passing the additional arguments to the potential handlers}
 #'  \item{\code{send(message, id)}}{Sends a websocket message to the client with the given id, or to all connected clients if id is missing}
-#'  \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{onAttach} method and a \code{name} and \code{require} field. Plugins can only get attached once unless \code{force = TRUE}}
+#'  \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{on_attach} method and a \code{name} and \code{require} field. Plugins can only get attached once unless \code{force = TRUE}}
 #'  \item{\code{has_plugin(name)}}{Check whether a plugin with the given name has been attached}
 #'  \item{\code{header(name, value)}}{Add a global header to the server that will be set on all responses}
 #'  \item{\code{set_data(name, value)}}{Adds data to the servers internal data store}

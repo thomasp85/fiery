@@ -26,7 +26,7 @@ test_that('Fire objects are printed', {
     app <- Fire$new()
     app$attach(list(
         name = 'test',
-        onAttach = function(...) {}
+        on_attach = function(...) {}
     ))
     app$on('start', function(...){})
     app$on('request', function(...){})
@@ -71,7 +71,7 @@ test_that('plugins are being attached', {
     app <- Fire$new()
     app$set_data('test', 10)
     plugin <- list(
-        onAttach = function(server, extraPar) {
+        on_attach = function(server, extraPar) {
             server$on('test', function(...){10 + extraPar})
         }
     )
@@ -81,7 +81,7 @@ test_that('plugins are being attached', {
     expect_error(app$attach(plugin, 10))
     expect_equal(app$trigger('test')[[1]], 25)
     plugin2 <- list(
-        onAttach = function(...) {message('test')},
+        on_attach = function(...) {message('test')},
         name = 'plugin2',
         require = c('plugin', 'test')
     )
@@ -91,7 +91,7 @@ test_that('plugins are being attached', {
     expect_equal(plugin, app$plugins$plugin)
     expect_error(app$plugins$test <- plugin)
     plugin3 <- list(
-        onAttach = function(...) {stop('test')},
+        on_attach = function(...) {stop('test')},
         name = 'plugin3'
     )
     expect_error(app$attach(plugin3), 'The plugin3 plugin failed to attach with the following error:')
