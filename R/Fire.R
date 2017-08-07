@@ -355,7 +355,7 @@ Fire <- R6Class('Fire',
                     stop('The ', name, ' plugin requires the following plugins: ', paste(requires[!exists], collapse = ', '), '.', call. = FALSE)
                 }
             }
-            has_error <- try(plugin$onAttach(self, ...), silent = TRUE)
+            has_error <- try(plugin$on_attach(self, ...), silent = TRUE)
             if (is.error(has_error)) {
                 stop('The ', name, ' plugin failed to attach with the following error: ', has_error, call. = FALSE)
             }
