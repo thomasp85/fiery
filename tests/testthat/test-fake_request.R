@@ -83,6 +83,7 @@ test_that('Content gets assigned', {
     expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
     expect_equal(req$rook.input$rewind(), 26)
     expect_equal(rawToChar(req$rook.input$read()), 'Multiple\nlines\nof content\n')
+    expect_equal(req$rook.input$read(l = 0), raw())
     expect_null(req$rook.input$close())
     
     req <- fake_request('http://www.example.com', content = c('Multiple', 'lines', 'of content'))
