@@ -33,7 +33,6 @@ Collate:
     'FutureStack.R'
     'fake_request.R'
     'fiery-package.R'
-    'firestarter.R'
 RoxygenNote: 6.0.1
 Suggests:
     testthat,
