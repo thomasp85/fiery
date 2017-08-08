@@ -4,8 +4,8 @@ NULL
 
 #' Generate a New App Object
 #' 
-#' The Fire generator creates a new 'Fire'-object, which is the the class 
-#' containing all app logic. The class is based on the R6 oo-system and is thus
+#' The Fire generator creates a new 'Fire'-object, which is the class containing 
+#' all the app logic. The class is based on the R6 OO-system and is thus
 #' reference-based with methods and data attached to each object, in contrast to
 #' the more well known S3 and S4 systems.
 #' 
@@ -101,13 +101,13 @@ NULL
 #'  request queue is flushed and all delayed, timed, and asynchronous calls have
 #'  been executed. The handlers will recieve the app itself as the \code{server} 
 #'  argument. Any return value is discarded.}
-#'  \item{header}{Will trigger everytime a the header of a request is recieved. 
+#'  \item{header}{Will trigger everytime the header of a request is recieved. 
 #'  The return value of the last called handler is used to determine if further
-#'  processing of the request will be done. If the return value is \code{NULL}
-#'  the request will continue on to normal processing. If the return value is a
-#'  response this will be send back and the connection will be closed without
-#'  retrieving the payload. The handlers will recieve the app itself as the 
-#'  \code{server} argument, the client id as the \code{id} argument and the 
+#'  processing of the request will be done. If the return value is \code{TRUE}
+#'  the request will continue on to normal processing. If the return value is 
+#'  FALSE the response will be send back and the connection will be closed 
+#'  without retrieving the payload. The handlers will recieve the app itself as 
+#'  the \code{server} argument, the client id as the \code{id} argument and the 
 #'  request object as the \code{request} argument}
 #'  \item{before-request}{Will trigger prior to handling of a request (that is, 
 #'  every time a request is recieved unless it is short-circuited by the header
@@ -182,6 +182,7 @@ NULL
 #' @importFrom utils browseURL
 #' @importFrom later later
 #' @importFrom stats setNames
+#' @importFrom reqres Request
 #' 
 #' @export
 #' @docType class
@@ -593,6 +594,7 @@ Fire <- R6Class('Fire',
             }
         },
         request_logic = function(req) {
+            req <- Request$new(req)
             id <- private$client_id(req)
             args <- unlist(
                 unname(
@@ -601,35 +603,33 @@ Fire <- R6Class('Fire',
                 ), 
                 recursive = FALSE
             )
-            response <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
-            if (length(response) != 0) {
-                response <- tail(response, 1)[[1]]
-            }
-            if (is.null(response)) {
-                response <- notFound
-            }
-            if (!(is.list(response) && all(has_name(response, c('status', 'headers', 'body'))))) {
-                response <- serverError
-            }
-            response$headers <- modifyList(private$headers, response$headers)
-            private$p_trigger('after-request', server = self, id = id, request = req, response = response)
+            private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
+            response <- req$respond()
+            for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
+            response <- response$as_list()
+            private$p_trigger('after-request', server = self, id = id, request = req)
             response
         },
         header_logic = function(req) {
+            req <- Request$new(req)
             id <- private$client_id(req)
             response <- private$p_trigger('header', server = self, id = id, request = req)
             if (length(response) == 0) {
                 NULL
             } else {
-                tail(response, 1)[[1]]
+                continue <- tail(response, 1)[[1]]
+                assert_that(is.flag(continue))
+                if (continue) NULL
+                else req$respond()$as_list()
             }
         },
         websocket_logic = function(ws) {
-            id <- private$client_id(ws$request)
+            req <- Request$new(ws$request)
+            id <- private$client_id(req)
             assign(id, ws, envir = private$websockets)
             
-            ws$onMessage(private$message_logic(id, ws$request))
-            ws$onClose(private$close_ws_logic(id, ws$request))
+            ws$onMessage(private$message_logic(id, req))
+            ws$onClose(private$close_ws_logic(id, req))
         },
         message_logic = function(id, request) {
             function(binary, msg) {

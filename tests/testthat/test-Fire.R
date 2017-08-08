@@ -104,7 +104,7 @@ test_that('id converter can be set and gets called', {
     })
     request <- fake_request('http://www.example.com', REMOTE_ADDR = '127.0.0.1')
     app$test_request(request)
-    expect_equal(app$get_data('id'), client_to_id(request))
+    expect_equal(app$get_data('id'), client_to_id(reqres::Request$new(request)))
     
     app$set_client_id_converter(function(request) {
         10
@@ -205,14 +205,14 @@ test_that('request events fire', {
         server$set_data('events', c(server$get_data('events'), 'before'))
         list(test = 4)
     })
-    app$on('request', function(server, arg_list, ...) {
+    app$on('request', function(server, arg_list, id, request, ...) {
         server$set_data('events', c(server$get_data('events'), 'during'))
         server$set_data('passed_args', arg_list$test)
-        list(status = 200)
+        request$respond()$status_with_text(200L)
     })
-    app$on('after-request', function(server, response, ...) {
+    app$on('after-request', function(server, request, ...) {
         server$set_data('events', c(server$get_data('events'), 'after'))
-        server$set_data('passed_response', response)
+        server$set_data('passed_response', request$respond()$as_list())
     })
     response <- app$test_request(request)
     
@@ -248,6 +248,7 @@ test_that('header event fire', {
     expect_true(is.null(app$test_header(request)))
     app$on('header', function(server, ...) {
         server$set_data('header', TRUE)
+        TRUE
     })
     app$test_header(request)
     expect_true(app$get_data('header'))
@@ -396,17 +397,13 @@ test_that('global headers are assigned and used', {
     app <- Fire$new()
     app$header('X-Powered-By', 'fiery')
     app$header('X-XSS-Protection', '1; mode=block')
-    app$on('request', function(...) {
-        list(
-            status = 200L,
-            headers = list(),
-            body = 'test'
-        )
+    app$on('request', function(request, ...) {
+        request$respond()$status_with_text(200L)
     })
     response <- app$test_request(fake_request('www.example.com'))
-    expect_equal(response$headers, list('X-Powered-By' = 'fiery', 'X-XSS-Protection' = '1; mode=block'))
+    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery', 'X-XSS-Protection' = '1; mode=block'))
     app$header('X-XSS-Protection', NULL)
     response <- app$test_request(fake_request('www.example.com'))
-    expect_equal(response$headers, list('X-Powered-By' = 'fiery'))
+    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery'))
     expect_equal(app$header('X-Powered-By'), 'fiery')
 })

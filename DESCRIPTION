@@ -1,7 +1,7 @@
 Package: fiery
 Type: Package
 Title: A Lightweight and Flexible Web Framework
-Version: 0.2.3.9000
+Version: 0.2.3.9001
 Date: 2017-07-13
 Authors@R: c(
     person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
@@ -23,7 +23,9 @@ Imports:
     stringi,
     future,
     later,
-    stats
+    stats,
+    desc,
+    reqres
 Collate:
     'aaa.R'
     'HandlerStack.R'
@@ -31,6 +33,7 @@ Collate:
     'FutureStack.R'
     'fake_request.R'
     'fiery-package.R'
+    'firestarter.R'
 RoxygenNote: 6.0.1
 Suggests:
     testthat,

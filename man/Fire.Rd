@@ -5,8 +5,8 @@
 \alias{Fire}
 \title{Generate a New App Object}
 \description{
-The Fire generator creates a new 'Fire'-object, which is the the class 
-containing all app logic. The class is based on the R6 oo-system and is thus
+The Fire generator creates a new 'Fire'-object, which is the class containing 
+all the app logic. The class is based on the R6 OO-system and is thus
 reference-based with methods and data attached to each object, in contrast to
 the more well known S3 and S4 systems.
 }
@@ -106,13 +106,13 @@ Following is a list of all lifecycle events:
  request queue is flushed and all delayed, timed, and asynchronous calls have
  been executed. The handlers will recieve the app itself as the \code{server} 
  argument. Any return value is discarded.}
- \item{header}{Will trigger everytime a the header of a request is recieved. 
+ \item{header}{Will trigger everytime the header of a request is recieved. 
  The return value of the last called handler is used to determine if further
- processing of the request will be done. If the return value is \code{NULL}
- the request will continue on to normal processing. If the return value is a
- response this will be send back and the connection will be closed without
- retrieving the payload. The handlers will recieve the app itself as the 
- \code{server} argument, the client id as the \code{id} argument and the 
+ processing of the request will be done. If the return value is \code{TRUE}
+ the request will continue on to normal processing. If the return value is 
+ FALSE the response will be send back and the connection will be closed 
+ without retrieving the payload. The handlers will recieve the app itself as 
+ the \code{server} argument, the client id as the \code{id} argument and the 
  request object as the \code{request} argument}
  \item{before-request}{Will trigger prior to handling of a request (that is, 
  every time a request is recieved unless it is short-circuited by the header
