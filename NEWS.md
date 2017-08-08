@@ -2,11 +2,22 @@
 
 * `Fire$new()` now takes a port and host argument to set these fields on 
   initialisation. (fixes #5)
-* Results from before-request and before-message events are now passed on to the
-  request and message handlers as a list in the `arg_list` argument rather than
-  as single arguments.
+* **BREAKING** Results from before-request and before-message events are now 
+  passed on to the request and message handlers as a list in the `arg_list` 
+  argument rather than as single arguments.
 * The host and port are now advertised when a server is started/resumed (#11)
 * Fire objects now has a print method (#12)
+* **BREAKING** fiery now uses the `reqres` Request and Response classes for 
+  handling http exchange.
+* **BREAKING** `attach()` now expect a `on_attach()` method rather than a 
+  `onAttach()` method from the plugin. It also expects a `name` field and 
+  optionally a `require` field
+* **BREAKING** The `header` event now expect handlers to return a logical, with
+  `TRUE` indicating further processing, and `FALSE` indicating termination.
+* Cycle events are now triggered when running with `block = FALSE` making the
+  two run modes identical in their lifecycle events.
+* **BREAKING** The `after-request` event will no longer pass the response to
+  handlers. This can be retrieved from the `request` object.
 
 # fiery 0.2.3
 
