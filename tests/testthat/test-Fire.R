@@ -252,6 +252,12 @@ test_that('header event fire', {
     })
     app$test_header(request)
     expect_true(app$get_data('header'))
+    app$on('header', function(server, request, ...) {
+        request$respond()$status_with_text(500L)
+        FALSE
+    })
+    response <- app$test_header(request)
+    expect_equal(response$status, 500L)
 })
 
 test_that('futures can be added and called', {
