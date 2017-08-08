@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="man/figures/fiery_logo.png"/>
+<img src="man/figures/fiery_logo.png"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery)
@@ -82,9 +82,14 @@ at specific points during the life-cycle that will call the handlers attached to
 these events. In addition to the life-cycle events, it is possible to trigger 
 custom events and attach handlers to these as well. Fiery is designed with 
 modularity in mind so that plugins can be developed for different tasks and 
-mixed and matched to suit the specific project. A plugin that will often be used
-is [routr](https://github.com/thomasp85/routr), which provides powerful routing 
-of HTTP requests, thus simplifying the server logic greatly.
+mixed and matched to suit the specific project. 
+
+While the intro might indicate that fiery is difficult to use, this is not the
+case. Much of the hard work of handling http requests has been encapsulated in 
+the [`reqres`](https://github.com/thomasp85/reqres) that fiery uses to handle
+http requests and responses. Further, A plugin that will often be used
+is [`routr`](https://github.com/thomasp85/routr), which provides powerful routing 
+of HTTP requests, thus simplifying the server logic even more.
 
 ## A minimal example
 Following is a very *Hello World*-ish example of a fiery app (sans `routr`), 
@@ -113,12 +118,11 @@ app$on('before-request', function(server, ...) {
 })
 
 # Handle requests
-app$on('request', function(server, ...) {
-    list(
-        status = 200L,
-        headers = list('Content-Type' = 'text/html'),
-        body = paste('This is indeed a test. You are number', server$get_data('visits'))
-    )
+app$on('request', function(server, request, ...) {
+    response <- request$respond()
+    response$status <- 200L
+    response$body <- paste0('<h1>This is indeed a test. You are number ', server$get_data('visits'), '</h1>')
+    response$type <- 'html'
 })
 
 # Show number of requests in the console
@@ -150,12 +154,4 @@ and you are free to ignore the other life-cycle events if they are not needed.
 
 ## Feedback
 I would love some feedback on this - open an issue or reach out to me on 
-[twitter](https://twitter.com/thomasp85). This is still a work-in-progress so if
-you want to influence the overall design, this is the moment to shout out.
-
-## Roadmap
-Fiery is intended to be minimal and lightweight so many features will be 
-delegated to plugins. On top of my list for fiery features are infrastructure 
-that allows for delayed, timed and asynchronous code execution, as well as 
-including some small plugins for standard functionality
-
+[twitter](https://twitter.com/thomasp85).
