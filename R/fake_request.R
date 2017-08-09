@@ -21,6 +21,9 @@ InputStreamFake <- R6Class('InputStreamFake',
             private$length <- length(content)
             seek(private$content, 0)
         },
+        finalize = function() {
+            try(close(private$content), silent = TRUE)
+        },
         read_lines = function(n = -1L) {
             readLines(private$content, n, warn = FALSE)
         },
@@ -38,7 +41,7 @@ InputStreamFake <- R6Class('InputStreamFake',
             seek(private$content, 0)
         },
         close = function() {
-            close(private$content)
+            try(close(private$content), silent = TRUE)
         }
     ),
     private = list(
