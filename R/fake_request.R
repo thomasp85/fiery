@@ -183,7 +183,7 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
 split_url <- function(url) {
     matches <- stri_match(
         url,
-        regex = '^(([^:/?#]+):)?(//([^/?#:]*)(:(\\d+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?'
+        regex = '^(([^:/?#]+)://)?(([^/?#:]*)(:(\\d+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?'
     )[1,]
     
     parsedURL <- list(
