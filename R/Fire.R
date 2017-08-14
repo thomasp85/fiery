@@ -432,17 +432,17 @@ Fire <- R6Class('Fire',
                 close_fun()
             }
         },
-        test_websocket = function(request, message) {
+        test_websocket = function(request, message, close = TRUE) {
             ws <- list(
                 request = request,
                 onMessage = function(func) {},
                 onClose = function(func) {},
                 send = function(message) {message(message)},
-                close = function() {}
+                close = function() {message('closing')}
             )
             private$websocket_logic(ws)
-            self$send(message)
-            private$close_ws(private$client_id(request))
+            self$send(message, private$client_id(request))
+            if (close) private$close_ws(private$client_id(request))
         }
     ),
     active = list(
