@@ -183,6 +183,7 @@ NULL
 #' @importFrom later later
 #' @importFrom stats setNames
 #' @importFrom reqres Request
+#' @importFrom stringi stri_pad_left
 #' 
 #' @export
 #' @docType class
@@ -255,24 +256,28 @@ Fire <- R6Class('Fire',
             private$TIME <- TimeStack$new()
             private$ASYNC <- AsyncStack$new()
         },
-        print = function(...) {
-            cat('\U0001f525 A fiery webserver\n')
-            cat('\U0001f525  \U0001f4a5   \U0001f4a5   \U0001f4a5\n')
-            plugins <- paste(names(private$pluginList), collapse = ', ')
-            if (plugins == '') plugins <- 'none'
-            cat('\U0001f525 Plugins attached: ', plugins, '\n', sep = '')
+        format = function(...) {
+            text <- c(
+                '\U0001f525 A fiery webserver',
+                '\U0001f525  \U0001f4a5   \U0001f4a5   \U0001f4a5'
+            )
+            mat <- matrix(c('Running on', ': ', paste0(self$host, ':', self$port, self$root)), ncol = 3)
+            plugins <- names(private$pluginList)
+            if (is.null(plugins)) plugins <- 'none'
+            mat <- rbind(mat, c('Plugins attached', ': ', plugins[1]))
+            mat <- rbind(mat, matrix(c(rep('', (length(plugins) - 1)*2), plugins[-1]), ncol = 3))
             handlers <- lapply(private$handlers, function(x) x$length())
             if (length(handlers) == 0) {
-                cat('\U0001f525 Event handlers added: none\n')
+                mat <- rbind(mat, c('Event handlers added', ': ', 'none'))
             } else {
-                cat('\U0001f525 Event handlers added\n')
+                mat <- rbind(mat, c('Event handlers added', '', ''))
                 order <- match(names(handlers), private$privateTriggers)
                 order[is.na(order)] <- seq_len(sum(is.na(order))) + max(order, na.rm = TRUE)
                 handlers <- handlers[order(order)]
-                name_length <- max(max(nchar(names(handlers))), 20)
-                names(handlers) <- sprintf(paste0('%', name_length, 's'), names(handlers))
-                for(i in names(handlers)) cat('\U0001f525 ', i, ': ', handlers[[i]], '\n', sep = '')
+                mat <- rbind(mat, matrix(c(names(handlers), rep(': ', length(handlers)), as.character(unlist(handlers))), ncol = 3))
             }
+            mat[, 1] <- stri_pad_left(mat[, 1], max(nchar(mat[,1])))
+            c(text, paste0('\U0001f525 ', apply(mat, 1, paste, collapse = '')))
         },
         ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
             if (!silent) message('Fire started at ', self$host, ':', self$port)
