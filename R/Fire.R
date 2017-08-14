@@ -341,6 +341,13 @@ Fire <- R6Class('Fire',
             private$p_trigger('send', server = self, id = id, message = message)
             invisible(NULL)
         },
+        close_ws_con = function(id) {
+            assert_that(is.string(id))
+            ws <- private$websockets[[id]]
+            if (!is.null(ws)) {
+                private$close_ws(id)
+            }
+        },
         attach = function(plugin, ..., force = FALSE) {
             name <- plugin$name
             assert_that(is.string(name))
@@ -710,8 +717,11 @@ Fire <- R6Class('Fire',
             }
         },
         close_ws = function(id) {
-            private$websockets[[id]]$close()
-            rm(list = id, envir = private$websockets)
+            ws <- private$websockets[[id]]
+            if (!is.null(ws)) {
+                try(ws$close(), silent = TRUE)
+                rm(list = id, envir = private$websockets)
+            }
         },
         open_browser = function() {
             url <- paste0('http://', private$HOST, ':', private$PORT, '/')
