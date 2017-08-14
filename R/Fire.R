@@ -478,6 +478,13 @@ Fire <- R6Class('Fire',
                 stop('Use the `attach` method to add plugins', call. = FALSE)
             }
             private$pluginList
+        },
+        root = function(path) {
+            if (missing(path)) return(private$ROOT)
+            assert_that(is.string(path))
+            path <- sub('/$', '', path)
+            if (path != '') path <- paste0('/', sub('^/+', '', path))
+            private$ROOT <- path
         }
     ),
     private = list(
@@ -487,6 +494,7 @@ Fire <- R6Class('Fire',
         REFRESHRATE = 0.001,
         REFRESHRATENB = 1,
         TRIGGERDIR = NULL,
+        ROOT = '',
         
         running = FALSE,
         nb_cycle = FALSE,
@@ -600,8 +608,20 @@ Fire <- R6Class('Fire',
                 }, private$REFRESHRATENB)
             }
         },
+        mount_request = function(req) {
+            if (!grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) stop('URL not matching mount point', call. = FALSE)
+            req$SCRIPT_NAME <- self$root
+            req$PATH_INFO <- sub(paste0('^', self$root, ''), '', req$PATH_INFO)
+            req
+        },
         request_logic = function(req) {
-            req <- Request$new(req)
+            request <- try(private$mount_request(req), silent = TRUE)
+            if (is.error(request)) {
+                req <- Request$new(req)
+                return(req$respond()$status_with_text(400L)$as_list())
+            } else {
+                req <- Request$new(request)
+            }
             id <- private$client_id(req)
             args <- unlist(
                 unname(
@@ -618,7 +638,13 @@ Fire <- R6Class('Fire',
             response
         },
         header_logic = function(req) {
-            req <- Request$new(req)
+            request <- try(private$mount_request(req), silent = TRUE)
+            if (is.error(request)) {
+                req <- Request$new(req)
+                return(req$respond()$status_with_text(400L)$as_list())
+            } else {
+                req <- Request$new(request)
+            }
             id <- private$client_id(req)
             response <- private$p_trigger('header', server = self, id = id, request = req)
             if (length(response) == 0) {
@@ -631,7 +657,13 @@ Fire <- R6Class('Fire',
             }
         },
         websocket_logic = function(ws) {
-            req <- Request$new(ws$request)
+            request <- try(private$mount_request(ws$request), silent = TRUE)
+            if (is.error(request)) {
+                ws$close()
+                return()
+            } else {
+                req <- Request$new(request)
+            }
             id <- private$client_id(req)
             assign(id, ws, envir = private$websockets)
             
