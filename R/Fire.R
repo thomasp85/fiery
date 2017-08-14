@@ -713,7 +713,7 @@ Fire <- R6Class('Fire',
                 id <- ls(envir = private$websockets)
             }
             for (i in id) {
-                private$websockets[[i]]$send(message)
+                if (i %in% names(private$websockets)) private$websockets[[i]]$send(message)
             }
         },
         close_ws = function(id) {
