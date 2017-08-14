@@ -240,6 +240,20 @@ test_that('message events fire', {
     
     expect_equal(app$get_data('events'), c('before', 'during', 'after'))
     expect_equal(app$get_data('passed_args'), list(test = 4, message = 'test2'))
+    
+    app <- Fire$new()
+    request <- fake_request('http://www.example.com')
+    
+    app$on('message', function(server, message, arg_list, ...) {
+        server$set_data('events', c(server$get_data('events'), 'during'))
+        server$set_data('passed_args', list(test = arg_list$test, message = message))
+    })
+    app$on('after-message', function(server, response, ...) {
+        server$set_data('events', c(server$get_data('events'), 'after'))
+    })
+    app$test_message(request, FALSE, 'test')
+    
+    expect_equal(app$get_data('events'), c('during', 'after'))
 })
 
 test_that('header event fire', {
@@ -385,8 +399,12 @@ test_that('websockets are attached, and removed', {
     expect_null(app$get_data('send'))
     expect_message(app$test_websocket(req, 'test', FALSE), 'test')
     expect_true(app$get_data('send'))
+    expect_message(app$send('keep testing', client_to_id(req)), 'keep testing')
+    expect_message(app$send('keep testing again'), 'keep testing again')
     expect_message(app$close_ws_con(client_to_id(req)), 'closing')
     expect_silent(app$close_ws_con(client_to_id(req)))
+    expect_silent(app$send('keep testing', client_to_id(req)))
+    expect_silent(app$send('keep testing again'))
 })
 
 test_that('showcase opens a browser', {
