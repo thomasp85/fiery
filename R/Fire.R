@@ -41,6 +41,7 @@ NULL
 #'  \item{\code{refreshRateNB}}{The interval in seconds between run cycles when running a non-bocking server (defaults to 1)}
 #'  \item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to NULL)}
 #'  \item{\code{plugins}}{A named list of the already attached plugins. Static - can only be modified using the \code{attach()} method.}
+#'  \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with 400 if the request does not match the root). E.g. the path of a request will be changed from /demo/test to /test if \code{root = '/demo'}}
 #' }
 #' 
 #' @section Methods:
@@ -55,6 +56,7 @@ NULL
 #'  \item{\code{off(handlerId)}}{Remove the handler tied to the given id}
 #'  \item{\code{trigger(event, ...)}}{Triggers an event passing the additional arguments to the potential handlers}
 #'  \item{\code{send(message, id)}}{Sends a websocket message to the client with the given id, or to all connected clients if id is missing}
+#'  \item{\code{close_ws_con(id)}}{Closes the websocket connection started from the client with the given id, firing the websocket-closed event}
 #'  \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{on_attach} method and a \code{name} and \code{require} field. Plugins can only get attached once unless \code{force = TRUE}}
 #'  \item{\code{has_plugin(name)}}{Check whether a plugin with the given name has been attached}
 #'  \item{\code{header(name, value)}}{Add a global header to the server that will be set on all responses}
