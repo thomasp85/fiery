@@ -380,11 +380,13 @@ test_that('external triggers are fired', {
 
 test_that('websockets are attached, and removed', {
     app <- Fire$new()
-    
+    req <- fake_request('http://www.example.com')
     app$on('send', function(server, ...) {server$set_data('send', TRUE)})
     expect_null(app$get_data('send'))
-    expect_message(app$test_websocket(fake_request('http://www.example.com'), 'test'), 'test')
+    expect_message(app$test_websocket(req, 'test', FALSE), 'test')
     expect_true(app$get_data('send'))
+    expect_message(app$close_ws_con(client_to_id(req)), 'closing')
+    expect_silent(app$close_ws_con(client_to_id(req)))
 })
 
 test_that('showcase opens a browser', {
@@ -412,4 +414,31 @@ test_that('global headers are assigned and used', {
     response <- app$test_request(fake_request('www.example.com'))
     expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery'))
     expect_equal(app$header('X-Powered-By'), 'fiery')
+})
+
+test_that('app can be mounted at path', {
+    app <- Fire$new()
+    expect_equal(app$root, '')
+    expect_error(app$root <- 123)
+    expect_error(app$root <- c('test', 'test2'))
+    app$root <- '//test/'
+    expect_equal(app$root, '/test')
+    req <- fake_request('http://example.com/test/testing')
+    app$test_request(req)
+    expect_equal(req$PATH_INFO, '/testing')
+    req <- fake_request('http://example.com/test/testing')
+    app$test_header(req)
+    expect_equal(req$PATH_INFO, '/testing')
+    req <- fake_request('http://example.com/test/testing')
+    expect_message(app$test_websocket(req, 'test'), 'test')
+    expect_equal(req$PATH_INFO, '/testing')
+    
+    req <- fake_request('http://example.com/testing')
+    res <- app$test_request(req)
+    expect_equal(res$status, 400L)
+    req <- fake_request('http://example.com/testing')
+    res <- app$test_header(req)
+    expect_equal(res$status, 400L)
+    req <- fake_request('http://example.com/testing')
+    expect_message(app$test_websocket(req, 'test'), '^closing\n$')
 })
