@@ -648,6 +648,7 @@ Fire <- R6Class('Fire',
                     ),
                     recursive = FALSE
                 )
+                if (is.null(args)) args <- structure(list(), names = character())
                 if ('binary' %in% names(args)) binary <- args$binary
                 if ('message' %in% names(args)) msg <- args$message
                 args <- modifyList(args, list(binary = NULL, message = NULL))
