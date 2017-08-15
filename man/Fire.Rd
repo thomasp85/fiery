@@ -42,9 +42,9 @@ object is desired, use the \code{clone()} method.
 \describe{
 \item{\code{host}}{A string giving a valid IPv4 address owned by the server, or \code{'0.0.0.0'} to listen on all addresses. The default is \code{'127.0.0.1'}}
 \item{\code{port}}{An integer giving the port number the server should listen on (defaults to \code{8080L})}
-\item{\code{refreshRate}}{The interval in seconds between run cycles when running a blocking server (defaults to \code{0.001})}
-\item{\code{refreshRateNB}}{The interval in seconds between run cycles when running a non-bocking server (defaults to \code{1})}
-\item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to \code{NULL})}
+\item{\code{refresh_rate}}{The interval in seconds between run cycles when running a blocking server (defaults to \code{0.001})}
+\item{\code{refresh_rate_nb}}{The interval in seconds between run cycles when running a non-bocking server (defaults to \code{1})}
+\item{\code{trigger_dir}}{A valid folder where trigger files can be put when running a blocking server (defaults to \code{NULL})}
 \item{\code{plugins}}{A named list of the already attached plugins. \strong{Static} - can only be modified using the \code{attach()} method.}
 \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \code{/demo/test} to \code{/test} if \code{root == '/demo'}}
 }

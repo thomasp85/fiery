@@ -134,10 +134,10 @@
 #' If a `fiery` server is running in blocking mode it is not possible to 
 #' communicate with it using the `trigger()` method. Instead it is possible to
 #' assign a directory to look in for event trigger instructions. The trigger 
-#' directory is set using the `triggerDir` field, e.g.:
+#' directory is set using the `trigger_dir` field, e.g.:
 #' 
 #' ```
-#' app$triggerDir <- '/some/path/to/dir/'
+#' app$trigger_dir <- '/some/path/to/dir/'
 #' ```
 #' 
 #' Events are triggered by placing an `rds` file named after the event in the

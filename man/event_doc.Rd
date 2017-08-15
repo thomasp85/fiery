@@ -141,7 +141,7 @@ whether handlers have been added.
 If a \code{fiery} server is running in blocking mode it is not possible to
 communicate with it using the \code{trigger()} method. Instead it is possible to
 assign a directory to look in for event trigger instructions. The trigger
-directory is set using the \code{triggerDir} field, e.g.:\preformatted{app$triggerDir <- '/some/path/to/dir/'
+directory is set using the \code{trigger_dir} field, e.g.:\preformatted{app$trigger_dir <- '/some/path/to/dir/'
 }
 
 Events are triggered by placing an \code{rds} file named after the event in the

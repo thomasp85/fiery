@@ -1,4 +1,4 @@
-# fiery 0.2.3.9000
+# fiery 1.0.0
 
 * `Fire$new()` now takes a port and host argument to set these fields on 
   initialisation. (fixes #5)
@@ -26,6 +26,9 @@
 * Better documentation. Events and plugins now has their own documentation 
   entries (fixes #10).
 * Convert roxygen documentation to md format
+* **BREAKING** fields now uses snake_case rather than camelCase for a more
+  consistent interface. This means `refreshRate` -> `refresh_rate`, 
+  `triggerDir` -> `trigger_dir`.
 
 # fiery 0.2.3
 

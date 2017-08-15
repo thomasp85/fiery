@@ -41,9 +41,9 @@ NULL
 #' \describe{
 #'  \item{`host`}{A string giving a valid IPv4 address owned by the server, or `'0.0.0.0'` to listen on all addresses. The default is `'127.0.0.1'`}
 #'  \item{`port`}{An integer giving the port number the server should listen on (defaults to `8080L`)}
-#'  \item{`refreshRate`}{The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)}
-#'  \item{`refreshRateNB`}{The interval in seconds between run cycles when running a non-bocking server (defaults to `1`)}
-#'  \item{`triggerDir`}{A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`)}
+#'  \item{`refresh_rate`}{The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)}
+#'  \item{`refresh_rate_nb`}{The interval in seconds between run cycles when running a non-bocking server (defaults to `1`)}
+#'  \item{`trigger_dir`}{A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`)}
 #'  \item{`plugins`}{A named list of the already attached plugins. **Static** - can only be modified using the `attach()` method.}
 #'  \item{`root`}{The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`}
 #' }
@@ -367,17 +367,17 @@ Fire <- R6Class('Fire',
             assert_that(is.count(n))
             private$PORT <- n
         },
-        refreshRate = function(rate) {
+        refresh_rate = function(rate) {
             if (missing(rate)) return(private$REFRESHRATE)
             assert_that(is.number(rate))
             private$REFRESHRATE <- rate
         },
-        refreshRateNB = function(rate) {
+        refresh_rate_nb = function(rate) {
             if (missing(rate)) return(private$REFRESHRATENB)
             assert_that(is.number(rate))
             private$REFRESHRATENB <- rate
         },
-        triggerDir = function(dir) {
+        trigger_dir = function(dir) {
             if (missing(dir)) return(private$TRIGGERDIR)
             if (!is.null(dir)) {
                 assert_that(is.dir(dir))
@@ -484,7 +484,7 @@ Fire <- R6Class('Fire',
                     private$quitting <- FALSE
                     break
                 }
-                Sys.sleep(self$refreshRate)
+                Sys.sleep(self$refresh_rate)
             }
         },
         run_allowing_server = function(showcase = FALSE) {
