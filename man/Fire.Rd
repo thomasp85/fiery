@@ -8,7 +8,12 @@
 The Fire generator creates a new 'Fire'-object, which is the class containing 
 all the app logic. The class is based on the R6 OO-system and is thus
 reference-based with methods and data attached to each object, in contrast to
-the more well known S3 and S4 systems.
+the more well known S3 and S4 systems. A \code{fiery} server is event driven,
+which means that it is build up and manipulated by adding event handlers and
+triggering events. To learn more about the \code{fiery} event model, read the
+\link[=event_doc]{event documentation}. \code{fiery} servers can be modified
+directly or by attaching plugins. As with events, 
+\link[=plugin_doc]{plugins has its own documentation}.
 }
 \section{Initialization}{
 
@@ -74,112 +79,6 @@ object is desired, use the \code{clone()} method.
  \item{\code{remove_async(id)}}{Removes the async evaluation identified by the id. The evaluation is not necessarily stopped but the then function will not get called.}
  \item{\code{set_client_id_converter(converter)}}{Sets the function that converts an HTTP request into a specific client id}
  \item{\code{clone()}}{Create a copy of the full 'Fire' object and return that}
-}
-}
-
-\section{Events}{
-
-fiery is using an event-based model to allow you to program the logic. During
-the lifecycle of an app a range of different events will be triggered and it
-is possible to add event handlers to these using the \code{on()} method. An 
-event handler is simply a function that will get called every time an event 
-is fired. Apart from the predefined lifecycle events it is also possible to 
-trigger custom events using the \code{trigger()} method. Manual triggering of
-lifecycle events is not allowed.
-
-Following is a list of all lifecycle events:
-
-\describe{
- \item{start}{Will trigger once when the app is started but before it is 
- running. The handlers will recieve the app itself as the \code{server} 
- argument as well as any argument passed on from the \code{ignite()} method. 
- Any return value is discarded.}
- \item{resume}{Will trigger once after the start event if the app has been
- started using the \code{reignite()} method. The handlers will recieve the 
- app itself as the \code{server} argument as well as any argument passed on 
- from the \code{reignite()} method. Any return value is discarded.}
- \item{end}{Will trigger once after the app is stopped. The handlers will 
- recieve the app itself as the \code{server} argument. Any return value is 
- discarded.}
- \item{cycle-start}{Will trigger in the beginning of each loop, before the 
- request queue is flushed. The handlers will recieve the app itself as the 
- \code{server} argument. Any return value is discarded.}
- \item{cycle-end}{Will trigger in the end of each loop, after the 
- request queue is flushed and all delayed, timed, and asynchronous calls have
- been executed. The handlers will recieve the app itself as the \code{server} 
- argument. Any return value is discarded.}
- \item{header}{Will trigger everytime the header of a request is recieved. 
- The return value of the last called handler is used to determine if further
- processing of the request will be done. If the return value is \code{TRUE}
- the request will continue on to normal processing. If the return value is 
- FALSE the response will be send back and the connection will be closed 
- without retrieving the payload. The handlers will recieve the app itself as 
- the \code{server} argument, the client id as the \code{id} argument and the 
- request object as the \code{request} argument}
- \item{before-request}{Will trigger prior to handling of a request (that is, 
- every time a request is recieved unless it is short-circuited by the header
- handlers). The return values of the handlers will be passed on to the request
- handlers and can thus be used to inject data into the request handlers (e.g.
- session specific data). The handlers will recieve the app itself as the 
- \code{server} argument, the client id as the \code{id} argument and the 
- request object as the \code{request} argument}
- \item{request}{Will trigger after the before-request event. This is where 
- the main request handling is done. The return value of the last handler is
- send back to the client as response. If no handler is reqistered a 404 error
- is returned automatically. If the return value is not a valid response,
- a 500 server error is returned instead. The handlers will recieve the app 
- itself as the \code{server} argument, the client id as the \code{id} 
- argument, the request object as the \code{request} argument, and the list of 
- values created by the before-event handlers as the \code{arg_list} argument.}
- \item{after-request}{Will trigger after the request event. This can be used
- to inspect the response (but not modify it) before it is send to the client. 
- The handlers will recieve the app itself as the \code{server} argument, the 
- client id as the \code{id} argument, the request object as the 
- \code{request} argument, and the response as the \code{response} argument. 
- Any return value is discarded.}
- \item{before-message}{This event is triggered when a websocket message is
- recieved. As with the before-request event the return values of the handlers
- are passed on to the message handlers. Specifically if a 'binary' and 
- 'message' value is returned they will override the original values in the
- message and after-message handler arguments. This can e.g. be used to decode 
- the message once before passing it through the message handlers. The 
- before-message handlers will recieve the app itself as the \code{server} 
- argument, the client id as the \code{id} argument, a flag indicating whether 
- the message is binary as the \code{binary} argument, the message itself as 
- the \code{message} argument, and the request object used to establish the 
- connection with the client as the \code{request} argument.}
- \item{message}{This event is triggered after the before-message event and is
- used for the primary websocket message handling. As with the request event,
- the handlers for the message event recieves the return values from the 
- before-message handlers which can be used to e.g. inject session specific
- data. The message handlers will recieve the app itself as the \code{server} 
- argument, the client id as the \code{id} argument, a flag indicating whether 
- the message is binary as the \code{binary} argument, the message itself as 
- the \code{message} argument, the request object used to establish the 
- connection with the client as the \code{request} argument, and the values
- returned by the before-message handlers as the \code{arg_list} argument. 
- Contrary to the request event the return values of the handlers are ignored
- as websocket communication is bidirectional}
- \item{after-message}{This event is triggered after the message event. It is
- provided more as an equivalent to the after-request event than out of 
- necessity as there is no final response to inspect and handler can thus just
- as well be atached to the message event. For clear division of server logic 
- message specific handlers should be attached to the message event, whereas 
- general handlers should, if possible, be attached to the after-message 
- event. The after-message handlers will recieve the app itself as the 
- \code{server} argument, the client id as the \code{id} argument, a flag 
- indicating whether the message is binary as the \code{binary} argument, the 
- message itself as the \code{message} argument, and the request object used 
- to establish the connection with the client as the \code{request} argument.}
- \item{send}{This event is triggered after a websocket message is send to a 
- client. The handlers will recieve the app itself as the \code{server} 
- argument, the client id as the \code{id} argument and the send message as 
- the \code{message} argument. Any return value is discarded.}
- \item{websocket-closed}{This event will be triggered every time a websocket
- connection is closed. The handlers will recieve the app itself as the 
- \code{server} argument, the client id as the \code{id} argument and request
- used to establish the closed connection as the \code{request} argument. Any 
- return value is discarded.}
 }
 }
 
