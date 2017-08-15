@@ -128,21 +128,21 @@ test_that('active bindings work', {
     app$port <- 10
     expect_equal(app$port, 10)
     
-    expect_error(app$refreshRate <- 'test')
-    expect_error(app$refreshRate <- 1:5)
-    app$refreshRate <- 10.5
-    expect_equal(app$refreshRate, 10.5)
+    expect_error(app$refresh_rate <- 'test')
+    expect_error(app$refresh_rate <- 1:5)
+    app$refresh_rate <- 10.5
+    expect_equal(app$refresh_rate, 10.5)
     
-    expect_error(app$refreshRateNB <- 'test')
-    expect_error(app$refreshRateNB <- 1:5)
-    app$refreshRateNB <- 10.5
-    expect_equal(app$refreshRateNB, 10.5)
+    expect_error(app$refresh_rate_nb <- 'test')
+    expect_error(app$refresh_rate_nb <- 1:5)
+    app$refresh_rate_nb <- 10.5
+    expect_equal(app$refresh_rate_nb, 10.5)
     
-    expect_error(app$triggerDir <- 'test')
-    expect_error(app$triggerDir <- 1:5)
+    expect_error(app$trigger_dir <- 'test')
+    expect_error(app$trigger_dir <- 1:5)
     dir <- tempdir()
-    app$triggerDir <- dir
-    expect_equal(app$triggerDir, dir)
+    app$trigger_dir <- dir
+    expect_equal(app$trigger_dir, dir)
 })
 
 test_that('lifecycle events get fired', {
@@ -380,7 +380,7 @@ test_that('external triggers are fired', {
     app <- Fire$new()
     
     dir <- tempdir()
-    app$triggerDir <- dir
+    app$trigger_dir <- dir
     
     app$on('test', function(server, ...) {
         server$set_data('ext_args', list(...))
