@@ -4,78 +4,77 @@ NULL
 
 #' Generate a New App Object
 #' 
-#' The Fire generator creates a new 'Fire'-object, which is the class containing 
-#' all the app logic. The class is based on the R6 OO-system and is thus
-#' reference-based with methods and data attached to each object, in contrast to
-#' the more well known S3 and S4 systems. A \code{fiery} server is event driven,
-#' which means that it is build up and manipulated by adding event handlers and
-#' triggering events. To learn more about the \code{fiery} event model, read the
-#' \link[=event_doc]{event documentation}. \code{fiery} servers can be modified
-#' directly or by attaching plugins. As with events, 
-#' \link[=plugin_doc]{plugins has its own documentation}.
+#' The Fire generator creates a new `Fire`-object, which is the class containing
+#' all the app logic. The class is based on the [R6][R6::R6Class] OO-system and
+#' is thus reference-based with methods and data attached to each object, in
+#' contrast to the more well known S3 and S4 systems. A `fiery` server is event
+#' driven, which means that it is build up and manipulated by adding event
+#' handlers and triggering events. To learn more about the `fiery` event model,
+#' read the [event documentation][events]. `fiery` servers can be modified 
+#' directly or by attaching plugins. As with events, [plugins has its own
+#' documentation][plugins].
 #' 
 #' @usage NULL
 #' @format NULL
 #' 
 #' @section Initialization:
-#' A new 'Fire'-object is initialized using the \code{new()} method on the 
-#' generator:
+#' A new 'Fire'-object is initialized using the `new()` method on the generator:
 #' 
 #' \strong{Usage}
 #' \tabular{l}{
-#'  \code{app <- Fire$new(host = '127.0.0.1', port = 8080L)}
+#'  `app <- Fire$new(host = '127.0.0.1', port = 8080L)`
 #' }
 #' 
 #' \strong{Arguments}
 #' \tabular{lll}{
-#'  \code{host} \tab  \tab A string overriding the default host (see the Fields section below)\cr
-#'  \code{port} \tab  \tab An integer overriding the default port (see the Fields section below)
+#'  `host` \tab  \tab A string overriding the default host (see the *Fields* section below)\cr
+#'  `port` \tab  \tab An integer overriding the default port (see the *Fields* section below)
 #' }
 #' 
-#' \emph{Copying}
+#' *Copying*
 #' 
-#' As 'Fire' objects are using reference semantics new copies of an app cannot
-#' be made simply be assigning it to a new variable. If a true copy of a 'Fire'
-#' object is desired, use the \code{clone()} method.
+#' As `Fire` objects are using reference semantics new copies of an app cannot
+#' be made simply be assigning it to a new variable. If a true copy of a `Fire`
+#' object is desired, use the `clone()` method.
 #' 
 #' @section Fields:
 #' \describe{
-#'  \item{\code{host}}{A string giving a valid IPv4 address owned by the server, or '0.0.0.0' to listen on all addresses. The default is '127.0.0.1'}
-#'  \item{\code{port}}{An integer giving the port number the server should listen on (defaults to 8080L)}
-#'  \item{\code{refreshRate}}{The interval in seconds between run cycles when running a blocking server (defaults to 0.001)}
-#'  \item{\code{refreshRateNB}}{The interval in seconds between run cycles when running a non-bocking server (defaults to 1)}
-#'  \item{\code{triggerDir}}{A valid folder where trigger files can be put when running a blocking server (defaults to NULL)}
-#'  \item{\code{plugins}}{A named list of the already attached plugins. Static - can only be modified using the \code{attach()} method.}
-#'  \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with 400 if the request does not match the root). E.g. the path of a request will be changed from /demo/test to /test if \code{root = '/demo'}}
+#'  \item{`host`}{A string giving a valid IPv4 address owned by the server, or `'0.0.0.0'` to listen on all addresses. The default is `'127.0.0.1'`}
+#'  \item{`port`}{An integer giving the port number the server should listen on (defaults to `8080L`)}
+#'  \item{`refreshRate`}{The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)}
+#'  \item{`refreshRateNB`}{The interval in seconds between run cycles when running a non-bocking server (defaults to `1`)}
+#'  \item{`triggerDir`}{A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`)}
+#'  \item{`plugins`}{A named list of the already attached plugins. **Static** - can only be modified using the `attach()` method.}
+#'  \item{`root`}{The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`}
 #' }
 #' 
 #' @section Methods:
 #' \describe{
-#'  \item{\code{ignite(block = TRUE, showcase = FALSE, ...)}}{Begins the server,either blocking the console if \code{block = TRUE} or not. If \code{showcase = TRUE} a browser window is opened directing at the server address. \code{...} will be redirected to the 'start' handler(s)}
-#'  \item{\code{start(block = TRUE, showcase = FALSE, ...)}}{A less dramatic synonym of for \code{ignite}}
-#'  \item{\code{reignite(block = TRUE, showcase = FALSE, ...)}}{As \code{ignite} but additionally triggers the 'resume' event after the 'start' event}
-#'  \item{\code{resume(block = TRUE, showcase = FALSE, ...)}}{Another less dramatic synonym, this time for reignite}
-#'  \item{\code{extinguish()}}{Stops a running server}
-#'  \item{\code{stop()}}{Boring synonym for \code{extinguish}}
-#'  \item{\code{on(event, handler, pos = NULL)}}{Add a handler function to to an event at the given position in the handler stack. Returns a string uniquely identifying the handler}
-#'  \item{\code{off(handlerId)}}{Remove the handler tied to the given id}
-#'  \item{\code{trigger(event, ...)}}{Triggers an event passing the additional arguments to the potential handlers}
-#'  \item{\code{send(message, id)}}{Sends a websocket message to the client with the given id, or to all connected clients if id is missing}
-#'  \item{\code{close_ws_con(id)}}{Closes the websocket connection started from the client with the given id, firing the websocket-closed event}
-#'  \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a plugin to the server. A plugin is an R6 object with an \code{on_attach} method and a \code{name} and \code{require} field. Plugins can only get attached once unless \code{force = TRUE}}
-#'  \item{\code{has_plugin(name)}}{Check whether a plugin with the given name has been attached}
-#'  \item{\code{header(name, value)}}{Add a global header to the server that will be set on all responses}
-#'  \item{\code{set_data(name, value)}}{Adds data to the servers internal data store}
-#'  \item{\code{get_data(name)}}{Extracts data from the internal data store}
-#'  \item{\code{remove_data(name)}}{Removes the data with the given name from the internal data store}
-#'  \item{\code{time(expr, then, after, loop = FALSE)}}{Add a timed evaluation that will be evaluated after the given number of seconds, potentially repeating if loop=TRUE. After the expression has evaluated the 'then' function will get called with the result of the expression and the server object as arguments.}
-#'  \item{\code{remove_time(id)}}{Removes the timed evaluation identified by the id (returned when adding the evaulation)}
-#'  \item{\code{delay(expr, then)}}{As time except the expr is evaluated immediately at the end of the loop cycle}
-#'  \item{\code{remove_delay(id)}}{Removes the delayed evaluation identified by the id}
-#'  \item{\code{async(expr, then)}}{As delay and time except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
-#'  \item{\code{remove_async(id)}}{Removes the async evaluation identified by the id. The evaluation is not necessarily stopped but the then function will not get called.}
-#'  \item{\code{set_client_id_converter(converter)}}{Sets the function that converts an HTTP request into a specific client id}
-#'  \item{\code{clone()}}{Create a copy of the full 'Fire' object and return that}
+#'  \item{`ignite(block = TRUE, showcase = FALSE, ...)`}{Begins the server, either blocking the console if `block = TRUE` or not. If `showcase = TRUE` a browser window is opened directing at the server address. `...` will be redirected to the `start` handler(s)}
+#'  \item{`start(block = TRUE, showcase = FALSE, ...)`}{A less dramatic synonym of for `ignite()`}
+#'  \item{`reignite(block = TRUE, showcase = FALSE, ...)`}{As `ignite` but additionally triggers the `resume` event after the `start` event}
+#'  \item{`resume(block = TRUE, showcase = FALSE, ...)`}{Another less dramatic synonym, this time for `reignite()`}
+#'  \item{`extinguish()`}{Stops a running server}
+#'  \item{`stop()`}{Boring synonym for `extinguish()`}
+#'  \item{`on(event, handler, pos = NULL)`}{Add a `handler` function to to an `event` at the given position (`pos`) in the handler stack. Returns a string uniquely identifying the handler. See the [event documentation][events] for more information.}
+#'  \item{`off(handlerId)`}{Remove the handler tied to the given `id`}
+#'  \item{`trigger(event, ...)`}{Triggers an `event` passing the additional arguments to the potential handlers}
+#'  \item{`send(message, id)`}{Sends a websocket `message` to the client with the given `id`, or to all connected clients if `id` is missing}
+#'  \item{`close_ws_con(id)`}{Closes the websocket connection started from the client with the given `id`, firing the `websocket-closed` event}
+#'  \item{`attach(plugin, ..., force = FALSE)`}{Attaches a `plugin` to the server. See the [plugin documentation][plugins] for more information. Plugins can only get attached once unless `force = TRUE`}
+#'  \item{`has_plugin(name)`}{Check whether a plugin with the given `name` has been attached}
+#'  \item{`header(name, value)`}{Add a global `header` to the server that will be set on all responses. Remove by setting `value = NULL`}
+#'  \item{`set_data(name, value)`}{Adds data to the servers internal data store}
+#'  \item{`get_data(name)`}{Extracts data from the internal data store}
+#'  \item{`remove_data(name)`}{Removes the data with the given `name` from the internal data store}
+#'  \item{`time(expr, then, after, loop = FALSE)`}{Add a timed evaluation (`expr`) that will be evaluated after the given number of seconds (`after`), potentially repeating if `loop = TRUE`. After the expression has evaluated the `then` function will get called with the result of the expression and the server object as arguments.}
+#'  \item{`remove_time(id)`}{Removes the timed evaluation identified by the `id` (returned when adding the evaulation)}
+#'  \item{`delay(expr, then)`}{As `time()` except the `expr` is evaluated immediately at the end of the loop cycle}
+#'  \item{`remove_delay(id)`}{Removes the delayed evaluation identified by the `id`}
+#'  \item{`async(expr, then)`}{As `delay()` and `time()` except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
+#'  \item{`remove_async(id)`}{Removes the async evaluation identified by the `id`. The evaluation is not necessarily stopped but the then function will not get called.}
+#'  \item{`set_client_id_converter(converter)`}{Sets the function that converts an HTTP request into a specific client id}
+#'  \item{`clone()`}{Create a copy of the full `Fire` object and return that}
 #' }
 #' 
 #' @importFrom R6 R6Class
@@ -90,6 +89,10 @@ NULL
 #' 
 #' @export
 #' @docType class
+#' 
+#' @seealso [events] describes how the server event cycle works
+#' 
+#' [plugins] describes how to use plugins to modify the server
 #' 
 #' @examples 
 #' # Create a New App

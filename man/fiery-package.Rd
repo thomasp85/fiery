@@ -6,18 +6,35 @@
 \alias{fiery-package}
 \title{A Fiery Framework for R-Based Web Development}
 \description{
-Fiery is a lightweight and flexible framework for web servers build on top
-of the \link{httpuv} package. The framework is largely event-based, letting
-the developer attach handlers to life-cycle events as well as defining and
-triggering their own events. This approach to development is common in 
-JavaScript, but might feel foreign to R developers. Thankfully it is a rather
-simple concept that should be easy to gradually begin to use to greater and
-greater effect.
+\code{fiery} is a lightweight and flexible framework for web servers build on top of
+the \link[httpuv:httpuv-package]{httpuv} package. The framework is largely
+event-based, letting the developer attach handlers to life-cycle events as
+well as defining and triggering their own events. This approach to
+development is common in JavaScript, but might feel foreign to R developers.
+Thankfully it is a rather simple concept that should be easy to gradually
+begin to use to greater and greater effect.
 }
+\section{Read more}{
+
+\itemize{
+\item Creation of the server object, along with all its methods and fields, is
+described in the documentation of the \code{\link{Fire}} class.
+\item An overview of the event model, along with descriptions of the predefined
+life-cycle events and custom events can be found in the \link{events}
+documentation.
+\item A description of the \code{fiery} plugin interface and how to develop your
+own plugins is laid out in the \link{plugins} documentation
+}
+}
+
 \seealso{
-\code{\link{Fire}} for the main approach to build your server logic
+Useful links:
+\itemize{
+  \item \url{https://github.com/thomasp85/fiery}
+  \item Report bugs at \url{https://github.com/thomasp85/fiery/issues}
+}
+
 }
 \author{
-\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com}
-
+Thomas Lin Pedersen \href{mailto:thomasp85@gmail.com}{thomasp85@gmail.com}
 }

@@ -39,6 +39,6 @@ RoxygenNote: 6.0.1
 Suggests:
     testthat,
     covr
-Remotes: thomasp85/reqres
+Roxygen: list(markdown = TRUE)
 URL: https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues

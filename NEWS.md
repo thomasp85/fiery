@@ -19,10 +19,13 @@
 * **BREAKING** The `after-request` event will no longer pass the response to
   handlers. This can be retrieved from the `request` object.
 * The server can now be mounted at a path, which will strip that path from 
-  request paths this making the app logic independent on mounting. Use the 
+  request paths thus making the app logic independent on mounting. Use the 
   `root` field to access and change the root location.
 * Websocket connections can now be closed from the server by using the 
   `close_ws_con()` method.
+* Better documentation. Events and plugins now has their own documentation 
+  entries (fixes #10).
+* Convert roxygen documentation to md format
 
 # fiery 0.2.3
 
