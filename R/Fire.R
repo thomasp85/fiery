@@ -186,7 +186,7 @@ Fire <- R6Class('Fire',
             c(text, paste0('\U0001f525 ', apply(mat, 1, paste, collapse = '')))
         },
         ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-            if (!silent) message('Fire started at ', self$host, ':', self$port)
+            if (!silent) message('Fire started at ', self$host, ':', self$port, self$root)
             private$run(block = block, showcase = showcase, ...)
             invisible(NULL)
         },
@@ -194,7 +194,7 @@ Fire <- R6Class('Fire',
             self$ignite(block = block, showcase = showcase, ..., silent = silent)
         },
         reignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-            if (!silent) message('Fire restarted at ', self$host, ':', self$port)
+            if (!silent) message('Fire restarted at ', self$host, ':', self$port, self$root)
             private$run(block = block, resume = TRUE, showcase = showcase, ...)
             invisible(NULL)
         },
