@@ -42,7 +42,7 @@ list or environment (e.g. a \code{\link[methods:setRefClass]{RefClass}} or
 
 Apart from this, the list/environment can contain anything you desires. For
 an example of a relatively complex plugin, have a look at the source code for
-the \code{\href{https://github.com/thomasp85/routr}{routr}} package.
+the \href{https://github.com/thomasp85/routr}{\code{routr}} package.
 }
 
 \section{Accessing Plugins}{
