@@ -15,7 +15,7 @@
 * **BREAKING** The `header` event now expect handlers to return a logical, with
   `TRUE` indicating further processing, and `FALSE` indicating termination.
 * Cycle events are now triggered when running with `block = FALSE` making the
-  two run modes identical in their lifecycle events.
+  two run modes identical in their life cycle events.
 * **BREAKING** The `after-request` event will no longer pass the response to
   handlers. This can be retrieved from the `request` object.
 * The server can now be mounted at a path, which will strip that path from 
@@ -29,6 +29,8 @@
 * **BREAKING** fields now uses snake_case rather than camelCase for a more
   consistent interface. This means `refreshRate` -> `refresh_rate`, 
   `triggerDir` -> `trigger_dir`.
+* Switch to MIT License
+* Catch errors in start and resume event handlers
 
 # fiery 0.2.3
 

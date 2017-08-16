@@ -1,8 +1,8 @@
 Package: fiery
 Type: Package
 Title: A Lightweight and Flexible Web Framework
-Version: 0.2.3.9001
-Date: 2017-07-13
+Version: 1.0.0
+Date: 2017-08-16
 Authors@R: c(
     person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
     )
@@ -13,7 +13,7 @@ Description: A very flexible framework for building server side logic in R. The
     static content to full-blown dynamic web-apps. Fiery does not hold your hand
     as much as e.g. the shiny package does, but instead sets you free to create
     your web app the way you want.
-License: GPL (>=2)
+License: MIT + file LICENSE
 Imports:
     R6,
     assertthat,
@@ -26,7 +26,7 @@ Imports:
     stats,
     desc,
     reqres
-Collate: 
+Collate:
     'aaa.R'
     'HandlerStack.R'
     'Fire.R'
