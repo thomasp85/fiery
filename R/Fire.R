@@ -437,9 +437,17 @@ Fire <- R6Class('Fire',
             if (!private$running) {
                 private$running <- TRUE
                 private$TIME$reset()
-                private$p_trigger('start', server = self, ...)
+                error <- try(private$p_trigger('start', server = self, ...), silent = TRUE)
+                if (is.error(error)) {
+                    private$running <- FALSE
+                    stop(trimws(error), call. = FALSE)
+                }
                 if (resume) {
-                    private$p_trigger('resume', server = self, ...)
+                    error <- try(private$p_trigger('resume', server = self, ...), silent = TRUE)
+                    if (is.error(error)) {
+                        private$running <- FALSE
+                        stop(trimws(error), call. = FALSE)
+                    }
                 }
                 
                 if (block) {
