@@ -68,7 +68,7 @@ NULL
 #'  \item{`get_data(name)`}{Extracts data from the internal data store}
 #'  \item{`remove_data(name)`}{Removes the data with the given `name` from the internal data store}
 #'  \item{`time(expr, then, after, loop = FALSE)`}{Add a timed evaluation (`expr`) that will be evaluated after the given number of seconds (`after`), potentially repeating if `loop = TRUE`. After the expression has evaluated the `then` function will get called with the result of the expression and the server object as arguments.}
-#'  \item{`remove_time(id)`}{Removes the timed evaluation identified by the `id` (returned when adding the evaulation)}
+#'  \item{`remove_time(id)`}{Removes the timed evaluation identified by the `id` (returned when adding the evaluation)}
 #'  \item{`delay(expr, then)`}{As `time()` except the `expr` is evaluated immediately at the end of the loop cycle}
 #'  \item{`remove_delay(id)`}{Removes the delayed evaluation identified by the `id`}
 #'  \item{`async(expr, then)`}{As `delay()` and `time()` except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
@@ -98,7 +98,7 @@ NULL
 #' # Create a New App
 #' app <- Fire$new(port = 4689)
 #' 
-#' # Setup the data everytime it starts
+#' # Setup the data every time it starts
 #' app$on('start', function(server, ...) {
 #'     server$set_data('visits', 0)
 #'     server$set_data('cycles', 0)

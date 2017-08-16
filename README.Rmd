@@ -20,8 +20,8 @@ knitr::opts_chunk$set(
 [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery)
 [![Coverage Status](https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg)](https://codecov.io/github/thomasp85/fiery?branch=master)
 
-Fiery is a flexible and lighweight framework for building web servers in R. It 
-is relatively unoppinionated about how you chose to build your server logic and
+Fiery is a flexible and lightweight framework for building web servers in R. It 
+is relatively unopinionated about how you chose to build your server logic and
 supports many use cases, from serving static files to being used as a base for a
 model-view-controller based setup.
 
@@ -61,7 +61,7 @@ complexity, but with the goal of giving you more power over what you can do.
 *So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*
 
 Now we're getting somewhere! httpuv is sitting in the bottom of the stack for
-both Shiny and Fiery, but where Shiny build an elaborate, oppinionated and 
+both Shiny and Fiery, but where Shiny build an elaborate, opinionated and 
 complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to
 running a httpuv based web server. You could say that Fiery *sits between* 
 httpuv and Shiny, and that Shiny (or an alternative framework) could in theory 
@@ -101,7 +101,7 @@ library(fiery)
 # Create a New App
 app <- Fire$new()
 
-# Setup the data everytime it starts
+# Setup the data every time it starts
 app$on('start', function(server, ...) {
     server$set_data('visits', 0)
     server$set_data('cycles', 0)

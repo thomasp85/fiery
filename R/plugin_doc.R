@@ -4,7 +4,7 @@
 #' `fiery` servers `fiery` implements a plugin interface. Indeed, the reason why
 #' `fiery` is so minimal in functionality is because it is intended as a
 #' foundation for separate plugins that can add convenience and power. This
-#' approach allows `fiery` itself to remain unoppinionated and flexible.
+#' approach allows `fiery` itself to remain unopinionated and flexible.
 #' 
 #' @section Using Plugins:
 #' Plugins are added to a [`Fire`] object using the `attach()` method. Any
@@ -16,7 +16,7 @@
 #' ```
 #' 
 #' @section Creating Plugins:
-#' The `fiery` plugin spcification is rather simple. A plugin is either a list
+#' The `fiery` plugin specification is rather simple. A plugin is either a list
 #' or environment (e.g. a [RefClass][methods::setRefClass] or [R6][R6::R6Class]
 #' object) with the following elements:
 #' 

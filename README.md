@@ -4,7 +4,7 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery) [![Coverage Status](https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg)](https://codecov.io/github/thomasp85/fiery?branch=master)
 
-Fiery is a flexible and lighweight framework for building web servers in R. It is relatively unoppinionated about how you chose to build your server logic and supports many use cases, from serving static files to being used as a base for a model-view-controller based setup.
+Fiery is a flexible and lightweight framework for building web servers in R. It is relatively unopinionated about how you chose to build your server logic and supports many use cases, from serving static files to being used as a base for a model-view-controller based setup.
 
 ### The shiny elephant in the room
 
@@ -27,7 +27,7 @@ From the above it is quite clear that Fiery to a higher degree gives you the cho
 
 *So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*
 
-Now we're getting somewhere! httpuv is sitting in the bottom of the stack for both Shiny and Fiery, but where Shiny build an elaborate, oppinionated and complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to running a httpuv based web server. You could say that Fiery *sits between* httpuv and Shiny, and that Shiny (or an alternative framework) could in theory be build on top of Fiery.
+Now we're getting somewhere! httpuv is sitting in the bottom of the stack for both Shiny and Fiery, but where Shiny build an elaborate, opinionated and complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to running a httpuv based web server. You could say that Fiery *sits between* httpuv and Shiny, and that Shiny (or an alternative framework) could in theory be build on top of Fiery.
 
 How to install this
 -------------------
@@ -57,7 +57,7 @@ library(fiery)
 # Create a New App
 app <- Fire$new()
 
-# Setup the data everytime it starts
+# Setup the data every time it starts
 app$on('start', function(server, ...) {
     server$set_data('visits', 0)
     server$set_data('cycles', 0)

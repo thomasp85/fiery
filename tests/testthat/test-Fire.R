@@ -145,7 +145,7 @@ test_that('active bindings work', {
     expect_equal(app$trigger_dir, dir)
 })
 
-test_that('lifecycle events get fired', {
+test_that('life cycle events get fired', {
     app <- Fire$new()
     app$on('start', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'start'))

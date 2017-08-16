@@ -21,7 +21,7 @@ client_to_id <- function(request) {
 
 #' Predefined responses
 #' 
-#' This is a convenience for not having to type out a typical response everytime 
+#' This is a convenience for not having to type out a typical response every time 
 #' they are needed
 #' 
 #' @noRd

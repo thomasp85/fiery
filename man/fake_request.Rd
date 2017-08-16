@@ -8,7 +8,7 @@ fake_request(url, method = "get", appLocation = "", content = "",
   headers = list(), ...)
 }
 \arguments{
-\item{url}{A complete url for the ressource the request should ask for}
+\item{url}{A complete url for the resource the request should ask for}
 
 \item{method}{The request type (get, post, put, etc). Defaults to \code{"get"}}
 
@@ -25,8 +25,8 @@ be stripped from the path}
 A Rook-compliant environment
 }
 \description{
-This function creates a new request for a specific ressource defined by a
-URL. It mimicks the format of the requests provided through httpuv, meaning
+This function creates a new request for a specific resource defined by a
+URL. It mimics the format of the requests provided through httpuv, meaning
 that it can be used in place for the requests send to the \code{before-request},
 \code{request}, and \code{after-request} handlers. This is only provided so that
 handlers can be tested without having to start up a server.

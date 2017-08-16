@@ -71,7 +71,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{get_data(name)}}{Extracts data from the internal data store}
 \item{\code{remove_data(name)}}{Removes the data with the given \code{name} from the internal data store}
 \item{\code{time(expr, then, after, loop = FALSE)}}{Add a timed evaluation (\code{expr}) that will be evaluated after the given number of seconds (\code{after}), potentially repeating if \code{loop = TRUE}. After the expression has evaluated the \code{then} function will get called with the result of the expression and the server object as arguments.}
-\item{\code{remove_time(id)}}{Removes the timed evaluation identified by the \code{id} (returned when adding the evaulation)}
+\item{\code{remove_time(id)}}{Removes the timed evaluation identified by the \code{id} (returned when adding the evaluation)}
 \item{\code{delay(expr, then)}}{As \code{time()} except the \code{expr} is evaluated immediately at the end of the loop cycle}
 \item{\code{remove_delay(id)}}{Removes the delayed evaluation identified by the \code{id}}
 \item{\code{async(expr, then)}}{As \code{delay()} and \code{time()} except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
@@ -85,7 +85,7 @@ object is desired, use the \code{clone()} method.
 # Create a New App
 app <- Fire$new(port = 4689)
 
-# Setup the data everytime it starts
+# Setup the data every time it starts
 app$on('start', function(server, ...) {
     server$set_data('visits', 0)
     server$set_data('cycles', 0)

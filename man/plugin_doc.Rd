@@ -9,7 +9,7 @@ In order to facilitate encapsulate functionality that can be shared between
 \code{fiery} servers \code{fiery} implements a plugin interface. Indeed, the reason why
 \code{fiery} is so minimal in functionality is because it is intended as a
 foundation for separate plugins that can add convenience and power. This
-approach allows \code{fiery} itself to remain unoppinionated and flexible.
+approach allows \code{fiery} itself to remain unopinionated and flexible.
 }
 \section{Using Plugins}{
 
@@ -21,7 +21,7 @@ passed on to the plugins \code{on_attach()} method (see below).\preformatted{app
 
 \section{Creating Plugins}{
 
-The \code{fiery} plugin spcification is rather simple. A plugin is either a list
+The \code{fiery} plugin specification is rather simple. A plugin is either a list
 or environment (e.g. a \link[methods:setRefClass]{RefClass} or \link[R6:R6Class]{R6}
 object) with the following elements:
 
