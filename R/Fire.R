@@ -171,7 +171,7 @@ Fire <- R6Class('Fire',
             plugins <- names(private$pluginList)
             if (is.null(plugins)) plugins <- 'none'
             mat <- rbind(mat, c('Plugins attached', ': ', plugins[1]))
-            mat <- rbind(mat, matrix(c(rep('', (length(plugins) - 1)*2), plugins[-1]), ncol = 3))
+            mat <- rbind(mat, matrix(c(rep('  ', (length(plugins) - 1)*2), plugins[-1]), ncol = 3))
             handlers <- lapply(private$handlers, function(x) x$length())
             if (length(handlers) == 0) {
                 mat <- rbind(mat, c('Event handlers added', ': ', 'none'))
