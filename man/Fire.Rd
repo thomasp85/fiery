@@ -77,6 +77,8 @@ object is desired, use the \code{clone()} method.
 \item{\code{async(expr, then)}}{As \code{delay()} and \code{time()} except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 \item{\code{remove_async(id)}}{Removes the async evaluation identified by the \code{id}. The evaluation is not necessarily stopped but the then function will not get called.}
 \item{\code{set_client_id_converter(converter)}}{Sets the function that converts an HTTP request into a specific client id}
+\item{\code{set_logger(logger)}}{Sets the function that takes care of logging}
+\item{\code{set_client_id_converter(converter)}}{Sets the function that converts an HTTP request into a specific client id}
 \item{\code{clone()}}{Create a copy of the full \code{Fire} object and return that}
 }
 }

@@ -74,6 +74,8 @@ NULL
 #'  \item{`async(expr, then)`}{As `delay()` and `time()` except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 #'  \item{`remove_async(id)`}{Removes the async evaluation identified by the `id`. The evaluation is not necessarily stopped but the then function will not get called.}
 #'  \item{`set_client_id_converter(converter)`}{Sets the function that converts an HTTP request into a specific client id}
+#'  \item{`set_logger(logger)`}{Sets the function that takes care of logging}
+#'  \item{`set_client_id_converter(converter)`}{Sets the function that converts an HTTP request into a specific client id}
 #'  \item{`clone()`}{Create a copy of the full `Fire` object and return that}
 #' }
 #' 
@@ -158,6 +160,7 @@ Fire <- R6Class('Fire',
             private$handlers <- new.env(parent = emptyenv())
             private$websockets <- new.env(parent = emptyenv())
             private$client_id <- client_to_id
+            private$logger <- null_logger
             private$DELAY <- DelayStack$new()
             private$TIME <- TimeStack$new()
             private$ASYNC <- AsyncStack$new()
@@ -187,6 +190,7 @@ Fire <- R6Class('Fire',
         },
         ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
             if (!silent) message('Fire started at ', self$host, ':', self$port, self$root)
+            self$log('start', paste0(self$host, ':', self$port, self$root))
             private$run(block = block, showcase = showcase, ...)
             invisible(NULL)
         },
@@ -195,6 +199,7 @@ Fire <- R6Class('Fire',
         },
         reignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
             if (!silent) message('Fire restarted at ', self$host, ':', self$port, self$root)
+            self$log('resume', paste0(self$host, ':', self$port, self$root))
             private$run(block = block, resume = TRUE, showcase = showcase, ...)
             invisible(NULL)
         },
@@ -216,6 +221,7 @@ Fire <- R6Class('Fire',
                 } else {
                     private$quitting <- TRUE
                 }
+                self$log('stop', paste0(self$host, ':', self$port, self$root))
             }
             invisible(NULL)
         },
@@ -328,6 +334,16 @@ Fire <- R6Class('Fire',
             private$client_id <- converter
             invisible(NULL)
         },
+        set_logger = function(logger) {
+            assert_that(is.function(logger))
+            assert_that(has_args(logger, c('event', 'message', 'request', '...')))
+            private$logger <- logger
+            invisible(NULL)
+        },
+        log = function(event, message, request = NULL, ...) {
+            private$logger(event, message, request, ...)
+            invisible(NULL)
+        },
         test_request = function(request) {
             private$request_logic(request)
         },
@@ -422,6 +438,7 @@ Fire <- R6Class('Fire',
         websockets = NULL,
         server = NULL,
         client_id = NULL,
+        logger = NULL,
         
         DELAY = NULL,
         TIME = NULL,
@@ -460,7 +477,7 @@ Fire <- R6Class('Fire',
                     private$run_allowing_server(showcase = showcase)
                 }
             } else {
-                warning('Server is already running and cannot be started')
+                self$log('warning', 'Server is already running and cannot be started')
             }
         },
         run_blocking_server = function(showcase = FALSE) {
@@ -484,9 +501,9 @@ Fire <- R6Class('Fire',
                 private$p_trigger('cycle-start', server = self)
                 service()
                 private$external_triggers()
-                private$DELAY$eval(server = self)
-                private$TIME$eval(server = self)
-                private$ASYNC$eval(server = self)
+                private$safe_call(private$DELAY$eval(server = self))
+                private$safe_call(private$TIME$eval(server = self))
+                private$safe_call(private$ASYNC$eval(server = self))
                 private$p_trigger('cycle-end', server = self)
                 if (private$quitting) {
                     private$quitting <- FALSE
@@ -517,9 +534,9 @@ Fire <- R6Class('Fire',
                 private$nb_cycle <- TRUE # To hinder stopDeamonizedServer from crashing session
                 private$p_trigger('cycle-start', server = self)
                 private$external_triggers()
-                private$DELAY$eval(server = self)
-                private$TIME$eval(server = self)
-                private$ASYNC$eval(server = self)
+                private$safe_call(private$DELAY$eval(server = self))
+                private$safe_call(private$TIME$eval(server = self))
+                private$safe_call(private$ASYNC$eval(server = self))
                 private$p_trigger('cycle-end', server = self)
                 private$nb_cycle <- FALSE
                 later(function() {
@@ -534,33 +551,40 @@ Fire <- R6Class('Fire',
             req
         },
         request_logic = function(req) {
+            start <- Sys.time()
             request <- try(private$mount_request(req), silent = TRUE)
             if (is.error(request)) {
                 req <- Request$new(req)
-                return(req$respond()$status_with_text(400L)$as_list())
+                response <- req$respond()
+                response$status_with_text(400L)
+                self$log('error', trimws(as.vector(request)), req)
             } else {
                 req <- Request$new(request)
+                id <- private$client_id(req)
+                args <- unlist(
+                    unname(
+                        private$p_trigger('before-request', server = self, id = id, 
+                                          request = req)
+                    ), 
+                    recursive = FALSE
+                )
+                private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
+                response <- req$respond()
+                for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
+                response <- response$as_list()
+                private$p_trigger('after-request', server = self, id = id, request = req)
             }
-            id <- private$client_id(req)
-            args <- unlist(
-                unname(
-                    private$p_trigger('before-request', server = self, id = id, 
-                                      request = req)
-                ), 
-                recursive = FALSE
-            )
-            private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
-            response <- req$respond()
-            for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
-            response <- response$as_list()
-            private$p_trigger('after-request', server = self, id = id, request = req)
+            self$log('request', paste0('processed in ', format(Sys.time() - start, digits = 3)), req)
             response
         },
         header_logic = function(req) {
             request <- try(private$mount_request(req), silent = TRUE)
             if (is.error(request)) {
                 req <- Request$new(req)
-                return(req$respond()$status_with_text(400L)$as_list())
+                response <- req$respond()
+                response$status_with_text(400L)
+                self$log('error', trimws(as.vector(request)), req)
+                return(response)
             } else {
                 req <- Request$new(request)
             }
@@ -571,13 +595,18 @@ Fire <- R6Class('Fire',
             } else {
                 continue <- tail(response, 1)[[1]]
                 assert_that(is.flag(continue))
-                if (continue) NULL
-                else req$respond()$as_list()
+                if (continue) {
+                    NULL
+                } else {
+                    self$log('request', 'denied after header', req)
+                    req$respond()$as_list()
+                }
             }
         },
         websocket_logic = function(ws) {
             request <- try(private$mount_request(ws$request), silent = TRUE)
             if (is.error(request)) {
+                self$log('error', trimws(as.vector(request)))
                 ws$close()
                 return()
             } else {
@@ -585,12 +614,14 @@ Fire <- R6Class('Fire',
             }
             id <- private$client_id(req)
             assign(id, ws, envir = private$websockets)
+            self$log('websocket', paste0('connection established to ', id), req)
             
             ws$onMessage(private$message_logic(id, req))
             ws$onClose(private$close_ws_logic(id, req))
         },
         message_logic = function(id, request) {
             function(binary, msg) {
+                start <- Sys.time()
                 args <- unlist(
                     unname(
                         private$p_trigger('before-message', server = self, 
@@ -607,29 +638,32 @@ Fire <- R6Class('Fire',
                 private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args)
                 
                 private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request)
+                
+                self$log('message', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, message = msg)
             }
         },
         close_ws_logic = function(id, request) {
             function() {
                 private$p_trigger('websocket-closed', server = self, id = id, request = request)
+                self$log('websocket', paste0('connection to ', id, ' closed from the client'), request)
             }
         },
         add_handler = function(event, handler, pos, id) {
             if (is.null(private$handlers[[event]])) {
                 private$handlers[[event]] <- HandlerStack$new()
             }
-            private$handlers[[event]]$add(handler, id, pos)
+            private$safe_call(private$handlers[[event]]$add(handler, id, pos))
         },
         remove_handler = function(id) {
             event <- private$handlerMap[[id]]
-            private$handlers[[event]]$remove(id)
+            private$safe_call(private$handlers[[event]]$remove(id))
         },
         add_plugin = function(plugin, name) {
             private$pluginList[[name]] <- plugin
         },
         p_trigger = function(event, ...) {
             if (!is.null(private$handlers[[event]])) {
-                private$handlers[[event]]$dispatch(...)
+                private$safe_call(private$handlers[[event]]$dispatch(...))
             } else {
                 setNames(list(), character())
             }
@@ -644,8 +678,7 @@ Fire <- R6Class('Fire',
                 args <- readRDS(triggerFiles[nextFile])
                 unlink(triggerFiles[nextFile])
                 if (!is.list(args)) {
-                    warning('External triggers must be an rds file containing a list', call. = FALSE)
-                    flush.console()
+                    self$log('warning', 'External triggers must be an rds file containing a list')
                 } else {
                     args$event <- event
                     args$server <- self
@@ -653,6 +686,17 @@ Fire <- R6Class('Fire',
                 }
                 triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
             }
+        },
+        safe_call = function(expr) {
+            withCallingHandlers(
+                tryCatch(expr, error = function(e) {
+                    self$log('error', e$message)
+                }),
+                warning = function(w) {
+                    self$log('warning', w$message)
+                    invokeRestart('muffleWarning')
+                }
+            )
         },
         send_ws = function(message, id) {
             if (!is.raw(message)) {
@@ -667,12 +711,14 @@ Fire <- R6Class('Fire',
             for (i in id) {
                 if (i %in% names(private$websockets)) private$websockets[[i]]$send(message)
             }
+            self$log('message', paste0('send to ', paste(id, collapse = ', ')))
         },
         close_ws = function(id) {
             ws <- private$websockets[[id]]
             if (!is.null(ws)) {
                 try(ws$close(), silent = TRUE)
                 rm(list = id, envir = private$websockets)
+                self$log('websocket', paste0('connection to ', id, ' closed from the server'))
             }
         },
         open_browser = function() {

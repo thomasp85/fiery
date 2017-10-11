@@ -26,7 +26,7 @@ Imports:
     stats,
     desc,
     reqres
-Collate:
+Collate: 
     'aaa.R'
     'HandlerStack.R'
     'Fire.R'
@@ -34,6 +34,7 @@ Collate:
     'event_doc.R'
     'fake_request.R'
     'fiery-package.R'
+    'loggers.R'
     'plugin_doc.R'
 RoxygenNote: 6.0.1
 Suggests:
