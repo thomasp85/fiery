@@ -473,3 +473,18 @@ test_that('app can be mounted at path', {
     req <- fake_request('http://example.com/testing')
     expect_message(app$test_websocket(req, 'test'), '^closing\n$')
 })
+
+test_that("Logging can be configured", {
+    app <- Fire$new()
+    expect_equal(app$access_log_format, common_log_format)
+    app$access_log_format <- combined_log_format
+    expect_equal(app$access_log_format, combined_log_format)
+    app$on('test', function(server, ...) {
+        server$log('test', 'this is a test')
+    })
+    app$set_logger(logger_console())
+    expect_output(app$trigger('test'), 'test: this is a test')
+    
+    app$access_log_format <- common_log_format
+    expect_output(app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')), 'request: test - ID_test \\[\\d{2}/\\w+/\\d{4}:\\d{2}:\\d{2}:\\d{2} +|-\\d{4}\\] "GET /path HTTP/1\\.1" 404 0')
+})
