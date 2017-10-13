@@ -1,5 +1,6 @@
 #' @include aaa.R
 #' @include HandlerStack.R
+#' @include loggers.R
 NULL
 
 #' Generate a New App Object
@@ -46,6 +47,7 @@ NULL
 #'  \item{`trigger_dir`}{A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`)}
 #'  \item{`plugins`}{A named list of the already attached plugins. **Static** - can only be modified using the `attach()` method.}
 #'  \item{`root`}{The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`}
+#'  \item{`access_log_format`}{A [glue][glue::glue] string defining how requests will be logged. For standard formats see [log_formats]. Defaults to the *Common Log Format*}
 #' }
 #' 
 #' @section Methods:
@@ -60,6 +62,7 @@ NULL
 #'  \item{`off(handlerId)`}{Remove the handler tied to the given `id`}
 #'  \item{`trigger(event, ...)`}{Triggers an `event` passing the additional arguments to the potential handlers}
 #'  \item{`send(message, id)`}{Sends a websocket `message` to the client with the given `id`, or to all connected clients if `id` is missing}
+#'  \item{`log(event, message, request, ...)`}{Send a `message` to the logger. The `event` defines the type of message you are passing on, while `request` is the related `Request` object if applicable.}
 #'  \item{`close_ws_con(id)`}{Closes the websocket connection started from the client with the given `id`, firing the `websocket-closed` event}
 #'  \item{`attach(plugin, ..., force = FALSE)`}{Attaches a `plugin` to the server. See the [plugin documentation][plugins] for more information. Plugins can only get attached once unless `force = TRUE`}
 #'  \item{`has_plugin(name)`}{Check whether a plugin with the given `name` has been attached}
@@ -160,7 +163,7 @@ Fire <- R6Class('Fire',
             private$handlers <- new.env(parent = emptyenv())
             private$websockets <- new.env(parent = emptyenv())
             private$client_id <- client_to_id
-            private$logger <- null_logger
+            private$logger <- logger_null()
             private$DELAY <- DelayStack$new()
             private$TIME <- TimeStack$new()
             private$ASYNC <- AsyncStack$new()
@@ -341,7 +344,10 @@ Fire <- R6Class('Fire',
             invisible(NULL)
         },
         log = function(event, message, request = NULL, ...) {
-            private$logger(event, message, request, ...)
+            time <- Sys.time()
+            self$delay(NULL, function(...) {
+                private$logger(event, message, request, time, ...)
+            })
             invisible(NULL)
         },
         test_request = function(request) {
@@ -412,6 +418,11 @@ Fire <- R6Class('Fire',
             path <- sub('/$', '', path)
             if (path != '') path <- paste0('/', sub('^/+', '', path))
             private$ROOT <- path
+        },
+        access_log_format = function(format) {
+            if (missing(format)) return(private$ACCESS_LOG_FORMAT)
+            assert_that(is.string(format))
+            private$ACCESS_LOG_FORMAT <- format
         }
     ),
     private = list(
@@ -422,6 +433,7 @@ Fire <- R6Class('Fire',
         REFRESHRATENB = 1,
         TRIGGERDIR = NULL,
         ROOT = '',
+        ACCESS_LOG_FORMAT = common_log_format,
         
         running = FALSE,
         nb_cycle = FALSE,
@@ -551,7 +563,7 @@ Fire <- R6Class('Fire',
             req
         },
         request_logic = function(req) {
-            start <- Sys.time()
+            start_time <- Sys.time()
             request <- try(private$mount_request(req), silent = TRUE)
             if (is.error(request)) {
                 req <- Request$new(req)
@@ -574,34 +586,46 @@ Fire <- R6Class('Fire',
                 response <- response$as_list()
                 private$p_trigger('after-request', server = self, id = id, request = req)
             }
-            self$log('request', paste0('processed in ', format(Sys.time() - start, digits = 3)), req)
+            end_time <- Sys.time()
+            self$log('request', glue_log(
+                list(start_time = start_time, end_time = end_time, request = req, response = req$response, id = id),
+                self$access_log_format
+            ), req)
             response
         },
         header_logic = function(req) {
+            start_time <- Sys.time()
             request <- try(private$mount_request(req), silent = TRUE)
             if (is.error(request)) {
                 req <- Request$new(req)
                 response <- req$respond()
                 response$status_with_text(400L)
                 self$log('error', trimws(as.vector(request)), req)
-                return(response)
             } else {
                 req <- Request$new(request)
-            }
-            id <- private$client_id(req)
-            response <- private$p_trigger('header', server = self, id = id, request = req)
-            if (length(response) == 0) {
-                NULL
-            } else {
-                continue <- tail(response, 1)[[1]]
-                assert_that(is.flag(continue))
-                if (continue) {
+                id <- private$client_id(req)
+                response <- private$p_trigger('header', server = self, id = id, request = req)
+                response <- if (length(response) == 0) {
                     NULL
                 } else {
-                    self$log('request', 'denied after header', req)
-                    req$respond()$as_list()
+                    continue <- tail(response, 1)[[1]]
+                    assert_that(is.flag(continue))
+                    if (continue) {
+                        NULL
+                    } else {
+                        self$log('request', 'denied after header', req)
+                        req$respond()$as_list()
+                    }
                 }
             }
+            if (!is.null(response)) {
+                end_time <- Sys.time()
+                self$log('request', glue_log(
+                    list(start_time = start_time, end_time = end_time, request = req, response = req$response, id = id),
+                    self$access_log_format
+                ), req)
+            }
+            response
         },
         websocket_logic = function(ws) {
             request <- try(private$mount_request(ws$request), silent = TRUE)

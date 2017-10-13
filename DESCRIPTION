@@ -1,7 +1,7 @@
 Package: fiery
 Type: Package
 Title: A Lightweight and Flexible Web Framework
-Version: 1.0.0
+Version: 1.0.0.9999
 Date: 2017-08-16
 Authors@R: c(
     person('Thomas Lin', 'Pedersen', , 'thomasp85@gmail.com', c('aut', 'cre'))
@@ -25,8 +25,10 @@ Imports:
     later,
     stats,
     desc,
-    reqres
+    reqres,
+    glue
 Collate: 
+    'loggers.R'
     'aaa.R'
     'HandlerStack.R'
     'Fire.R'
@@ -34,7 +36,6 @@ Collate:
     'event_doc.R'
     'fake_request.R'
     'fiery-package.R'
-    'loggers.R'
     'plugin_doc.R'
 RoxygenNote: 6.0.1
 Suggests:
@@ -43,3 +44,4 @@ Suggests:
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues
+Remotes: thomasp85/reqres

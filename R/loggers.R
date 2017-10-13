@@ -9,7 +9,7 @@
 #' if any error is encountered.
 #' 
 #' @section Setting a logger:
-#' By default, `fiery` uses `null_logger` which forwards warning and error 
+#' By default, `fiery` uses `logger_null()` which forwards warning and error 
 #' messages to `stderr()` and ignores any other logging events. To change this 
 #' behavior, set a different logger using the `set_logger()` method:
 #' 
@@ -18,15 +18,24 @@
 #' ```
 #' 
 #' where `logger` is a function taking at least the following arguments: `event`,
-#' `message`, `request`, and `...`.
+#' `message`, `request`, `time`, and `...`.
 #' 
-#' `fiery` comes with one additional logger, which writes all logs to a file. A
-#' new instance of the file logger can be created with 
-#' `create_file_logger(file)`:
+#' `fiery` comes with some additional loggers, which either writes all logs to a 
+#' file or to the console. A new instance of the file logger can be created with 
+#' `logger_file(file)`:
 #' 
 #' ```
-#' app$set_logger(create_file_logger('fiery_log.log'))
+#' app$set_logger(logger_file('fiery_log.log'))
 #' ```
+#' 
+#' A new instance of the console logger can be create with `logger_console()`:
+#' 
+#' ```
+#' app$set_logger(logger_console())
+#' ```
+#' 
+#' Both functions takes a `format` a argument that lets you customise how the
+#' log is written.
 #' 
 #' @section Automatic logs:
 #' `fiery` logs a number of different information by itself describing its 
@@ -52,6 +61,27 @@
 #' 
 #' By default only *warning* and *error* events will be logged by sending them
 #' to the error stream.
+#' 
+#' @section Access Logs:
+#' Of particular interest are logs that detail requests made to the server. 
+#' These are the `request` events detailed above. There are different standards
+#' for how requests are logged. `fiery` uses the *Common Log Format* by default,
+#' but this can be modified by setting the `access_log_format` field to a 
+#' [glue][glue::glue] expression that has access to the following variables:
+#' 
+#' \describe{
+#'  \item{`start_time`}{The time the request was recieved}
+#'  \item{`end_time`}{The time the response was send back}
+#'  \item{`request`}{The `Request` object}
+#'  \item{`response`}{The `Response` object}
+#'  \item{`id`}{The client id}
+#' }
+#' 
+#' To change the format:
+#' 
+#' ```
+#' app$access_log_format <- combined_log_format
+#' ```
 #' 
 #' @section Custom logs:
 #' Apart from the standard logs described above it is also possible to send 
@@ -79,33 +109,65 @@
 NULL
 
 #' @rdname loggers
-#' 
-#' @param event A string giving the type of event
-#' 
-#' @param message A string describing the particular event in detail
-#' 
-#' @param request either `NULL` or a `Request` object associated with the log
-#' 
-#' @param ... Additional information passed on from the `log()` method
-#' 
 #' @export
-null_logger <- function(event, message, request = NULL, ...) {
-    if (event %in% c('error', 'warning')) {
-        cat(event, ': ', message, file = stderr(), sep = '')
+logger_null <- function() {
+    function(event, message, request = NULL, time = Sys.time(), ...) {
+        if (event %in% c('error', 'warning')) {
+            cat(event, ': ', message, file = stderr(), sep = '')
+        }
     }
 }
-
+#' @rdname loggers
+#' 
+#' @export
+logger_console <- function(format = '{time} - {event}: {message}') {
+    function(event, message, request = NULL, time = Sys.time(), ...) {
+        msg <- glue_log(list(
+            time = time,
+            event = event,
+            message = message
+        ), format)
+        cat(msg, file = stdout(), append = TRUE)
+        cat('\n', file = stdout(), append = TRUE)
+    }
+}
 #' @rdname loggers
 #' 
 #' @param file A file or connection to write to
+#' @param format A [glue][glue::glue] string specifying the format of the log entry
 #' 
 #' @export
-create_file_logger <- function(file) {
-    function(event, message, request = NULL, ...) {
-        msg <- paste0(Sys.time(), ' - ', event, ': ', message)
-        if (event == 'request' && !is.null(request)) {
-            msg <- paste0(msg, ' (', toupper(request$method),' ', request$url, 'returning ', request$respond()$status, ')')
-        }
-        cat(paste0(msg, '\n'), file = file, append = TRUE)
+logger_file <- function(file, format = '{time} - {event}: {message}') {
+    format <- sub('\n$', '', format)
+    con <- file(file, open = 'a', blocking = FALSE)
+    function(event, message, request = NULL, time = Sys.time(), ...) {
+        if (!isOpen(con)) con <<- open(con, 'a')
+        msg <- glue_log(list(
+            time = time,
+            event = event,
+            message = message
+        ), format)
+        cat(msg, file = con, append = TRUE)
+        cat('\n', file = con, append = TRUE)
     }
+}
+#' @rdname loggers
+#' @export
+common_log_format <- '{request$ip} - {id} [{format(end_time, "%d/%b/%Y:%T %z")}] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
+#' @rdname loggers
+#' @export
+combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer")}" "{request$get_header("User-agent")}"')
+
+
+# Helpers -----------------------------------------------------------------
+
+safely_transformer <- function(otherwise = NA) {
+    function(code, envir) {
+        tryCatch(eval(code, envir),
+                 error = function(e) if (is.language(otherwise)) eval(otherwise) else otherwise)
+    }
+}
+#' @importFrom glue glue_data
+glue_log <- function(.data, ...) {
+    glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
 }

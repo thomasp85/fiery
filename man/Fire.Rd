@@ -47,6 +47,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{trigger_dir}}{A valid folder where trigger files can be put when running a blocking server (defaults to \code{NULL})}
 \item{\code{plugins}}{A named list of the already attached plugins. \strong{Static} - can only be modified using the \code{attach()} method.}
 \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \code{/demo/test} to \code{/test} if \code{root == '/demo'}}
+\item{\code{access_log_format}}{A \link[glue:glue]{glue} string defining how requests will be logged. For standard formats see \link{log_formats}. Defaults to the \emph{Common Log Format}}
 }
 }
 
@@ -63,6 +64,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{off(handlerId)}}{Remove the handler tied to the given \code{id}}
 \item{\code{trigger(event, ...)}}{Triggers an \code{event} passing the additional arguments to the potential handlers}
 \item{\code{send(message, id)}}{Sends a websocket \code{message} to the client with the given \code{id}, or to all connected clients if \code{id} is missing}
+\item{\code{log(event, message, request, ...)}}{Send a \code{message} to the logger. The \code{event} defines the type of message you are passing on, while \code{request} is the related \code{Request} object if applicable.}
 \item{\code{close_ws_con(id)}}{Closes the websocket connection started from the client with the given \code{id}, firing the \code{websocket-closed} event}
 \item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a \code{plugin} to the server. See the \link[=plugins]{plugin documentation} for more information. Plugins can only get attached once unless \code{force = TRUE}}
 \item{\code{has_plugin(name)}}{Check whether a plugin with the given \code{name} has been attached}

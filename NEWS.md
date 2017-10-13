@@ -1,3 +1,10 @@
+# fiery 1.0.0.9999
+
+* Add logging API. Set custom loggers with `set_logger()` and send messages to
+  the log with `log()`. Logging is automatically delayed so it doesn't slow down
+  request and message handling (#18).
+* Added `access_log_format` field to define how requests are logged.
+
 # fiery 1.0.0
 
 * `Fire$new()` now takes a port and host argument to set these fields on 
