@@ -47,7 +47,7 @@ NULL
 #'  \item{`trigger_dir`}{A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`)}
 #'  \item{`plugins`}{A named list of the already attached plugins. **Static** - can only be modified using the `attach()` method.}
 #'  \item{`root`}{The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`}
-#'  \item{`access_log_format`}{A [glue][glue::glue] string defining how requests will be logged. For standard formats see [log_formats]. Defaults to the *Common Log Format*}
+#'  \item{`access_log_format`}{A [glue][glue::glue] string defining how requests will be logged. For standard formats see [common_log_format] and [combined_log_format]. Defaults to the *Common Log Format*}
 #' }
 #' 
 #' @section Methods:

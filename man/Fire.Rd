@@ -47,7 +47,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{trigger_dir}}{A valid folder where trigger files can be put when running a blocking server (defaults to \code{NULL})}
 \item{\code{plugins}}{A named list of the already attached plugins. \strong{Static} - can only be modified using the \code{attach()} method.}
 \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \code{/demo/test} to \code{/test} if \code{root == '/demo'}}
-\item{\code{access_log_format}}{A \link[glue:glue]{glue} string defining how requests will be logged. For standard formats see \link{log_formats}. Defaults to the \emph{Common Log Format}}
+\item{\code{access_log_format}}{A \link[glue:glue]{glue} string defining how requests will be logged. For standard formats see \link{common_log_format} and \link{combined_log_format}. Defaults to the \emph{Common Log Format}}
 }
 }
 
