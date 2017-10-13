@@ -274,18 +274,21 @@ test_that('header event fire', {
     expect_equal(response$status, 500L)
 })
 
-# test_that('errors in start and resume gets caught', {
-#     app <- Fire$new()
-#     app$on('start', function(...) {
-#         stop('Testing an error')
-#     })
-#     expect_error(app$ignite(silent = TRUE))
-#     app <- Fire$new()
-#     app$on('resume', function(...) {
-#         stop('Testing an error')
-#     })
-#     expect_error(app$reignite(silent = TRUE))
-# })
+test_that('errors in start and resume gets caught', {
+    app <- Fire$new()
+    app$set_logger(logger_console())
+    app$on('start', function(...) {
+        stop('Testing an error')
+    })
+    expect_output(app$ignite(silent = TRUE, block = FALSE), 'Testing an error')
+    app$extinguish()
+    app <- Fire$new()
+    app$on('resume', function(...) {
+        stop('Testing an error')
+    })
+    expect_output(app$reignite(silent = TRUE, block = FALSE), 'Testing an error')
+    app$extinguish()
+})
 
 test_that('futures can be added and called', {
     app <- Fire$new()
