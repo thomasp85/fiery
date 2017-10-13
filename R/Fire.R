@@ -564,6 +564,7 @@ Fire <- R6Class('Fire',
             request <- try(private$mount_request(req), silent = TRUE)
             if (is.error(request)) {
                 req <- Request$new(req)
+                id <- private$client_id(req)
                 response <- req$respond()
                 response$status_with_text(400L)
                 self$log('error', trimws(as.vector(request)), req)
@@ -595,6 +596,7 @@ Fire <- R6Class('Fire',
             request <- try(private$mount_request(req), silent = TRUE)
             if (is.error(request)) {
                 req <- Request$new(req)
+                id <- private$client_id(req)
                 response <- req$respond()
                 response$status_with_text(400L)
                 self$log('error', trimws(as.vector(request)), req)
