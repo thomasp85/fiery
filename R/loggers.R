@@ -161,12 +161,12 @@ combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer
 
 # Helpers -----------------------------------------------------------------
 
-safely_transformer <- function(otherwise = NA) {
-    function(code, envir) {
-        tryCatch(eval(code, envir),
-                 error = function(e) if (is.language(otherwise)) eval(otherwise) else otherwise)
-    }
-}
+# safely_transformer <- function(otherwise = NA) {
+#     function(code, envir) {
+#         tryCatch(eval(code, envir),
+#                  error = function(e) if (is.language(otherwise)) eval(otherwise) else otherwise)
+#     }
+# }
 #' @importFrom glue glue_data
 glue_log <- function(.data, ..., .envir = parent.frame()) {
     glue_data(.data, ..., .envir = .envir)
