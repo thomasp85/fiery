@@ -341,9 +341,13 @@ Fire <- R6Class('Fire',
         },
         log = function(event, message, request = NULL, ...) {
             time <- Sys.time()
-            self$delay(NULL, function(...) {
+            if (private$running) {
+                self$delay(NULL, function(...) {
+                    private$logger(event, message, request, time, ...)
+                })
+            } else {
                 private$logger(event, message, request, time, ...)
-            })
+            }
             invisible(NULL)
         },
         test_request = function(request) {
