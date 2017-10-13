@@ -168,6 +168,7 @@ safely_transformer <- function(otherwise = NA) {
     }
 }
 #' @importFrom glue glue_data
-glue_log <- function(.data, ...) {
-    glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
+glue_log <- function(.data, ..., .envir = parent.frame()) {
+    glue_data(.data, ..., .envir = .envir)
+    #glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
 }
