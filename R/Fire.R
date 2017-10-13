@@ -466,17 +466,9 @@ Fire <- R6Class('Fire',
             if (!private$running) {
                 private$running <- TRUE
                 private$TIME$reset()
-                error <- try(private$p_trigger('start', server = self, ...), silent = TRUE)
-                if (is.error(error)) {
-                    private$running <- FALSE
-                    stop(trimws(error), call. = FALSE)
-                }
+                private$p_trigger('start', server = self, ...)
                 if (resume) {
-                    error <- try(private$p_trigger('resume', server = self, ...), silent = TRUE)
-                    if (is.error(error)) {
-                        private$running <- FALSE
-                        stop(trimws(error), call. = FALSE)
-                    }
+                    private$p_trigger('resume', server = self, ...)
                     if (!silent) message('Fire restarted at ', self$host, ':', self$port, self$root)
                     self$log('resume', paste0(self$host, ':', self$port, self$root))
                 } else {
