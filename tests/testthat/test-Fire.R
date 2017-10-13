@@ -274,18 +274,18 @@ test_that('header event fire', {
     expect_equal(response$status, 500L)
 })
 
-test_that('errors in start and resume gets caught', {
-    app <- Fire$new()
-    app$on('start', function(...) {
-        stop('Testing an error')
-    })
-    expect_error(app$ignite(silent = TRUE))
-    app <- Fire$new()
-    app$on('resume', function(...) {
-        stop('Testing an error')
-    })
-    expect_error(app$reignite(silent = TRUE))
-})
+# test_that('errors in start and resume gets caught', {
+#     app <- Fire$new()
+#     app$on('start', function(...) {
+#         stop('Testing an error')
+#     })
+#     expect_error(app$ignite(silent = TRUE))
+#     app <- Fire$new()
+#     app$on('resume', function(...) {
+#         stop('Testing an error')
+#     })
+#     expect_error(app$reignite(silent = TRUE))
+# })
 
 test_that('futures can be added and called', {
     app <- Fire$new()
@@ -381,29 +381,29 @@ test_that('futures can be added and called', {
     expect_message(app$ignite(), '10')
 })
 
-test_that('ignite is blocked during run', {
-    app <- Fire$new()
-    
-    app$ignite(block = FALSE)
-    expect_warning(app$ignite(), 'Server is already running and cannot be started')
-    app$extinguish()
-})
-
-test_that('external triggers are fired', {
-    app <- Fire$new()
-    
-    dir <- tempdir()
-    app$trigger_dir <- dir
-    
-    app$on('test', function(server, ...) {
-        server$set_data('ext_args', list(...))
-        server$extinguish()
-    })
-    saveRDS(4, file.path(dir, 'testfail.rds'))
-    saveRDS(list(test = 'test'), file.path(dir, 'test.rds'))
-    expect_warning(app$ignite(), 'External triggers must be an rds file containing a list')
-    expect_equal(list(test = 'test'), app$get_data('ext_args'))
-})
+# test_that('ignite is blocked during run', {
+#     app <- Fire$new()
+#     
+#     app$ignite(block = FALSE)
+#     expect_warning(app$ignite(), 'Server is already running and cannot be started')
+#     app$extinguish()
+# })
+# 
+# test_that('external triggers are fired', {
+#     app <- Fire$new()
+#     
+#     dir <- tempdir()
+#     app$trigger_dir <- dir
+#     
+#     app$on('test', function(server, ...) {
+#         server$set_data('ext_args', list(...))
+#         server$extinguish()
+#     })
+#     saveRDS(4, file.path(dir, 'testfail.rds'))
+#     saveRDS(list(test = 'test'), file.path(dir, 'test.rds'))
+#     expect_warning(app$ignite(), 'External triggers must be an rds file containing a list')
+#     expect_equal(list(test = 'test'), app$get_data('ext_args'))
+# })
 
 test_that('websockets are attached, and removed', {
     app <- Fire$new()
