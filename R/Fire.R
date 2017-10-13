@@ -192,18 +192,14 @@ Fire <- R6Class('Fire',
             c(text, paste0('\U0001f525 ', apply(mat, 1, paste, collapse = '')))
         },
         ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-            if (!silent) message('Fire started at ', self$host, ':', self$port, self$root)
-            self$log('start', paste0(self$host, ':', self$port, self$root))
-            private$run(block = block, showcase = showcase, ...)
+            private$run(block = block, showcase = showcase, ..., silent = silent)
             invisible(NULL)
         },
         start = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
             self$ignite(block = block, showcase = showcase, ..., silent = silent)
         },
         reignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-            if (!silent) message('Fire restarted at ', self$host, ':', self$port, self$root)
-            self$log('resume', paste0(self$host, ':', self$port, self$root))
-            private$run(block = block, resume = TRUE, showcase = showcase, ...)
+            private$run(block = block, resume = TRUE, showcase = showcase, ..., silent = silent)
             invisible(NULL)
         },
         resume = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
@@ -457,7 +453,7 @@ Fire <- R6Class('Fire',
         ASYNC = NULL,
         
         # Methods
-        run = function(block = TRUE, resume = FALSE, showcase = FALSE, ...) {
+        run = function(block = TRUE, resume = FALSE, showcase = FALSE, ..., silent = FALSE) {
             assert_that(
                 is.flag(block),
                 is.flag(resume),
@@ -477,6 +473,11 @@ Fire <- R6Class('Fire',
                         private$running <- FALSE
                         stop(trimws(error), call. = FALSE)
                     }
+                    if (!silent) message('Fire restarted at ', self$host, ':', self$port, self$root)
+                    self$log('resume', paste0(self$host, ':', self$port, self$root))
+                } else {
+                    if (!silent) message('Fire started at ', self$host, ':', self$port, self$root)
+                    self$log('start', paste0(self$host, ':', self$port, self$root))
                 }
                 
                 if (block) {
