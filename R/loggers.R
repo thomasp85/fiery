@@ -58,9 +58,9 @@
 #'  will contain information about how long time it took to handle the request 
 #'  or if it was denied.}
 #'  \item{*websocket*}{Will be send every time a WebSocket connection is 
-#'  established or closed.}
-#'  \item{*message*}{Will be send every time a WebSocket message is received or
-#'  send}
+#'  established or closed as well as when a message is received or send}
+#'  \item{*message*}{Will be send every time a message is emitted by an event 
+#'  handler or delayed execution handler}
 #'  \item{*warning*}{Will be send everytime a warning is emitted by an event 
 #'  handler or delayed execution handler}
 #'  \item{*error*}{Will be send everytime an error is signaled by an event 
@@ -68,8 +68,8 @@
 #'  will also emit error event when exceptions are encountered}
 #' }
 #' 
-#' By default only *warning* and *error* events will be logged by sending them
-#' to the error stream.
+#' By default only *message*, *warning* and *error* events will be logged by 
+#' sending them to the error stream as a [message()].
 #' 
 #' @section Access Logs:
 #' Of particular interest are logs that detail requests made to the server. 
@@ -121,8 +121,8 @@ NULL
 #' @export
 logger_null <- function() {
     function(event, message, request = NULL, time = Sys.time(), ...) {
-        if (event %in% c('error', 'warning')) {
-            cat(event, ': ', message, file = stderr(), sep = '')
+        if (event %in% c('error', 'warning', 'message')) {
+            message(event, ': ', trimws(message), sep = '')
         }
     }
 }
@@ -134,7 +134,7 @@ logger_console <- function(format = '{time} - {event}: {message}') {
         msg <- glue_log(list(
             time = time,
             event = event,
-            message = message
+            message = trimws(message)
         ), format)
         cat(msg, file = stdout(), append = TRUE)
         cat('\n', file = stdout(), append = TRUE)

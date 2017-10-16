@@ -210,8 +210,8 @@ Fire <- R6Class('Fire',
             if (private$running) {
                 if (!is.null(private$server)) {
                     if (private$nb_cycle) {
-                        message('Cannot stop server from within a non-blocking event cycle')
-                        flush.console()
+                        warning('Cannot stop server from within a non-blocking event cycle', call. = FALSE)
+                        return(invisible(NULL))
                     } else {
                         private$running <- FALSE
                         private$p_trigger('end', server = self)
@@ -248,7 +248,7 @@ Fire <- R6Class('Fire',
         trigger = function(event, ...) {
             assert_that(is.string(event))
             if (event %in% private$privateTriggers) {
-                stop(event, ' and other protected events cannot be triggered while running', call. = FALSE)
+                stop(event, ' and other protected events cannot be triggered manually', call. = FALSE)
             } else {
                 private$p_trigger(event, server = self, ...)
             }
@@ -280,9 +280,9 @@ Fire <- R6Class('Fire',
                     stop('The ', name, ' plugin requires the following plugins: ', paste(requires[!exists], collapse = ', '), '.', call. = FALSE)
                 }
             }
-            has_error <- try(plugin$on_attach(self, ...), silent = TRUE)
-            if (is.error(has_error)) {
-                stop('The ', name, ' plugin failed to attach with the following error: ', has_error, call. = FALSE)
+            has_error <- tri(plugin$on_attach(self, ...))
+            if (is.error_cond(has_error)) {
+                stop('The ', name, ' plugin failed to attach with the following error: ', conditionMessage(has_error), call. = FALSE)
             }
             private$add_plugin(plugin, name)
             invisible(NULL)
@@ -563,13 +563,13 @@ Fire <- R6Class('Fire',
         },
         request_logic = function(req) {
             start_time <- Sys.time()
-            request <- try(private$mount_request(req), silent = TRUE)
-            if (is.error(request)) {
+            request <- tri(private$mount_request(req))
+            if (is.error_cond(request)) {
                 req <- Request$new(req)
                 id <- private$client_id(req)
                 response <- req$respond()
                 response$status_with_text(400L)
-                self$log('error', trimws(as.vector(request)), req)
+                self$log('error', conditionMessage(request), req)
             } else {
                 req <- Request$new(request)
                 id <- private$client_id(req)
@@ -595,13 +595,13 @@ Fire <- R6Class('Fire',
         },
         header_logic = function(req) {
             start_time <- Sys.time()
-            request <- try(private$mount_request(req), silent = TRUE)
-            if (is.error(request)) {
+            request <- tri(private$mount_request(req))
+            if (is.error_cond(request)) {
                 req <- Request$new(req)
                 id <- private$client_id(req)
                 response <- req$respond()
                 response$status_with_text(400L)
-                self$log('error', trimws(as.vector(request)), req)
+                self$log('error', conditionMessage(request), req)
             } else {
                 req <- Request$new(request)
                 id <- private$client_id(req)
@@ -629,9 +629,9 @@ Fire <- R6Class('Fire',
             response
         },
         websocket_logic = function(ws) {
-            request <- try(private$mount_request(ws$request), silent = TRUE)
-            if (is.error(request)) {
-                self$log('error', trimws(as.vector(request)))
+            request <- tri(private$mount_request(ws$request))
+            if (is.error_cond(request)) {
+                self$log('error', conditionMessage(request))
                 ws$close()
                 return()
             } else {
@@ -664,7 +664,7 @@ Fire <- R6Class('Fire',
                 
                 private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request)
                 
-                self$log('message', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, message = msg)
+                self$log('websocket', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, message = msg)
             }
         },
         close_ws_logic = function(id, request) {
@@ -715,11 +715,15 @@ Fire <- R6Class('Fire',
         safe_call = function(expr) {
             withCallingHandlers(
                 tryCatch(expr, error = function(e) {
-                    self$log('error', e$message)
+                    self$log('error', conditionMessage(e))
                 }),
                 warning = function(w) {
-                    self$log('warning', w$message)
+                    self$log('warning', conditionMessage(w))
                     invokeRestart('muffleWarning')
+                },
+                message = function(m) {
+                    self$log('message', conditionMessage(m))
+                    invokeRestart('muffleMessage')
                 }
             )
         },
@@ -732,11 +736,14 @@ Fire <- R6Class('Fire',
             }
             if (missing(id) || is.null(id)) {
                 id <- ls(envir = private$websockets)
+            } else {
+                id <- intersect(id, ls(envir = private$websockets))
             }
+            if (length(id) == 0) return(NULL)
             for (i in id) {
-                if (i %in% names(private$websockets)) private$websockets[[i]]$send(message)
+                private$websockets[[i]]$send(message)
             }
-            self$log('message', paste0('send to ', paste(id, collapse = ', ')))
+            self$log('websocket', paste0('send to ', paste(id, collapse = ', ')))
         },
         close_ws = function(id) {
             ws <- private$websockets[[id]]

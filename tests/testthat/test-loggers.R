@@ -2,12 +2,10 @@ context("loggers")
 
 test_that("null logger works", {
     logger <- logger_null()
-    expect_equal(capture.output(logger('error', 'error test'), type = 'message'),
-                 "error: error test")
-    expect_equal(capture.output(logger('warning', 'warning test'), type = 'message'),
-                 "warning: warning test")
-    expect_equal(capture.output(logger('info', 'info test'), type = 'message'),
-                 character(0))
+    expect_message(logger('error', 'error test'), "error: error test")
+    expect_message(logger('warning', 'warning test'), "warning: warning test")
+    expect_message(logger('message', 'message test'), "message: message test")
+    expect_silent(logger('info', 'info test'))
 })
 
 test_that("console logger works", {
