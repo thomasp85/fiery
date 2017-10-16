@@ -183,13 +183,18 @@ test_that('life cycle events get fired', {
     expect_equal(reigniteRes, resumeRes)
     expect_equal(reigniteRes, c('start', 'resume', 'cycle-start', 'cycle-end', 'cycle-start', 'cycle-end', 'end'))
     
+    app$refresh_rate_nb <- 0.001
     app$ignite(block = FALSE)
-    Sys.sleep(2)
-    expect_message(later::run_now(), 'Cannot stop server from within a non-blocking event cycle')
+    expect_message({ # Need to force some cycles to happen
+        Sys.sleep(.1)
+        later::run_now()
+        Sys.sleep(.1)
+        later::run_now()
+    }, 'Cannot stop server from within a non-blocking event cycle')
     app$stop()
     igniteResNoBlock <- app$get_data('events')
     app$remove_data('events')
-    expect_equal(igniteResNoBlock, c('start', 'cycle-start', 'cycle-end', 'cycle-start', 'cycle-end', 'end'))
+    expect_equal(unique(igniteResNoBlock), c('start', 'cycle-start', 'cycle-end', 'end'))
     app$reignite(block = FALSE)
     app$extinguish()
     reigniteResNoBlock <- app$get_data('events')
@@ -276,15 +281,25 @@ test_that('header event fire', {
 
 test_that('errors in start and resume gets caught', {
     app <- Fire$new()
+    app$set_logger(logger_console())
     app$on('start', function(...) {
         stop('Testing an error')
     })
-    expect_error(app$ignite(silent = TRUE))
+    expect_output({
+        app$ignite(silent = TRUE, block = FALSE)
+        later::run_now()
+    }, 'Testing an error')
+    capture_output(app$extinguish())
     app <- Fire$new()
+    app$set_logger(logger_console())
     app$on('resume', function(...) {
         stop('Testing an error')
     })
-    expect_error(app$reignite(silent = TRUE))
+    expect_output({
+        app$reignite(silent = TRUE, block = FALSE)
+        later::run_now()
+    }, 'Testing an error')
+    capture_output(app$extinguish())
 })
 
 test_that('futures can be added and called', {
@@ -383,25 +398,34 @@ test_that('futures can be added and called', {
 
 test_that('ignite is blocked during run', {
     app <- Fire$new()
-    
-    app$ignite(block = FALSE)
-    expect_warning(app$ignite(), 'Server is already running and cannot be started')
-    app$extinguish()
+    app$set_logger(logger_console())
+    app$refresh_rate_nb <- 0.001
+
+    capture_output(app$ignite(block = FALSE))
+    expect_output({
+        app$ignite()
+        later::run_now()
+    }, 'Server is already running and cannot be started')
+    capture_output(app$extinguish())
 })
 
 test_that('external triggers are fired', {
     app <- Fire$new()
-    
+    app$set_logger(logger_console())
+
     dir <- tempdir()
     app$trigger_dir <- dir
-    
+
     app$on('test', function(server, ...) {
         server$set_data('ext_args', list(...))
-        server$extinguish()
     })
     saveRDS(4, file.path(dir, 'testfail.rds'))
     saveRDS(list(test = 'test'), file.path(dir, 'test.rds'))
-    expect_warning(app$ignite(), 'External triggers must be an rds file containing a list')
+    expect_output({
+        app$ignite(silent = TRUE, block = FALSE)
+        later::run_now()
+        app$extinguish()
+    }, 'External triggers must be an rds file containing a list')
     expect_equal(list(test = 'test'), app$get_data('ext_args'))
 })
 
@@ -449,6 +473,8 @@ test_that('global headers are assigned and used', {
 
 test_that('app can be mounted at path', {
     app <- Fire$new()
+    app$set_logger(logger_console())
+    
     expect_equal(app$root, '')
     expect_error(app$root <- 123)
     expect_error(app$root <- c('test', 'test2'))
@@ -461,15 +487,32 @@ test_that('app can be mounted at path', {
     app$test_header(req)
     expect_equal(req$PATH_INFO, '/testing')
     req <- fake_request('http://example.com/test/testing')
+    app$set_logger(logger_null())
     expect_message(app$test_websocket(req, 'test'), 'test')
     expect_equal(req$PATH_INFO, '/testing')
     
+    app$set_logger(logger_console())
     req <- fake_request('http://example.com/testing')
-    res <- app$test_request(req)
+    expect_output(res <- app$test_request(req), 'URL not matching mount point')
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
-    res <- app$test_header(req)
+    expect_output(res <- app$test_header(req), 'URL not matching mount point')
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
-    expect_message(app$test_websocket(req, 'test'), '^closing\n$')
+    expect_output(app$test_websocket(req, 'test'), 'URL not matching mount point')
+})
+
+test_that("Logging can be configured", {
+    app <- Fire$new()
+    expect_equal(app$access_log_format, common_log_format)
+    app$access_log_format <- combined_log_format
+    expect_equal(app$access_log_format, combined_log_format)
+    app$on('test', function(server, ...) {
+        server$log('test', 'this is a test')
+    })
+    app$set_logger(logger_console())
+    expect_output(app$trigger('test'), 'test: this is a test')
+    
+    app$access_log_format <- common_log_format
+    expect_output(app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')), 'request: test - ID_test \\[\\d{2}/\\w+/\\d{4}:\\d{2}:\\d{2}:\\d{2} +|-\\d{4}\\] "GET /path HTTP/1\\.1" 404 0')
 })
