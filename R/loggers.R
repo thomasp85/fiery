@@ -37,6 +37,15 @@
 #' Both functions takes a `format` a argument that lets you customise how the
 #' log is written.
 #' 
+#' As a last possibility it is possible to use different loggers dependent on 
+#' the event by using the switch logger:
+#' 
+#' ```
+#' app$set_logger(logger_switch(warning =, 
+#'                              error = logger_file('errors.log),
+#'                              default = logger_file('info.log')))
+#' ```
+#' 
 #' @section Automatic logs:
 #' `fiery` logs a number of different information by itself describing its 
 #' operations during run. The following events are send to the log:
@@ -149,6 +158,29 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
         ), format)
         cat(msg, file = con, append = TRUE)
         cat('\n', file = con, append = TRUE)
+#' @rdname loggers
+#' 
+#' @param ... A named list of loggers to use for different events. The same 
+#' semantics as [switch][base::switch] is used so it is possible to let events
+#' *fall through* e.g. `logger_switch(error =, warning = logger_file('errors.log'))`.
+#' 
+#' @param default A catch-all logger for use with events not defined in `...`
+#' 
+#' @export
+logger_switch <- function(..., default = logger_null()) {
+    enclos <- parent.frame()
+    args <- eval(substitute(alist(...)))
+    args <- lapply(args, function(e) {
+        if (!identical(e, quote(expr = ))) {
+            eval(e, envir = enclos)
+        } else {
+            e
+        }
+    })
+    args <- c(args, list(default))
+    function(event, message, request = NULL, time = Sys.time(), ...) {
+        loc_args <- c(list(event), args)
+        do.call(switch, loc_args)(event = event, message = message, request = request, time = time, ...)
     }
 }
 #' @rdname loggers

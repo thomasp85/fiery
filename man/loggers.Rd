@@ -7,6 +7,7 @@
 \alias{logger_null}
 \alias{logger_console}
 \alias{logger_file}
+\alias{logger_switch}
 \alias{common_log_format}
 \alias{combined_log_format}
 \title{App Logging}
@@ -18,6 +19,8 @@ logger_console(format = "{time} - {event}: {message}")
 
 logger_file(file, format = "{time} - {event}: {message}")
 
+logger_switch(..., default = logger_null())
+
 common_log_format
 
 combined_log_format
@@ -26,6 +29,12 @@ combined_log_format
 \item{format}{A \link[glue:glue]{glue} string specifying the format of the log entry}
 
 \item{file}{A file or connection to write to}
+
+\item{...}{A named list of loggers to use for different events. The same
+semantics as \link[base:switch]{switch} is used so it is possible to let events
+\emph{fall through} e.g. \code{logger_switch(error =, warning = logger_file('errors.log'))}.}
+
+\item{default}{A catch-all logger for use with events not defined in \code{...}}
 }
 \description{
 \code{fiery} has a build in logging mechanism that lets you capture event
@@ -56,6 +65,12 @@ A new instance of the console logger can be create with \code{logger_console()}:
 
 Both functions takes a \code{format} a argument that lets you customise how the
 log is written.
+
+As a last possibility it is possible to use different loggers dependent on
+the event by using the switch logger:\preformatted{app$set_logger(logger_switch(warning =, 
+                             error = logger_file('errors.log),
+                             default = logger_file('info.log')))
+}
 }
 
 \section{Automatic logs}{
@@ -71,9 +86,9 @@ operations during run. The following events are send to the log:
 will contain information about how long time it took to handle the request
 or if it was denied.}
 \item{\emph{websocket}}{Will be send every time a WebSocket connection is
-established or closed.}
-\item{\emph{message}}{Will be send every time a WebSocket message is received or
-send}
+established or closed as well as when a message is received or send}
+\item{\emph{message}}{Will be send every time a message is emitted by an event
+handler or delayed execution handler}
 \item{\emph{warning}}{Will be send everytime a warning is emitted by an event
 handler or delayed execution handler}
 \item{\emph{error}}{Will be send everytime an error is signaled by an event
@@ -81,8 +96,8 @@ handler or delayed execution handler. In addition some internal functions
 will also emit error event when exceptions are encountered}
 }
 
-By default only \emph{warning} and \emph{error} events will be logged by sending them
-to the error stream.
+By default only \emph{message}, \emph{warning} and \emph{error} events will be logged by
+sending them to the error stream as a \code{\link[=message]{message()}}.
 }
 
 \section{Access Logs}{
