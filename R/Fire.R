@@ -167,6 +167,7 @@ Fire <- R6Class('Fire',
             private$DELAY <- DelayStack$new()
             private$TIME <- TimeStack$new()
             private$ASYNC <- AsyncStack$new()
+            private$LOG_QUEUE <- DelayStack$new()
         },
         format = function(...) {
             text <- c(
@@ -342,9 +343,7 @@ Fire <- R6Class('Fire',
         log = function(event, message, request = NULL, ...) {
             time <- Sys.time()
             if (private$running) {
-                self$delay(NULL, function(...) {
-                    private$logger(event, message, request, time, ...)
-                })
+                private$LOG_QUEUE$add(NULL, function(...) private$logger(event, message, request, time, ...))
             } else {
                 private$logger(event, message, request, time, ...)
             }
@@ -455,6 +454,7 @@ Fire <- R6Class('Fire',
         DELAY = NULL,
         TIME = NULL,
         ASYNC = NULL,
+        LOG_QUEUE = NULL,
         
         # Methods
         run = function(block = TRUE, resume = FALSE, showcase = FALSE, ..., silent = FALSE) {
@@ -513,6 +513,7 @@ Fire <- R6Class('Fire',
                 private$safe_call(private$DELAY$eval(server = self))
                 private$safe_call(private$TIME$eval(server = self))
                 private$safe_call(private$ASYNC$eval(server = self))
+                tri(private$LOG_QUEUE$eval(server = self))
                 private$p_trigger('cycle-end', server = self)
                 if (private$quitting) {
                     private$quitting <- FALSE
@@ -546,6 +547,7 @@ Fire <- R6Class('Fire',
                 private$safe_call(private$DELAY$eval(server = self))
                 private$safe_call(private$TIME$eval(server = self))
                 private$safe_call(private$ASYNC$eval(server = self))
+                tri(private$LOG_QUEUE$eval(server = self))
                 private$p_trigger('cycle-end', server = self)
                 private$nb_cycle <- FALSE
                 later(function() {
