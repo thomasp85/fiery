@@ -58,6 +58,7 @@ NULL
 #'  \item{`resume(block = TRUE, showcase = FALSE, ...)`}{Another less dramatic synonym, this time for `reignite()`}
 #'  \item{`extinguish()`}{Stops a running server}
 #'  \item{`stop()`}{Boring synonym for `extinguish()`}
+#'  \item{`is_running()`}{Check if the server is currently running}
 #'  \item{`on(event, handler, pos = NULL)`}{Add a `handler` function to to an `event` at the given position (`pos`) in the handler stack. Returns a string uniquely identifying the handler. See the [event documentation][events] for more information.}
 #'  \item{`off(handlerId)`}{Remove the handler tied to the given `id`}
 #'  \item{`trigger(event, ...)`}{Triggers an `event` passing the additional arguments to the potential handlers}
@@ -348,6 +349,9 @@ Fire <- R6Class('Fire',
                 private$logger(event, message, request, time, ...)
             }
             invisible(NULL)
+        },
+        is_running = function() {
+            private$running
         },
         test_request = function(request) {
             private$request_logic(request)

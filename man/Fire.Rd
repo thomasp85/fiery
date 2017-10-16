@@ -60,6 +60,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{resume(block = TRUE, showcase = FALSE, ...)}}{Another less dramatic synonym, this time for \code{reignite()}}
 \item{\code{extinguish()}}{Stops a running server}
 \item{\code{stop()}}{Boring synonym for \code{extinguish()}}
+\item{\code{is_running()}}{Check if the server is currently running}
 \item{\code{on(event, handler, pos = NULL)}}{Add a \code{handler} function to to an \code{event} at the given position (\code{pos}) in the handler stack. Returns a string uniquely identifying the handler. See the \link[=events]{event documentation} for more information.}
 \item{\code{off(handlerId)}}{Remove the handler tied to the given \code{id}}
 \item{\code{trigger(event, ...)}}{Triggers an \code{event} passing the additional arguments to the potential handlers}

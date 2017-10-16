@@ -516,3 +516,22 @@ test_that("Logging can be configured", {
     app$access_log_format <- common_log_format
     expect_output(app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')), 'request: test - ID_test \\[\\d{2}/\\w+/\\d{4}:\\d{2}:\\d{2}:\\d{2} +|-\\d{4}\\] "GET /path HTTP/1\\.1" 404 0')
 })
+
+test_that('is_running works', {
+    app <- Fire$new()
+    expect_false(app$is_running())
+    app$on('cycle-start', function(server, ...) {
+        server$log('message', server$is_running())
+    })
+    app$on('cycle-end', function(server, ...) {
+        server$extinguish()
+    })
+    expect_message(app$ignite(), 'message: TRUE')
+    expect_false(app$is_running())
+    
+    app <- Fire$new()
+    app$ignite(block = FALSE)
+    expect_true(app$is_running())
+    app$extinguish()
+    expect_false(app$is_running())
+})
