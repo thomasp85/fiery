@@ -4,6 +4,7 @@
   the log with `log()`. Logging is automatically delayed so it doesn't slow down
   request and message handling (#18).
 * Added `access_log_format` field to define how requests are logged.
+* Added `is_running()` method to query the state of the server.
 
 # fiery 1.0.0
 
