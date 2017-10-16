@@ -148,16 +148,16 @@ logger_console <- function(format = '{time} - {event}: {message}') {
 #' @export
 logger_file <- function(file, format = '{time} - {event}: {message}') {
     format <- sub('\n$', '', format)
-    con <- file(file, open = 'a', blocking = FALSE)
     function(event, message, request = NULL, time = Sys.time(), ...) {
-        if (!isOpen(con)) con <<- open(con, 'a')
         msg <- glue_log(list(
             time = time,
             event = event,
-            message = message
+            message = trimws(message)
         ), format)
-        cat(msg, file = con, append = TRUE)
-        cat('\n', file = con, append = TRUE)
+        cat(msg, file = file, append = TRUE)
+        cat('\n', file = file, append = TRUE)
+    }
+}
 #' @rdname loggers
 #' 
 #' @param ... A named list of loggers to use for different events. The same 
