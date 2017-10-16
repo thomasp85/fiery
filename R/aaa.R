@@ -1,10 +1,10 @@
 # Silence 
 globalVariables(
-    c(
-        'private',
-        'self',
-        'super'
-    )
+  c(
+    'private',
+    'self',
+    'super'
+  )
 )
 
 #' Convert a request to an ID
@@ -16,7 +16,7 @@ globalVariables(
 #' @noRd
 #' 
 client_to_id <- function(request) {
-    paste0('ID_', request$ip)
+  paste0('ID_', request$ip)
 }
 
 #' Predefined responses
@@ -27,19 +27,19 @@ client_to_id <- function(request) {
 #' @noRd
 #' 
 notFound <- list(
-    status = 404L,
-    headers = list('Content-Type' = 'text/plain'),
-    body = ''
+  status = 404L,
+  headers = list('Content-Type' = 'text/plain'),
+  body = ''
 )
 serverError <- list(
-    status = 500L,
-    headers = list('Content-Type' = 'text/plain'),
-    body = ''
+  status = 500L,
+  headers = list('Content-Type' = 'text/plain'),
+  body = ''
 )
 
 # better try
 tri <- function(expr) {
-    tryCatch(expr, error = function(e) e)
+  tryCatch(expr, error = function(e) e)
 }
 is.condition <- function(x) inherits(x, 'condition')
 is.error_cond <- function(x) is.condition(x) && inherits(x, 'error')

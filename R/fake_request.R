@@ -9,45 +9,45 @@ NULL
 #' @noRd
 #' 
 InputStreamFake <- R6Class('InputStreamFake',
-    public = list(
-        initialize = function(content) {
-            if (!is.raw(content)) {
-                assert_that(is.character(content))
-                content <- paste(content, collapse = '\n')
-                content <- paste0(content, '\n')
-                content <- charToRaw(content)
-            }
-            private$content <- rawConnection(content)
-            private$length <- length(content)
-            seek(private$content, 0)
-        },
-        finalize = function() {
-            try(close(private$content), silent = TRUE)
-        },
-        read_lines = function(n = -1L) {
-            readLines(private$content, n, warn = FALSE)
-        },
-        read = function(l = -1L) {
-            # l < 0 means read all remaining bytes
-            if (l < 0)
-                l <- private$length - seek(private$content)
-            
-            if (l == 0)
-                return(raw())
-            else
-                return(readBin(private$content, raw(), l))
-        },
-        rewind = function() {
-            seek(private$content, 0)
-        },
-        close = function() {
-            try(close(private$content), silent = TRUE)
-        }
-    ),
-    private = list(
-        content = NULL,
-        length = NULL
-    )
+  public = list(
+    initialize = function(content) {
+      if (!is.raw(content)) {
+        assert_that(is.character(content))
+        content <- paste(content, collapse = '\n')
+        content <- paste0(content, '\n')
+        content <- charToRaw(content)
+      }
+      private$content <- rawConnection(content)
+      private$length <- length(content)
+      seek(private$content, 0)
+    },
+    finalize = function() {
+      try(close(private$content), silent = TRUE)
+    },
+    read_lines = function(n = -1L) {
+      readLines(private$content, n, warn = FALSE)
+    },
+    read = function(l = -1L) {
+      # l < 0 means read all remaining bytes
+      if (l < 0)
+        l <- private$length - seek(private$content)
+      
+      if (l == 0)
+        return(raw())
+      else
+        return(readBin(private$content, raw(), l))
+    },
+    rewind = function() {
+      seek(private$content, 0)
+    },
+    close = function() {
+      try(close(private$content), silent = TRUE)
+    }
+  ),
+  private = list(
+    content = NULL,
+    length = NULL
+  )
 )
 #' A Class mimicking NullInputStream from httpuv
 #' 
@@ -56,16 +56,16 @@ InputStreamFake <- R6Class('InputStreamFake',
 #' @noRd
 #' 
 NullInputStreamFake <- R6Class('NullInputStreamFake',
-    public = list(
-        read_lines = function(n = -1L) {
-            character()
-        },
-        read = function(l = -1L) {
-            raw()
-        },
-        rewind = function() invisible(),
-        close = function() invisible()
-    )
+  public = list(
+    read_lines = function(n = -1L) {
+      character()
+    },
+    read = function(l = -1L) {
+      raw()
+    },
+    rewind = function() invisible(),
+    close = function() invisible()
+  )
 )
 #' A Class mimicking ErrorStream from httpuv
 #' 
@@ -74,14 +74,14 @@ NullInputStreamFake <- R6Class('NullInputStreamFake',
 #' @noRd
 #' 
 ErrorStreamFake <- R6Class('ErrorStreamFake',
-    public = list(
-        cat = function(... , sep = " ", fill = FALSE, labels = NULL) {
-            base::cat(..., sep=sep, fill=fill, labels=labels, file=stderr())
-        },
-        flush = function() {
-            base::flush(stderr())
-        }
-    )
+  public = list(
+    cat = function(... , sep = " ", fill = FALSE, labels = NULL) {
+      base::cat(..., sep=sep, fill=fill, labels=labels, file=stderr())
+    },
+    flush = function() {
+      base::flush(stderr())
+    }
+  )
 )
 
 #' Create a fake request to use in testing
@@ -128,74 +128,74 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #' # ... etc.
 #' 
 fake_request <- function(url, method = 'get', appLocation = '', content = '', headers = list(), ...) {
-    rook <- new.env(parent = emptyenv())
-    rook$REQUEST_METHOD <- toupper(method)
-    
-    # Split up URL
-    url <- split_url(url)
-    rook$rook.url_scheme <- url$scheme
-    rook$SERVER_NAME <- url$domain
-    rook$SERVER_PORT <- url$port
-    if (appLocation != '') {
-        appLocation <- sub('/$', '', appLocation)
-        appLocReg <- paste0('^', appLocation)
-        if (!grepl(appLocReg, url$path)) {
-            stop('appLocation must correspond to the beginning of the path')
-        }
-        rook$SCRIPT_NAME <- appLocation
-        url$path <- sub(appLocReg, '', url$path)
+  rook <- new.env(parent = emptyenv())
+  rook$REQUEST_METHOD <- toupper(method)
+  
+  # Split up URL
+  url <- split_url(url)
+  rook$rook.url_scheme <- url$scheme
+  rook$SERVER_NAME <- url$domain
+  rook$SERVER_PORT <- url$port
+  if (appLocation != '') {
+    appLocation <- sub('/$', '', appLocation)
+    appLocReg <- paste0('^', appLocation)
+    if (!grepl(appLocReg, url$path)) {
+      stop('appLocation must correspond to the beginning of the path')
     }
-    rook$PATH_INFO <- url$path
-    rook$QUERY_STRING <- url$query
-    
-    # Misc
-    rook$httpuv.version <- packageVersion('httpuv')
-    rook$rook.version <- "1.1-0"
-    rook$REMOTE_PORT <- paste(sample(0:9, 5, TRUE), collapse = '')
-    
-    # Headers
-    if (length(headers) > 0) {
-        names(headers) <- paste0('HTTP_', sub('^HTTP_', '', toupper(names(headers))))
-        for (i in names(headers)) {
-            assert_that(is.scalar(headers[[i]]))
-            assign(i, as.character(headers[[i]]), envir = rook)
-        }
+    rook$SCRIPT_NAME <- appLocation
+    url$path <- sub(appLocReg, '', url$path)
+  }
+  rook$PATH_INFO <- url$path
+  rook$QUERY_STRING <- url$query
+  
+  # Misc
+  rook$httpuv.version <- packageVersion('httpuv')
+  rook$rook.version <- "1.1-0"
+  rook$REMOTE_PORT <- paste(sample(0:9, 5, TRUE), collapse = '')
+  
+  # Headers
+  if (length(headers) > 0) {
+    names(headers) <- paste0('HTTP_', sub('^HTTP_', '', toupper(names(headers))))
+    for (i in names(headers)) {
+      assert_that(is.scalar(headers[[i]]))
+      assign(i, as.character(headers[[i]]), envir = rook)
     }
-    
-    # Extra
-    extra <- list(...)
-    for (i in names(extra)) {
-        assign(i, extra[[i]], envir = rook)
-    }
-    
-    # Input
-    if (length(content) == 1 && content == '') {
-        rook$rook.input <- NullInputStreamFake$new()
-    } else {
-        rook$rook.input <- InputStreamFake$new(content)
-    }
-    rook$rook.errors <- ErrorStreamFake$new()
-    
-    rook
+  }
+  
+  # Extra
+  extra <- list(...)
+  for (i in names(extra)) {
+    assign(i, extra[[i]], envir = rook)
+  }
+  
+  # Input
+  if (length(content) == 1 && content == '') {
+    rook$rook.input <- NullInputStreamFake$new()
+  } else {
+    rook$rook.input <- InputStreamFake$new(content)
+  }
+  rook$rook.errors <- ErrorStreamFake$new()
+  
+  rook
 }
 #' @importFrom stringi stri_match
 split_url <- function(url) {
-    matches <- stri_match(
-        url,
-        regex = '^(([^:/?#]+)://)?(([^/?#:]*)(:(\\d+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?'
-    )[1,]
-    
-    parsedURL <- list(
-        scheme = if (is.na(matches[3])) 'http' else matches[3],
-        domain = matches[5],
-        port = matches[7],
-        path = if (is.na(matches[8]) | matches[8] == '') '/' else matches[8],
-        query = if (is.na(matches[10])) '' else matches[10],
-        fragment = if (is.na(matches[12])) '' else matches[12]
-    )
-    
-    if (is.na(parsedURL$port)) {
-        parsedURL$port <- if (parsedURL$scheme == 'http') '80' else '443'
-    }
-    parsedURL
+  matches <- stri_match(
+    url,
+    regex = '^(([^:/?#]+)://)?(([^/?#:]*)(:(\\d+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?'
+  )[1,]
+  
+  parsedURL <- list(
+    scheme = if (is.na(matches[3])) 'http' else matches[3],
+    domain = matches[5],
+    port = matches[7],
+    path = if (is.na(matches[8]) | matches[8] == '') '/' else matches[8],
+    query = if (is.na(matches[10])) '' else matches[10],
+    fragment = if (is.na(matches[12])) '' else matches[12]
+  )
+  
+  if (is.na(parsedURL$port)) {
+    parsedURL$port <- if (parsedURL$scheme == 'http') '80' else '443'
+  }
+  parsedURL
 }

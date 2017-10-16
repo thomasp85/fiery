@@ -120,25 +120,25 @@ NULL
 #' @rdname loggers
 #' @export
 logger_null <- function() {
-    function(event, message, request = NULL, time = Sys.time(), ...) {
-        if (event %in% c('error', 'warning', 'message')) {
-            message(event, ': ', trimws(message), sep = '')
-        }
+  function(event, message, request = NULL, time = Sys.time(), ...) {
+    if (event %in% c('error', 'warning', 'message')) {
+      message(event, ': ', trimws(message), sep = '')
     }
+  }
 }
 #' @rdname loggers
 #' 
 #' @export
 logger_console <- function(format = '{time} - {event}: {message}') {
-    function(event, message, request = NULL, time = Sys.time(), ...) {
-        msg <- glue_log(list(
-            time = time,
-            event = event,
-            message = trimws(message)
-        ), format)
-        cat(msg, file = stdout(), append = TRUE)
-        cat('\n', file = stdout(), append = TRUE)
-    }
+  function(event, message, request = NULL, time = Sys.time(), ...) {
+    msg <- glue_log(list(
+      time = time,
+      event = event,
+      message = trimws(message)
+    ), format)
+    cat(msg, file = stdout(), append = TRUE)
+    cat('\n', file = stdout(), append = TRUE)
+  }
 }
 #' @rdname loggers
 #' 
@@ -147,16 +147,16 @@ logger_console <- function(format = '{time} - {event}: {message}') {
 #' 
 #' @export
 logger_file <- function(file, format = '{time} - {event}: {message}') {
-    format <- sub('\n$', '', format)
-    function(event, message, request = NULL, time = Sys.time(), ...) {
-        msg <- glue_log(list(
-            time = time,
-            event = event,
-            message = trimws(message)
-        ), format)
-        cat(msg, file = file, append = TRUE)
-        cat('\n', file = file, append = TRUE)
-    }
+  format <- sub('\n$', '', format)
+  function(event, message, request = NULL, time = Sys.time(), ...) {
+    msg <- glue_log(list(
+      time = time,
+      event = event,
+      message = trimws(message)
+    ), format)
+    cat(msg, file = file, append = TRUE)
+    cat('\n', file = file, append = TRUE)
+  }
 }
 #' @rdname loggers
 #' 
@@ -168,20 +168,20 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
 #' 
 #' @export
 logger_switch <- function(..., default = logger_null()) {
-    enclos <- parent.frame()
-    args <- eval(substitute(alist(...)))
-    args <- lapply(args, function(e) {
-        if (!identical(e, quote(expr = ))) {
-            eval(e, envir = enclos)
-        } else {
-            e
-        }
-    })
-    args <- c(args, list(default))
-    function(event, message, request = NULL, time = Sys.time(), ...) {
-        loc_args <- c(list(event), args)
-        do.call(switch, loc_args)(event = event, message = message, request = request, time = time, ...)
+  enclos <- parent.frame()
+  args <- eval(substitute(alist(...)))
+  args <- lapply(args, function(e) {
+    if (!identical(e, quote(expr = ))) {
+      eval(e, envir = enclos)
+    } else {
+      e
     }
+  })
+  args <- c(args, list(default))
+  function(event, message, request = NULL, time = Sys.time(), ...) {
+    loc_args <- c(list(event), args)
+    do.call(switch, loc_args)(event = event, message = message, request = request, time = time, ...)
+  }
 }
 #' @rdname loggers
 #' @export
@@ -194,13 +194,13 @@ combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer
 # Helpers -----------------------------------------------------------------
 
 # safely_transformer <- function(otherwise = NA) {
-#     function(code, envir) {
-#         tryCatch(eval(code, envir),
-#                  error = function(e) if (is.language(otherwise)) eval(otherwise) else otherwise)
-#     }
+#   function(code, envir) {
+#     tryCatch(eval(code, envir),
+#              error = function(e) if (is.language(otherwise)) eval(otherwise) else otherwise)
+#   }
 # }
 #' @importFrom glue glue_data
 glue_log <- function(.data, ..., .envir = parent.frame()) {
-    glue_data(.data, ..., .envir = .envir)
-    #glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
+  glue_data(.data, ..., .envir = .envir)
+  #glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
 }
