@@ -33,6 +33,7 @@ Collate:
     'HandlerStack.R'
     'Fire.R'
     'FutureStack.R'
+    'delay_doc.R'
     'event_doc.R'
     'fake_request.R'
     'fiery-package.R'

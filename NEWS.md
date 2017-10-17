@@ -7,6 +7,7 @@
 * Added `is_running()` method to query the state of the server.
 * Capture errors in each handler for events and delayed execution, so that 
   evaluation of the other handlers are unaffected (#20).
+* Document the use of delayed evaluation. See `?delay_doc`
 
 # fiery 1.0.0
 
