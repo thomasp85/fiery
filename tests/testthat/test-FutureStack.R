@@ -1,8 +1,10 @@
 context("FutureStack")
 
+app <- Fire$new()
+
 test_that('DelayStack works', {
     catcher <- new.env()
-    delay <- DelayStack$new()
+    delay <- DelayStack$new(app)
     expect_true(delay$empty())
     delay$add({
         message('test')
@@ -29,7 +31,7 @@ test_that('DelayStack works', {
 
 test_that('TimeStack works', {
     catcher <- new.env()
-    time <- TimeStack$new()
+    time <- TimeStack$new(app)
     expect_true(time$empty())
     time$add({
         message('test')

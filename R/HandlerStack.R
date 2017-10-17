@@ -35,7 +35,7 @@ HandlerStack <- R6Class('HandlerStack',
     },
     dispatch = function(...) {
       res <- lapply(private$handleOrder, function(id) {
-        private$handleEnv[[id]](...)
+        tri(private$handleEnv[[id]](...))
       })
       names(res) <- private$handleOrder
       res

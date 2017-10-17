@@ -9,7 +9,8 @@ NULL
 FutureStack <- R6Class('FutureStack',
   public = list(
     # Methods
-    initialize = function() {
+    initialize = function(server) {
+      private$server <- server
       private$futures <- new.env(parent = emptyenv())
     },
     add = function(expr, then, ..., substituted = FALSE) {
@@ -31,8 +32,14 @@ FutureStack <- R6Class('FutureStack',
       if (!self$empty()) {
         evalIds <- private$ids[sapply(private$ids, private$do_eval)]
         for (i in evalIds) {
-          res <- value(private$futures[[i]]$expr)
-          do.call(private$futures[[i]]$then, list(res = res, ...))
+          res <- tri(value(private$futures[[i]]$expr))
+          if (is.error_cond(res)) {
+            private$server$log('error', conditionMessage(res))
+          }
+          res <- tri(do.call(private$futures[[i]]$then, list(res = res, ...)))
+          if (is.error_cond(res)) {
+            private$server$log('error', conditionMessage(res))
+          }
         }
         if (length(evalIds) != 0) private$clear(evalIds)
       }
@@ -44,6 +51,7 @@ FutureStack <- R6Class('FutureStack',
     futures = NULL,
     catcher = 'future',
     lazy = FALSE,
+    server = NULL,
     
     # Methods
     make_future = function(expr, then, ...) {

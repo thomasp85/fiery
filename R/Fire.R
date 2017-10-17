@@ -165,10 +165,10 @@ Fire <- R6Class('Fire',
       private$websockets <- new.env(parent = emptyenv())
       private$client_id <- client_to_id
       private$logger <- logger_null()
-      private$DELAY <- DelayStack$new()
-      private$TIME <- TimeStack$new()
-      private$ASYNC <- AsyncStack$new()
-      private$LOG_QUEUE <- DelayStack$new()
+      private$DELAY <- DelayStack$new(self)
+      private$TIME <- TimeStack$new(self)
+      private$ASYNC <- AsyncStack$new(self)
+      private$LOG_QUEUE <- DelayStack$new(self)
     },
     format = function(...) {
       text <- c(
@@ -692,10 +692,12 @@ Fire <- R6Class('Fire',
     },
     p_trigger = function(event, ...) {
       if (!is.null(private$handlers[[event]])) {
-        private$safe_call(private$handlers[[event]]$dispatch(...))
+        res <- private$safe_call(private$handlers[[event]]$dispatch(...))
+        for (val in res) if (is.error_cond(val)) self$log('error', conditionMessage(val))
       } else {
-        setNames(list(), character())
+        res <- setNames(list(), character())
       }
+      res
     },
     external_triggers = function() {
       if (is.null(private$TRIGGERDIR)) return()

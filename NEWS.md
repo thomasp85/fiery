@@ -5,6 +5,8 @@
   request and message handling (#18).
 * Added `access_log_format` field to define how requests are logged.
 * Added `is_running()` method to query the state of the server.
+* Capture errors in each handler for events and delayed execution, so that 
+  evaluation of the other handlers are unaffected (#20).
 
 # fiery 1.0.0
 
