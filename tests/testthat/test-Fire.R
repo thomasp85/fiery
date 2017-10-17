@@ -535,3 +535,11 @@ test_that('is_running works', {
     app$extinguish()
     expect_false(app$is_running())
 })
+
+test_that('safe_call catches conditions', {
+  app <- Fire$new()
+  private <- environment(app$clone)$private
+  expect_message(private$safe_call(stop('error test')), 'error: error test')
+  expect_message(private$safe_call(warning('warning test')), 'warning: warning test')
+  expect_message(private$safe_call(message('message test')), 'message: message test')
+})

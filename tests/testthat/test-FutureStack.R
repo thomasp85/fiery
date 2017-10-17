@@ -27,6 +27,16 @@ test_that('DelayStack works', {
     expect_false(delay$empty())
     delay$remove(id)
     expect_true(delay$empty())
+    
+    delay$add(stop('error test'))
+    delay$add(5, function(res, ...) catcher$res <- res)
+    expect_message(delay$eval(), 'error: error test')
+    expect_equal(catcher$res, 5)
+    
+    delay$add(NULL, function(...) stop('error test'))
+    delay$add(15, function(res, ...) catcher$res <- res)
+    expect_message(delay$eval(), 'error: error test')
+    expect_equal(catcher$res, 15)
 })
 
 test_that('TimeStack works', {
