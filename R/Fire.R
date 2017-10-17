@@ -681,11 +681,11 @@ Fire <- R6Class('Fire',
       if (is.null(private$handlers[[event]])) {
         private$handlers[[event]] <- HandlerStack$new()
       }
-      private$safe_call(private$handlers[[event]]$add(handler, id, pos))
+      private$handlers[[event]]$add(handler, id, pos)
     },
     remove_handler = function(id) {
       event <- private$handlerMap[[id]]
-      private$safe_call(private$handlers[[event]]$remove(id))
+      private$handlers[[event]]$remove(id)
     },
     add_plugin = function(plugin, name) {
       private$pluginList[[name]] <- plugin
