@@ -75,7 +75,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{remove_data(name)}}{Removes the data with the given \code{name} from the internal data store}
 \item{\code{time(expr, then, after, loop = FALSE)}}{Add a timed evaluation (\code{expr}) that will be evaluated after the given number of seconds (\code{after}), potentially repeating if \code{loop = TRUE}. After the expression has evaluated the \code{then} function will get called with the result of the expression and the server object as arguments.}
 \item{\code{remove_time(id)}}{Removes the timed evaluation identified by the \code{id} (returned when adding the evaluation)}
-\item{\code{delay(expr, then)}}{As \code{time()} except the \code{expr} is evaluated immediately at the end of the loop cycle}
+\item{\code{delay(expr, then)}}{Similar to \code{time()}, except the \code{expr} is evaluated immediately at the end of the loop cycle (\link[=delay_doc]{see here} for detailed explanation of delayed evaluation in fiery).}
 \item{\code{remove_delay(id)}}{Removes the delayed evaluation identified by the \code{id}}
 \item{\code{async(expr, then)}}{As \code{delay()} and \code{time()} except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 \item{\code{remove_async(id)}}{Removes the async evaluation identified by the \code{id}. The evaluation is not necessarily stopped but the then function will not get called.}
