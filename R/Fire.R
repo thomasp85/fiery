@@ -218,11 +218,11 @@ Fire <- R6Class('Fire',
             private$p_trigger('end', server = self)
             stopDaemonizedServer(private$server)
             private$server <- NULL
+            self$log('stop', paste0(self$host, ':', self$port, self$root))
           }
         } else {
           private$quitting <- TRUE
         }
-        self$log('stop', paste0(self$host, ':', self$port, self$root))
       }
       invisible(NULL)
     },
@@ -484,6 +484,7 @@ Fire <- R6Class('Fire',
           on.exit({
             private$running <- FALSE
             private$p_trigger('end', server = self)
+            self$log('stop', paste0(self$host, ':', self$port, self$root))
           })
           private$run_blocking_server(showcase = showcase)
         } else {
