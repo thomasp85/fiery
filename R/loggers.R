@@ -203,7 +203,7 @@ logger_switch <- function(..., default = logger_null()) {
 common_log_format <- '{request$ip} - {id} [{format(end_time, "%d/%b/%Y:%T %z")}] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
 #' @rdname loggers
 #' @export
-combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer")}" "{request$get_header("User-agent")}"')
+combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer") %||% ""}" "{paste(request$get_header("User-Agent"), collapse = ", ") %||% ""}"')
 
 
 # Helpers -----------------------------------------------------------------

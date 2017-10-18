@@ -43,3 +43,5 @@ tri <- function(expr) {
 }
 is.condition <- function(x) inherits(x, 'condition')
 is.error_cond <- function(x) is.condition(x) && inherits(x, 'error')
+
+`%||%` <- function(l, r) if (is.null(l)) r else l
