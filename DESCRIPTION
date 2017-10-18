@@ -26,8 +26,9 @@ Imports:
     stats,
     desc,
     reqres,
-    glue
-Collate: 
+    glue,
+    crayon
+Collate:
     'loggers.R'
     'aaa.R'
     'HandlerStack.R'

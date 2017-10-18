@@ -64,7 +64,8 @@ A new instance of the console logger can be create with \code{logger_console()}:
 }
 
 Both functions takes a \code{format} a argument that lets you customise how the
-log is written.
+log is written. Furthermore the console logger will style the logs with
+colour coding depending on the content if the console supports it.
 
 As a last possibility it is possible to use different loggers dependent on
 the event by using the switch logger:\preformatted{app$set_logger(logger_switch(warning =, 

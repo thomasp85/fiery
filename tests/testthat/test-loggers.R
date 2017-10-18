@@ -10,9 +10,11 @@ test_that("null logger works", {
 
 test_that("console logger works", {
     logger <- logger_console()
+    req <- reqres::Request$new(fake_request('www.example.com'))
     expect_output(logger('error', 'error test'), "error: error test")
     expect_output(logger('warning', 'warning test'), "warning: warning test")
     expect_output(logger('info', 'info test'), 'info: info test')
+    expect_output(logger('request', 'request test', req), 'request: request test')
 })
 
 test_that("file logger works", {

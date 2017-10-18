@@ -35,7 +35,8 @@
 #' ```
 #' 
 #' Both functions takes a `format` a argument that lets you customise how the
-#' log is written.
+#' log is written. Furthermore the console logger will style the logs with 
+#' colour coding depending on the content if the console supports it.
 #' 
 #' As a last possibility it is possible to use different loggers dependent on 
 #' the event by using the switch logger:
@@ -128,14 +129,28 @@ logger_null <- function() {
 }
 #' @rdname loggers
 #' 
+#' @importFrom crayon red yellow blue green cyan magenta bold make_style
 #' @export
 logger_console <- function(format = '{time} - {event}: {message}') {
+  orange <- make_style('orange')
   function(event, message, request = NULL, time = Sys.time(), ...) {
     msg <- glue_log(list(
       time = time,
       event = event,
       message = trimws(message)
     ), format)
+    msg <- switch(event, error = red(msg), warning = yellow(msg), message = blue(msg), msg)
+    if (event == 'request') {
+      status_group <- as.integer(cut(request$respond()$status, breaks = c(100, 200, 300, 400, 500, 600), right = FALSE))
+      msg <- switch(
+        status_group,
+        blue$bold(msg),
+        green$bold(msg),
+        cyan$bold(msg),
+        orange$bold(msg),
+        red$bold(msg)
+      )
+    }
     cat(msg, file = stdout(), append = TRUE)
     cat('\n', file = stdout(), append = TRUE)
   }
