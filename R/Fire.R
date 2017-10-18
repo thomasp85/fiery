@@ -73,7 +73,7 @@ NULL
 #'  \item{`remove_data(name)`}{Removes the data with the given `name` from the internal data store}
 #'  \item{`time(expr, then, after, loop = FALSE)`}{Add a timed evaluation (`expr`) that will be evaluated after the given number of seconds (`after`), potentially repeating if `loop = TRUE`. After the expression has evaluated the `then` function will get called with the result of the expression and the server object as arguments.}
 #'  \item{`remove_time(id)`}{Removes the timed evaluation identified by the `id` (returned when adding the evaluation)}
-#'  \item{`delay(expr, then)`}{As `time()` except the `expr` is evaluated immediately at the end of the loop cycle}
+#'  \item{`delay(expr, then)`}{Similar to `time()`, except the `expr` is evaluated immediately at the end of the loop cycle ([see here][delay_doc] for detailed explanation of delayed evaluation in fiery).}
 #'  \item{`remove_delay(id)`}{Removes the delayed evaluation identified by the `id`}
 #'  \item{`async(expr, then)`}{As `delay()` and `time()` except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 #'  \item{`remove_async(id)`}{Removes the async evaluation identified by the `id`. The evaluation is not necessarily stopped but the then function will not get called.}
