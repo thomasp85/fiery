@@ -41,3 +41,8 @@ test_that("switch logger works", {
     logs <- readLines(logfile)
     expect_match(logs[1], "error: error test")
 })
+
+test_that("%||% works", {
+    expect_equal(NULL %||% 10, 10)
+    expect_equal(20 %||% 10, 20)
+})
