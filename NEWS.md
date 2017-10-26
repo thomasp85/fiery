@@ -1,4 +1,4 @@
-# fiery 1.0.0.9999
+# fiery 1.1.0
 
 * Add logging API. Set custom loggers with `set_logger()` and send messages to
   the log with `log()`. Logging is automatically delayed so it doesn't slow down
