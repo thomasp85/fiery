@@ -1,3 +1,8 @@
+#fiery 1.1.0.9999
+
+* Fix bug with root mounting of app where the root would be stripped before
+  checking if it exists.
+
 # fiery 1.1.0
 
 * Add logging API. Set custom loggers with `set_logger()` and send messages to

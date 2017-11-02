@@ -561,7 +561,7 @@ Fire <- R6Class('Fire',
       }
     },
     mount_request = function(req) {
-      if (!grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) stop('URL not matching mount point', call. = FALSE)
+      if (req$SCRIPT_NAME != self$root && !grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) stop('URL not matching mount point', call. = FALSE)
       req$SCRIPT_NAME <- self$root
       req$PATH_INFO <- sub(paste0('^', self$root, ''), '', req$PATH_INFO)
       req
