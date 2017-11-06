@@ -2,6 +2,8 @@
 
 * Fix bug with root mounting of app where the root would be stripped before
   checking if it exists.
+* Fix a bug when evaluating multiple futures at once, where the removal of the
+  futures would throw an error (#28)
 
 # fiery 1.1.0
 

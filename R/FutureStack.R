@@ -72,7 +72,7 @@ FutureStack <- R6Class('FutureStack',
     },
     clear = function(ids, ...) {
       if (length(ids) > 0) {
-        private$ids <- private$ids[private$ids != ids]
+        private$ids <- private$ids[!private$ids %in% ids]
         rm(list = ids, envir = private$futures)
       }
     },
