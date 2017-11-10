@@ -144,6 +144,8 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
     }
     rook$SCRIPT_NAME <- appLocation
     url$path <- sub(appLocReg, '', url$path)
+  } else {
+    rook$SCRIPT_NAME <- appLocation
   }
   rook$PATH_INFO <- url$path
   rook$QUERY_STRING <- url$query
