@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-<img src="man/figures/fiery_logo.png"/>
+<img src="man/figures/fiery.png"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery)

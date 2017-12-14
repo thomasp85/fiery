@@ -39,7 +39,7 @@ Collate:
     'fake_request.R'
     'fiery-package.R'
     'plugin_doc.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Suggests:
     testthat,
     covr

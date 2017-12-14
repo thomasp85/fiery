@@ -1,6 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<img src="man/figures/fiery_logo.png"/>
+<img src="man/figures/fiery.png"/>
 
 [![Travis-CI Build Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery) [![Coverage Status](https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg)](https://codecov.io/github/thomasp85/fiery?branch=master)
 
@@ -104,9 +104,11 @@ app$on('end', function(server) {
 
 app$ignite(showcase = TRUE)
 #> Fire started at 127.0.0.1:8080
-#> 1
-#> Ending...
-#> Goodbye
+#> message: 1
+#> message: 2
+#> message: 3
+#> message: 4
+#> message: Goodbye
 ```
 
 In general much of the logic will happen in the `request` and `message` handlers and you are free to ignore the other life-cycle events if they are not needed.

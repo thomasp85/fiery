@@ -4,8 +4,18 @@
 \name{fiery-package}
 \alias{fiery}
 \alias{fiery-package}
-\title{A Fiery Framework for R-Based Web Development}
+\title{fiery: A Lightweight and Flexible Web Framework}
 \description{
+\if{html}{\figure{logo.png}{options: align='right'}}
+
+A very flexible framework for building server side logic in R. The
+framework is unopinionated when it comes to how HTTP requests and WebSocket
+messages are handled and supports all levels of app complexity; from serving
+static content to full-blown dynamic web-apps. Fiery does not hold your hand
+as much as e.g. the shiny package does, but instead sets you free to create
+your web app the way you want.
+}
+\details{
 \code{fiery} is a lightweight and flexible framework for web servers build on top of
 the \link[httpuv:httpuv-package]{httpuv} package. The framework is largely
 event-based, letting the developer attach handlers to life-cycle events as
@@ -13,9 +23,8 @@ well as defining and triggering their own events. This approach to
 development is common in JavaScript, but might feel foreign to R developers.
 Thankfully it is a rather simple concept that should be easy to gradually
 begin to use to greater and greater effect.
-}
-\section{Read more}{
 
+\strong{Read more:}
 \itemize{
 \item Creation of the server object, along with all its methods and fields, is
 described in the documentation of the \code{\link{Fire}} class.
@@ -26,7 +35,6 @@ documentation.
 own plugins is laid out in the \link{plugins} documentation
 }
 }
-
 \seealso{
 Useful links:
 \itemize{
@@ -36,5 +44,6 @@ Useful links:
 
 }
 \author{
-Thomas Lin Pedersen \href{mailto:thomasp85@gmail.com}{thomasp85@gmail.com}
+\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com}
+
 }

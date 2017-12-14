@@ -1,0 +1,10 @@
+Name: app-name
+Description: Describe your app
+Version: 0.0.1
+Host: 127.0.0.1
+Port: 8080
+Hook: app
+Dependencies: 
+  CRAN: 
+  Remotes:
+  Apt: 

@@ -21,7 +21,7 @@ A new 'Fire'-object is initialized using the \code{new()} method on the generato
 
 \strong{Usage}
 \tabular{l}{
-\code{app <- Fire$new(host = '127.0.0.1', port = 8080L)}
+\code{app &lt;- Fire$new(host = '127.0.0.1', port = 8080L)}
 }
 
 \strong{Arguments}
