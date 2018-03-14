@@ -164,7 +164,6 @@ Fire <- R6Class('Fire',
       private$handlers <- new.env(parent = emptyenv())
       private$websockets <- new.env(parent = emptyenv())
       private$client_id <- client_to_id
-      private$logger <- logger_null()
       private$DELAY <- DelayStack$new(self)
       private$TIME <- TimeStack$new(self)
       private$ASYNC <- AsyncStack$new(self)
@@ -338,15 +337,15 @@ Fire <- R6Class('Fire',
     set_logger = function(logger) {
       assert_that(is.function(logger))
       assert_that(has_args(logger, c('event', 'message', 'request', '...')))
-      private$logger <- logger
+      private$logger <- list(logger)
       invisible(NULL)
     },
     log = function(event, message, request = NULL, ...) {
       time <- Sys.time()
       if (private$running) {
-        private$LOG_QUEUE$add(NULL, function(...) private$logger(event, message, request, time, ...))
+        private$LOG_QUEUE$add(NULL, function(...) private$logger[[1]](event, message, request, time, ...))
       } else {
-        private$logger(event, message, request, time, ...)
+        private$logger[[1]](event, message, request, time, ...)
       }
       invisible(NULL)
     },
@@ -453,7 +452,7 @@ Fire <- R6Class('Fire',
     websockets = NULL,
     server = NULL,
     client_id = NULL,
-    logger = NULL,
+    logger = list(logger_null()),
     
     DELAY = NULL,
     TIME = NULL,

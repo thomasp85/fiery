@@ -4,6 +4,7 @@
   checking if it exists.
 * Fix a bug when evaluating multiple futures at once, where the removal of the
   futures would throw an error (#28)
+* Fix a bug preventing setting loggers on cloned apps (#30)
 
 # fiery 1.1.0
 
