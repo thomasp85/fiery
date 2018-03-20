@@ -693,7 +693,7 @@ Fire <- R6Class('Fire',
     p_trigger = function(event, ...) {
       if (!is.null(private$handlers[[event]])) {
         res <- private$safe_call(private$handlers[[event]]$dispatch(...))
-        for (val in res) if (is.error_cond(val)) self$log('error', conditionMessage(val))
+        for (val in res) if (is.error_cond(val)) self$log('error', paste0(conditionMessage(val), ' from ', deparse(conditionCall(val), nlines = 1)))
       } else {
         res <- setNames(list(), character())
       }
@@ -721,14 +721,14 @@ Fire <- R6Class('Fire',
     safe_call = function(expr) {
       withCallingHandlers(
         tryCatch(expr, error = function(e) {
-          self$log('error', conditionMessage(e))
+          self$log('error', paste0(conditionMessage(e), ' from ', deparse(conditionCall(e), nlines = 1)))
         }),
         warning = function(w) {
-          self$log('warning', conditionMessage(w))
+          self$log('warning', paste0(conditionMessage(w), ' from ', deparse(conditionCall(w), nlines = 1)))
           invokeRestart('muffleWarning')
         },
         message = function(m) {
-          self$log('message', conditionMessage(m))
+          self$log('message', paste0(conditionMessage(m), ' from ', deparse(conditionCall(m), nlines = 1)))
           invokeRestart('muffleMessage')
         }
       )
