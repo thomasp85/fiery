@@ -25,7 +25,6 @@ Imports:
     future,
     later,
     stats,
-    desc,
     reqres,
     glue,
     crayon
