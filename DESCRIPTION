@@ -14,6 +14,7 @@ Description: A very flexible framework for building server side logic in R. The
     as much as e.g. the shiny package does, but instead sets you free to create
     your web app the way you want.
 License: MIT + file LICENSE
+Encoding: UTF-8
 Imports:
     R6,
     assertthat,
@@ -39,7 +40,7 @@ Collate:
     'fake_request.R'
     'fiery-package.R'
     'plugin_doc.R'
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0
 Suggests:
     testthat,
     covr

@@ -1,6 +1,6 @@
 context("FutureStack")
 
-app <- Fire$new()
+app <- Fire$new(port = random_port())
 
 test_that('DelayStack works', {
     catcher <- new.env()

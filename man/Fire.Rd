@@ -12,8 +12,7 @@ contrast to the more well known S3 and S4 systems. A \code{fiery} server is even
 driven, which means that it is build up and manipulated by adding event
 handlers and triggering events. To learn more about the \code{fiery} event model,
 read the \link[=events]{event documentation}. \code{fiery} servers can be modified
-directly or by attaching plugins. As with events, \link[=plugins]{plugins has its own
-documentation}.
+directly or by attaching plugins. As with events, \link[=plugins]{plugins has its own documentation}.
 }
 \section{Initialization}{
 
@@ -21,7 +20,7 @@ A new 'Fire'-object is initialized using the \code{new()} method on the generato
 
 \strong{Usage}
 \tabular{l}{
-\code{app &lt;- Fire$new(host = '127.0.0.1', port = 8080L)}
+\code{app <- Fire$new(host = '127.0.0.1', port = 8080L)}
 }
 
 \strong{Arguments}

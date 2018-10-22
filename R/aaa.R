@@ -7,6 +7,25 @@ globalVariables(
   )
 )
 
+#' Select a random safe port
+#' 
+#' This is a small utility function to get random safe ports to run your 
+#' application on. It chooses a port within the range that cannot be registeret
+#' to IANA and thus is safe to assume are not in use.
+#' 
+#' @return An integer in the range 49152-65535
+#' 
+#' @export
+#' 
+#' @examples
+#' random_port()
+#'  
+random_port <- function() {
+  low <- 49152
+  high <- 65535
+  as.integer(sample(high - low, 1) + low)
+}
+
 #' Convert a request to an ID
 #' 
 #' @param request A Request object
