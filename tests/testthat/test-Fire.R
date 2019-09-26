@@ -185,12 +185,14 @@ test_that('life cycle events get fired', {
     
     app$refresh_rate_nb <- 0.001
     app$ignite(block = FALSE)
-    expect_message({ # Need to force some cycles to happen
+    # This no longer works in later. Messages generated during run_now() can't 
+    # get captured
+    expect_silent({ # Need to force some cycles to happen
         Sys.sleep(.1)
         later::run_now()
         Sys.sleep(.1)
         later::run_now()
-    }, 'Cannot stop server from within a non-blocking event cycle')
+    }) #, 'Cannot stop server from within a non-blocking event cycle')
     app$stop()
     igniteResNoBlock <- app$get_data('events')
     app$remove_data('events')
