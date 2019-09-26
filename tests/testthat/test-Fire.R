@@ -187,12 +187,12 @@ test_that('life cycle events get fired', {
     app$ignite(block = FALSE)
     # This no longer works in later. Messages generated during run_now() can't 
     # get captured
-    expect_silent({ # Need to force some cycles to happen
-        Sys.sleep(.1)
-        later::run_now()
-        Sys.sleep(.1)
-        later::run_now()
-    }) #, 'Cannot stop server from within a non-blocking event cycle')
+#    expect_silent({ # Need to force some cycles to happen
+#        Sys.sleep(.1)
+#        later::run_now()
+#        Sys.sleep(.1)
+#        later::run_now()
+#    }) #, 'Cannot stop server from within a non-blocking event cycle')
     app$stop()
     igniteResNoBlock <- app$get_data('events')
     app$remove_data('events')
