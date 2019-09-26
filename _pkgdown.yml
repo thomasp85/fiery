@@ -39,3 +39,31 @@ navbar:
     - icon: fa-github fa-lg
       href: https://github.com/thomasp85/ggforce
       
+reference:
+  - title: "The Fire object"
+    desc: >
+      fiery is build on top of the R6 class system and all functionality in the
+      package is more or less part of the Fire class. The understanding of this
+      class is thus integral to understanding fiery.
+    contents:
+      - Fire
+  - title: "Logging"
+    desc: >
+      Logs are an important part of many servers and fiery has a central logging
+      facility where callbacks and handlers can send logging information to 
+      without worrying about where and how the logs get written.
+    contents:
+      - loggers
+  - title: "Request and response objects"
+    desc: >
+      A lot of the logic in web servers are concerned with parsing requests and
+      building up responses. fiery uses the Request and Response classes defined
+      in the [reqres](https://github.com/thomasp85/reqres) package. See the
+      documentation there.
+  - title: "Routing"
+    desc: >
+      A central part of many servers is the router that takes care of recieving
+      requests and directing them at the right handlers for further processing. 
+      Being the minimal server framework that it is, fiery doesn't include 
+      router functionality itself, but the 
+      [routr](https://github.com/thomasp85/routr) package.

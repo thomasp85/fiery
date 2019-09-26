@@ -6,5 +6,5 @@
 #' development is common in JavaScript, but might feel foreign to R developers.
 #' Thankfully it is a rather simple concept that should be easy to gradually
 #' begin to use to greater and greater effect.
-#' 
+#' @keywords internal
 '_PACKAGE'

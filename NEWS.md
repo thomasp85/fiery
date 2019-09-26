@@ -3,6 +3,7 @@
 * Fix bug where delayed logging would result in wrong message being logged (#39)
 * Remove some tests as new later architecture makes certain async operations 
   untestable (#40)
+* pkgdown site now available at <https://fiery.data-imaginist.com>
 
 # fiery 1.1.1
 

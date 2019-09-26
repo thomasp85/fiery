@@ -19,7 +19,8 @@ globalVariables(
 #' 
 #' @examples
 #' random_port()
-#'  
+#' 
+#' @keywords internal 
 random_port <- function() {
   low <- 49152
   high <- 65535
