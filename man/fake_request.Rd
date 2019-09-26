@@ -45,5 +45,9 @@ req[['QUERY_STRING']]
 
 # ... etc.
 
+# Cleaning up connections
+rm(req)
+gc()
+
 }
 \keyword{internal}
