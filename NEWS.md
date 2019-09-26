@@ -1,4 +1,4 @@
-# fiery (development version)
+# fiery 1.1.2
 
 * Fix bug where delayed logging would result in wrong message being logged (#39)
 * Remove some tests as new later architecture makes certain async operations 
