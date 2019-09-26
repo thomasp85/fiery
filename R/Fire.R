@@ -342,6 +342,7 @@ Fire <- R6Class('Fire',
     },
     log = function(event, message, request = NULL, ...) {
       time <- Sys.time()
+      force(message)
       if (private$running) {
         private$LOG_QUEUE$add(NULL, function(...) private$logger[[1]](event, message, request, time, ...))
       } else {

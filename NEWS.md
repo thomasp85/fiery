@@ -1,4 +1,10 @@
-#fiery 1.1.0.9999
+# fiery (development version)
+
+* Fix bug where delayed logging would result in wrong message being logged (#39)
+* Remove some tests as new later architecture makes certain async operations 
+  untestable (#40)
+
+# fiery 1.1.1
 
 * Fix bug with root mounting of app where the root would be stripped before
   checking if it exists.
