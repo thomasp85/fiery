@@ -175,5 +175,5 @@ I would love some feedback on this - open an issue or reach out to me on
 
 Please note that the ‘fiery’ project is released with a [Contributor
 Code of
-Conduct](https://ggforce.data-imaginist.com/CODE_OF_CONDUCT.html). By
+Conduct](https://fiery.data-imaginist.com/CODE_OF_CONDUCT.html). By
 contributing to this project, you agree to abide by its terms.
