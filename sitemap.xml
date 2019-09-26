@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://fiery.data-imaginist.com/index.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/Fire.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/delay_doc.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/event_doc.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/fake_request.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/fiery-package.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/loggers.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/plugin_doc.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/reference/random_port.html</loc>
+  </url>
+</urlset>
