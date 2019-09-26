@@ -1,9 +1,13 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 language: R
-sudo: false
+sudo: true
 cache: packages
-r_github_packages:
-  - jimhester/covr
+dist: xenial
+
 after_success:
   - Rscript -e 'library(covr);codecov()'
+  
+before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
+deploy:
+  provider: script
+  script: Rscript -e 'pkgdown::deploy_site_github()'
+  skip_cleanup: true
