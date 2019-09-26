@@ -149,7 +149,9 @@ TimeStack <- R6Class('TimeStack',
     restore = function(future) {
       if (future$state == 'finished') {
         future$state <- 'created'
-        rm('value', envir = future)
+        if (exists('value', envir = future)) {
+          rm('value', envir = future)
+        }
       }
     }
   )
