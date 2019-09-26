@@ -45,6 +45,6 @@ Suggests:
     knitr,
     rmarkdown
 Roxygen: list(markdown = TRUE)
-URL: https://github.com/thomasp85/fiery
+URL: https://fiery.data-imaginist.com, https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues
 VignetteBuilder: knitr
