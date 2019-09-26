@@ -7,3 +7,5 @@
 ^CODE_OF_CONDUCT\.md$
 ^_pkgdown\.yml$
 ^pkgdown$
+^cran-comments\.md$
+^revdep$
