@@ -8,3 +8,34 @@ authors:
 template:
   params:
     bootswatch: simplex
+
+navbar:
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: Reference
+      href: reference/index.html
+    - text: Articles
+      menu:
+      - text: The event cycle
+        href: articles/events.html
+      - text: Delaying code execution
+        href: articles/delayed.html
+      - text: Creating and using plugins
+        href: articles/plugins.html
+      - text: "------------------"
+      - text: "Demos"
+      - text: "Fiery on Heroku"
+        href: https://www.data-imaginist.com/2017/setting-fire-to-deployment/
+    - text: News
+      menu:
+      - text: "Release notes"
+      - text: "Version 1.0.0"
+        href: https://www.data-imaginist.com/2017/when-a-fire-starts-to-burn/
+      - text: "------------------"
+      - text: "Change log"
+        href: news/index.html
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/thomasp85/ggforce
+      

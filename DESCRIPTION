@@ -36,15 +36,15 @@ Collate:
     'HandlerStack.R'
     'Fire.R'
     'FutureStack.R'
-    'delay_doc.R'
-    'event_doc.R'
     'fake_request.R'
     'fiery-package.R'
-    'plugin_doc.R'
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests:
     testthat,
-    covr
+    covr,
+    knitr,
+    rmarkdown
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues
+VignetteBuilder: knitr

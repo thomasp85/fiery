@@ -7,14 +7,4 @@
 #' Thankfully it is a rather simple concept that should be easy to gradually
 #' begin to use to greater and greater effect.
 #' 
-#' **Read more:**
-#' 
-#' - Creation of the server object, along with all its methods and fields, is 
-#' described in the documentation of the [`Fire`] class.
-#' - An overview of the event model, along with descriptions of the predefined
-#' life-cycle events and custom events can be found in the [events]
-#' documentation.
-#' - A description of the `fiery` plugin interface and how to develop your
-#' own plugins is laid out in the [plugins] documentation
-#' 
 '_PACKAGE'

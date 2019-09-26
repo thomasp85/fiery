@@ -23,17 +23,6 @@ well as defining and triggering their own events. This approach to
 development is common in JavaScript, but might feel foreign to R developers.
 Thankfully it is a rather simple concept that should be easy to gradually
 begin to use to greater and greater effect.
-
-\strong{Read more:}
-\itemize{
-\item Creation of the server object, along with all its methods and fields, is
-described in the documentation of the \code{\link{Fire}} class.
-\item An overview of the event model, along with descriptions of the predefined
-life-cycle events and custom events can be found in the \link{events}
-documentation.
-\item A description of the \code{fiery} plugin interface and how to develop your
-own plugins is laid out in the \link{plugins} documentation
-}
 }
 \seealso{
 Useful links:
@@ -44,6 +33,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com}
+\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com} (0000-0002-5147-4711)
 
 }

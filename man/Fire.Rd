@@ -11,8 +11,9 @@ is thus reference-based with methods and data attached to each object, in
 contrast to the more well known S3 and S4 systems. A \code{fiery} server is event
 driven, which means that it is build up and manipulated by adding event
 handlers and triggering events. To learn more about the \code{fiery} event model,
-read the \link[=events]{event documentation}. \code{fiery} servers can be modified
-directly or by attaching plugins. As with events, \link[=plugins]{plugins has its own documentation}.
+read the \href{https://fiery.data-imaginist.com/articles/events.html}{event vignette}.
+\code{fiery} servers can be modified directly or by attaching plugins. As with
+events, \href{https://fiery.data-imaginist.com/articles/plugins.html}{plugins has its own vignette}.
 }
 \section{Initialization}{
 
@@ -60,13 +61,13 @@ object is desired, use the \code{clone()} method.
 \item{\code{extinguish()}}{Stops a running server}
 \item{\code{stop()}}{Boring synonym for \code{extinguish()}}
 \item{\code{is_running()}}{Check if the server is currently running}
-\item{\code{on(event, handler, pos = NULL)}}{Add a \code{handler} function to to an \code{event} at the given position (\code{pos}) in the handler stack. Returns a string uniquely identifying the handler. See the \link[=events]{event documentation} for more information.}
+\item{\code{on(event, handler, pos = NULL)}}{Add a \code{handler} function to to an \code{event} at the given position (\code{pos}) in the handler stack. Returns a string uniquely identifying the handler. See the \href{https://fiery.data-imaginist.com/articles/events.html}{event vignette} for more information.}
 \item{\code{off(handlerId)}}{Remove the handler tied to the given \code{id}}
 \item{\code{trigger(event, ...)}}{Triggers an \code{event} passing the additional arguments to the potential handlers}
 \item{\code{send(message, id)}}{Sends a websocket \code{message} to the client with the given \code{id}, or to all connected clients if \code{id} is missing}
 \item{\code{log(event, message, request, ...)}}{Send a \code{message} to the logger. The \code{event} defines the type of message you are passing on, while \code{request} is the related \code{Request} object if applicable.}
 \item{\code{close_ws_con(id)}}{Closes the websocket connection started from the client with the given \code{id}, firing the \code{websocket-closed} event}
-\item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a \code{plugin} to the server. See the \link[=plugins]{plugin documentation} for more information. Plugins can only get attached once unless \code{force = TRUE}}
+\item{\code{attach(plugin, ..., force = FALSE)}}{Attaches a \code{plugin} to the server. See the \href{https://fiery.data-imaginist.com/articles/plugins.html}{plugin vignette} for more information. Plugins can only get attached once unless \code{force = TRUE}}
 \item{\code{has_plugin(name)}}{Check whether a plugin with the given \code{name} has been attached}
 \item{\code{header(name, value)}}{Add a global \code{header} to the server that will be set on all responses. Remove by setting \code{value = NULL}}
 \item{\code{set_data(name, value)}}{Adds data to the servers internal data store}
@@ -74,7 +75,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{remove_data(name)}}{Removes the data with the given \code{name} from the internal data store}
 \item{\code{time(expr, then, after, loop = FALSE)}}{Add a timed evaluation (\code{expr}) that will be evaluated after the given number of seconds (\code{after}), potentially repeating if \code{loop = TRUE}. After the expression has evaluated the \code{then} function will get called with the result of the expression and the server object as arguments.}
 \item{\code{remove_time(id)}}{Removes the timed evaluation identified by the \code{id} (returned when adding the evaluation)}
-\item{\code{delay(expr, then)}}{Similar to \code{time()}, except the \code{expr} is evaluated immediately at the end of the loop cycle (\link[=delay_doc]{see here} for detailed explanation of delayed evaluation in fiery).}
+\item{\code{delay(expr, then)}}{Similar to \code{time()}, except the \code{expr} is evaluated immediately at the end of the loop cycle (\href{https://fiery.data-imaginist.com/articles/delayed.html}{see here} for detailed explanation of delayed evaluation in fiery).}
 \item{\code{remove_delay(id)}}{Removes the delayed evaluation identified by the \code{id}}
 \item{\code{async(expr, then)}}{As \code{delay()} and \code{time()} except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 \item{\code{remove_async(id)}}{Removes the async evaluation identified by the \code{id}. The evaluation is not necessarily stopped but the then function will not get called.}
@@ -139,10 +140,5 @@ app$on('end', function(server) {
 app$ignite(showcase = TRUE)
 }
 
-}
-\seealso{
-\link{events} describes how the server event cycle works
-
-\link{plugins} describes how to use plugins to modify the server
 }
 \keyword{datasets}

@@ -11,9 +11,9 @@ NULL
 #' contrast to the more well known S3 and S4 systems. A `fiery` server is event
 #' driven, which means that it is build up and manipulated by adding event
 #' handlers and triggering events. To learn more about the `fiery` event model,
-#' read the [event documentation][events]. `fiery` servers can be modified 
-#' directly or by attaching plugins. As with events, [plugins has its own
-#' documentation][plugins].
+#' read the [event vignette](https://fiery.data-imaginist.com/articles/events.html). 
+#' `fiery` servers can be modified directly or by attaching plugins. As with 
+#' events, [plugins has its own vignette](https://fiery.data-imaginist.com/articles/plugins.html).
 #' 
 #' @usage NULL
 #' @format NULL
@@ -59,13 +59,13 @@ NULL
 #'  \item{`extinguish()`}{Stops a running server}
 #'  \item{`stop()`}{Boring synonym for `extinguish()`}
 #'  \item{`is_running()`}{Check if the server is currently running}
-#'  \item{`on(event, handler, pos = NULL)`}{Add a `handler` function to to an `event` at the given position (`pos`) in the handler stack. Returns a string uniquely identifying the handler. See the [event documentation][events] for more information.}
+#'  \item{`on(event, handler, pos = NULL)`}{Add a `handler` function to to an `event` at the given position (`pos`) in the handler stack. Returns a string uniquely identifying the handler. See the [event vignette](https://fiery.data-imaginist.com/articles/events.html) for more information.}
 #'  \item{`off(handlerId)`}{Remove the handler tied to the given `id`}
 #'  \item{`trigger(event, ...)`}{Triggers an `event` passing the additional arguments to the potential handlers}
 #'  \item{`send(message, id)`}{Sends a websocket `message` to the client with the given `id`, or to all connected clients if `id` is missing}
 #'  \item{`log(event, message, request, ...)`}{Send a `message` to the logger. The `event` defines the type of message you are passing on, while `request` is the related `Request` object if applicable.}
 #'  \item{`close_ws_con(id)`}{Closes the websocket connection started from the client with the given `id`, firing the `websocket-closed` event}
-#'  \item{`attach(plugin, ..., force = FALSE)`}{Attaches a `plugin` to the server. See the [plugin documentation][plugins] for more information. Plugins can only get attached once unless `force = TRUE`}
+#'  \item{`attach(plugin, ..., force = FALSE)`}{Attaches a `plugin` to the server. See the [plugin vignette](https://fiery.data-imaginist.com/articles/plugins.html) for more information. Plugins can only get attached once unless `force = TRUE`}
 #'  \item{`has_plugin(name)`}{Check whether a plugin with the given `name` has been attached}
 #'  \item{`header(name, value)`}{Add a global `header` to the server that will be set on all responses. Remove by setting `value = NULL`}
 #'  \item{`set_data(name, value)`}{Adds data to the servers internal data store}
@@ -73,7 +73,7 @@ NULL
 #'  \item{`remove_data(name)`}{Removes the data with the given `name` from the internal data store}
 #'  \item{`time(expr, then, after, loop = FALSE)`}{Add a timed evaluation (`expr`) that will be evaluated after the given number of seconds (`after`), potentially repeating if `loop = TRUE`. After the expression has evaluated the `then` function will get called with the result of the expression and the server object as arguments.}
 #'  \item{`remove_time(id)`}{Removes the timed evaluation identified by the `id` (returned when adding the evaluation)}
-#'  \item{`delay(expr, then)`}{Similar to `time()`, except the `expr` is evaluated immediately at the end of the loop cycle ([see here][delay_doc] for detailed explanation of delayed evaluation in fiery).}
+#'  \item{`delay(expr, then)`}{Similar to `time()`, except the `expr` is evaluated immediately at the end of the loop cycle ([see here](https://fiery.data-imaginist.com/articles/delayed.html) for detailed explanation of delayed evaluation in fiery).}
 #'  \item{`remove_delay(id)`}{Removes the delayed evaluation identified by the `id`}
 #'  \item{`async(expr, then)`}{As `delay()` and `time()` except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
 #'  \item{`remove_async(id)`}{Removes the async evaluation identified by the `id`. The evaluation is not necessarily stopped but the then function will not get called.}
@@ -95,10 +95,6 @@ NULL
 #' 
 #' @export
 #' @docType class
-#' 
-#' @seealso [events] describes how the server event cycle works
-#' 
-#' [plugins] describes how to use plugins to modify the server
 #' 
 #' @examples 
 #' # Create a New App
