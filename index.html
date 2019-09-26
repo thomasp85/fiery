@@ -83,14 +83,15 @@
   <div class="contents col-md-9">
 
 <p><img src="reference/figures/fiery.png"></p>
-<p><a href="https://travis-ci.org/thomasp85/fiery"><img src="https://travis-ci.org/thomasp85/fiery.svg?branch=master" alt="Travis-CI Build Status"></a> <a href="https://ci.appveyor.com/project/thomasp85/fiery"><img src="https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a> <a href="https://cran.r-project.org/package=fiery"><img src="http://www.r-pkg.org/badges/version-ago/fiery" alt="CRAN_Status_Badge"></a> <a href="https://cran.r-project.org/package=fiery"><img src="http://cranlogs.r-pkg.org/badges/fiery" alt="CRAN_Download_Badge"></a> <a href="https://codecov.io/github/thomasp85/fiery?branch=master"><img src="https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg" alt="Coverage Status"></a></p>
+<!-- badges: start -->
+
 <p>Fiery is a flexible and lightweight framework for building web servers in R. It is relatively unopinionated about how you chose to build your server logic and supports many use cases, from serving static files to being used as a base for a model-view-controller based setup.</p>
 <div id="the-shiny-elephant-in-the-room" class="section level3">
 <h3 class="hasAnchor">
 <a href="#the-shiny-elephant-in-the-room" class="anchor"></a>The shiny elephant in the room</h3>
 <p>Before going any further I will briefly address what most people are thinking of when they think R+web: <a href="https://github.com/rstudio/shiny">Shiny</a>:</p>
 <p><em>Is this a competing framework to Shiny?</em></p>
-<p>In a way, yes. Any package that provides functionality for creating web applications in R will be competing for the developers who wish to make web apps. This is of course reinforced by the name of the package, which is a gentle jab at Shiny. But mostly no. I believe Shiny and Fiery will appeal to vastly different use cases, in the same way as automakers and motorbike makers are in theory competing for the customers who wish to acquire the means to transport themselves, but would never be seen as truly competing.</p>
+<p>In a way, yes. Any package that provides functionality for creating web applications in R will be competing for the developers who wish to make web apps. This is of course reinforced by the name of the package, which is a gently jab at Shiny. But mostly no. I believe Shiny and Fiery will appeal to vastly different use cases, in the same way as automakers and motorbike makers are in theory competing for the customers who wish to acquire the means to transport themselves, but would never be seen as truly competing.</p>
 <p><em>So what is so different about Fiery?</em></p>
 <p>Without falling too much into the trap of defining a project by how it differs from another, there are some very clear differences in approach between Fiery and Shiny.</p>
 <ul>
@@ -173,16 +174,20 @@
 <a class="sourceLine" id="cb2-51" data-line-number="51">app<span class="op">$</span><span class="kw">ignite</span>(<span class="dt">showcase =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb2-52" data-line-number="52"><span class="co">#&gt; Fire started at 127.0.0.1:8080</span></a>
 <a class="sourceLine" id="cb2-53" data-line-number="53"><span class="co">#&gt; message: 1</span></a>
-<a class="sourceLine" id="cb2-54" data-line-number="54"><span class="co">#&gt; message: 2</span></a>
-<a class="sourceLine" id="cb2-55" data-line-number="55"><span class="co">#&gt; message: 3</span></a>
-<a class="sourceLine" id="cb2-56" data-line-number="56"><span class="co">#&gt; message: 4</span></a>
-<a class="sourceLine" id="cb2-57" data-line-number="57"><span class="co">#&gt; message: Goodbye</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-54" data-line-number="54"><span class="co">#&gt;  from message(server$get_data("visits"))</span></a>
+<a class="sourceLine" id="cb2-55" data-line-number="55"><span class="co">#&gt; message: Goodbye</span></a>
+<a class="sourceLine" id="cb2-56" data-line-number="56"><span class="co">#&gt;  from message("Goodbye")</span></a></code></pre></div>
 <p>In general much of the logic will happen in the <code>request</code> and <code>message</code> handlers and you are free to ignore the other life-cycle events if they are not needed.</p>
 </div>
 <div id="feedback" class="section level2">
 <h2 class="hasAnchor">
 <a href="#feedback" class="anchor"></a>Feedback</h2>
 <p>I would love some feedback on this - open an issue or reach out to me on <a href="https://twitter.com/thomasp85">twitter</a>.</p>
+</div>
+<div id="code-of-conduct" class="section level2">
+<h2 class="hasAnchor">
+<a href="#code-of-conduct" class="anchor"></a>Code of Conduct</h2>
+<p>Please note that the ‘fiery’ project is released with a <a href="https://ggforce.data-imaginist.com/CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 </div>
 
   </div>
@@ -207,6 +212,12 @@
 </li>
 </ul>
 </div>
+<div class="community">
+<h2>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
+</ul>
+</div>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
@@ -215,7 +226,18 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://www.tidyverse.org/lifecycle/#stable"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://travis-ci.org/thomasp85/fiery"><img src="https://travis-ci.org/thomasp85/fiery.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://ci.appveyor.com/project/thomasp85/fiery"><img src="https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
+<li><a href="https://cran.r-project.org/package=fiery"><img src="http://www.r-pkg.org/badges/version-ago/fiery" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cran.r-project.org/package=fiery"><img src="http://cranlogs.r-pkg.org/badges/fiery" alt="CRAN_Download_Badge"></a></li>
+<li><a href="https://codecov.io/github/thomasp85/fiery?branch=master"><img src="https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg" alt="Coverage Status"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
