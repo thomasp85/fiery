@@ -84,21 +84,58 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../news/index.html">Changelog</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/events.html">The event cycle</a>
+    </li>
+    <li>
+      <a href="../articles/delayed.html">Delaying code execution</a>
+    </li>
+    <li>
+      <a href="../articles/plugins.html">Creating and using plugins</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Demos</li>
+    <li>
+      <a href="https://www.data-imaginist.com/2017/setting-fire-to-deployment/">Fiery on Heroku</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.data-imaginist.com/2017/when-a-fire-starts-to-burn/">Version 1.0.0</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="../news/index.html">Change log</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/thomasp85/fiery">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/thomasp85/ggforce">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -142,18 +179,6 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="delay_doc.html">delay_doc</a></code> </p>
-        </td>
-        <td><p>Delaying code execution in Fiery</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="event_doc.html">event_doc</a></code> </p>
-        </td>
-        <td><p>Event Overview</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="fiery-package.html">fiery-package</a></code> </p>
         </td>
         <td><p>fiery: A Lightweight and Flexible Web Framework</p></td>
@@ -163,12 +188,6 @@
           <p><code><a href="loggers.html">logger_null()</a></code> <code><a href="loggers.html">logger_console()</a></code> <code><a href="loggers.html">logger_file()</a></code> <code><a href="loggers.html">logger_switch()</a></code> <code><a href="loggers.html">common_log_format</a></code> <code><a href="loggers.html">combined_log_format</a></code> </p>
         </td>
         <td><p>App Logging</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plugin_doc.html">plugin_doc</a></code> </p>
-        </td>
-        <td><p>Plugin Interface</p></td>
       </tr><tr>
         
         <td>

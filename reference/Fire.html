@@ -49,8 +49,9 @@ is thus reference-based with methods and data attached to each object, in
 contrast to the more well known S3 and S4 systems. A fiery server is event
 driven, which means that it is build up and manipulated by adding event
 handlers and triggering events. To learn more about the fiery event model,
-read the event documentation. fiery servers can be modified
-directly or by attaching plugins. As with events, plugins has its own documentation." />
+read the event vignette.
+fiery servers can be modified directly or by attaching plugins. As with
+events, plugins has its own vignette." />
 <meta property="og:image" content="https://fiery.data-imaginist.com/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -92,21 +93,58 @@ directly or by attaching plugins. As with events, plugins has its own documentat
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../news/index.html">Changelog</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/events.html">The event cycle</a>
+    </li>
+    <li>
+      <a href="../articles/delayed.html">Delaying code execution</a>
+    </li>
+    <li>
+      <a href="../articles/plugins.html">Creating and using plugins</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Demos</li>
+    <li>
+      <a href="https://www.data-imaginist.com/2017/setting-fire-to-deployment/">Fiery on Heroku</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.data-imaginist.com/2017/when-a-fire-starts-to-burn/">Version 1.0.0</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="../news/index.html">Change log</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/thomasp85/fiery">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/thomasp85/ggforce">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -135,8 +173,9 @@ is thus reference-based with methods and data attached to each object, in
 contrast to the more well known S3 and S4 systems. A <code>fiery</code> server is event
 driven, which means that it is build up and manipulated by adding event
 handlers and triggering events. To learn more about the <code>fiery</code> event model,
-read the <a href='event_doc.html'>event documentation</a>. <code>fiery</code> servers can be modified
-directly or by attaching plugins. As with events, <a href='plugin_doc.html'>plugins has its own documentation</a>.</p>
+read the <a href='https://fiery.data-imaginist.com/articles/events.html'>event vignette</a>.
+<code>fiery</code> servers can be modified directly or by attaching plugins. As with
+events, <a href='https://fiery.data-imaginist.com/articles/plugins.html'>plugins has its own vignette</a>.</p>
     </div>
 
 
@@ -189,23 +228,23 @@ object is desired, use the <code>clone()</code> method.</p>
 <dt><code>extinguish()</code></dt><dd><p>Stops a running server</p></dd>
 <dt><code><a href='https://rdrr.io/r/base/stop.html'>stop()</a></code></dt><dd><p>Boring synonym for <code>extinguish()</code></p></dd>
 <dt><code>is_running()</code></dt><dd><p>Check if the server is currently running</p></dd>
-<dt><code>on(event, handler, pos = NULL)</code></dt><dd><p>Add a <code>handler</code> function to to an <code>event</code> at the given position (<code>pos</code>) in the handler stack. Returns a string uniquely identifying the handler. See the <a href='event_doc.html'>event documentation</a> for more information.</p></dd>
+<dt><code>on(event, handler, pos = NULL)</code></dt><dd><p>Add a <code>handler</code> function to to an <code>event</code> at the given position (<code>pos</code>) in the handler stack. Returns a string uniquely identifying the handler. See the <a href='https://fiery.data-imaginist.com/articles/events.html'>event vignette</a> for more information.</p></dd>
 <dt><code>off(handlerId)</code></dt><dd><p>Remove the handler tied to the given <code>id</code></p></dd>
 <dt><code>trigger(event, ...)</code></dt><dd><p>Triggers an <code>event</code> passing the additional arguments to the potential handlers</p></dd>
 <dt><code>send(message, id)</code></dt><dd><p>Sends a websocket <code>message</code> to the client with the given <code>id</code>, or to all connected clients if <code>id</code> is missing</p></dd>
 <dt><code><a href='https://rdrr.io/r/base/Log.html'>log(event, message, request, ...)</a></code></dt><dd><p>Send a <code>message</code> to the logger. The <code>event</code> defines the type of message you are passing on, while <code>request</code> is the related <code>Request</code> object if applicable.</p></dd>
 <dt><code>close_ws_con(id)</code></dt><dd><p>Closes the websocket connection started from the client with the given <code>id</code>, firing the <code>websocket-closed</code> event</p></dd>
-<dt><code><a href='https://rdrr.io/r/base/attach.html'>attach(plugin, ..., force = FALSE)</a></code></dt><dd><p>Attaches a <code>plugin</code> to the server. See the <a href='plugin_doc.html'>plugin documentation</a> for more information. Plugins can only get attached once unless <code>force = TRUE</code></p></dd>
+<dt><code><a href='https://rdrr.io/r/base/attach.html'>attach(plugin, ..., force = FALSE)</a></code></dt><dd><p>Attaches a <code>plugin</code> to the server. See the <a href='https://fiery.data-imaginist.com/articles/plugins.html'>plugin vignette</a> for more information. Plugins can only get attached once unless <code>force = TRUE</code></p></dd>
 <dt><code>has_plugin(name)</code></dt><dd><p>Check whether a plugin with the given <code>name</code> has been attached</p></dd>
 <dt><code>header(name, value)</code></dt><dd><p>Add a global <code>header</code> to the server that will be set on all responses. Remove by setting <code>value = NULL</code></p></dd>
 <dt><code>set_data(name, value)</code></dt><dd><p>Adds data to the servers internal data store</p></dd>
 <dt><code>get_data(name)</code></dt><dd><p>Extracts data from the internal data store</p></dd>
 <dt><code>remove_data(name)</code></dt><dd><p>Removes the data with the given <code>name</code> from the internal data store</p></dd>
-<dt><code><a href='delay_doc.html'>time(expr, then, after, loop = FALSE)</a></code></dt><dd><p>Add a timed evaluation (<code>expr</code>) that will be evaluated after the given number of seconds (<code>after</code>), potentially repeating if <code>loop = TRUE</code>. After the expression has evaluated the <code>then</code> function will get called with the result of the expression and the server object as arguments.</p></dd>
+<dt><code><a href='https://rdrr.io/r/stats/time.html'>time(expr, then, after, loop = FALSE)</a></code></dt><dd><p>Add a timed evaluation (<code>expr</code>) that will be evaluated after the given number of seconds (<code>after</code>), potentially repeating if <code>loop = TRUE</code>. After the expression has evaluated the <code>then</code> function will get called with the result of the expression and the server object as arguments.</p></dd>
 <dt><code>remove_time(id)</code></dt><dd><p>Removes the timed evaluation identified by the <code>id</code> (returned when adding the evaluation)</p></dd>
-<dt><code><a href='delay_doc.html'>delay(expr, then)</a></code></dt><dd><p>Similar to <code><a href='delay_doc.html'>time()</a></code>, except the <code>expr</code> is evaluated immediately at the end of the loop cycle (<a href='delay_doc.html'>see here</a> for detailed explanation of delayed evaluation in fiery).</p></dd>
+<dt><code><a href='https://rdrr.io/r/base/base-defunct.html'>delay(expr, then)</a></code></dt><dd><p>Similar to <code><a href='https://rdrr.io/r/stats/time.html'>time()</a></code>, except the <code>expr</code> is evaluated immediately at the end of the loop cycle (<a href='https://fiery.data-imaginist.com/articles/delayed.html'>see here</a> for detailed explanation of delayed evaluation in fiery).</p></dd>
 <dt><code>remove_delay(id)</code></dt><dd><p>Removes the delayed evaluation identified by the <code>id</code></p></dd>
-<dt><code><a href='delay_doc.html'>async(expr, then)</a></code></dt><dd><p>As <code><a href='delay_doc.html'>delay()</a></code> and <code><a href='delay_doc.html'>time()</a></code> except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle</p></dd>
+<dt><code>async(expr, then)</code></dt><dd><p>As <code><a href='https://rdrr.io/r/base/base-defunct.html'>delay()</a></code> and <code><a href='https://rdrr.io/r/stats/time.html'>time()</a></code> except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle</p></dd>
 <dt><code>remove_async(id)</code></dt><dd><p>Removes the async evaluation identified by the <code>id</code>. The evaluation is not necessarily stopped but the then function will not get called.</p></dd>
 <dt><code>set_client_id_converter(converter)</code></dt><dd><p>Sets the function that converts an HTTP request into a specific client id</p></dd>
 <dt><code>set_logger(logger)</code></dt><dd><p>Sets the function that takes care of logging</p></dd>
@@ -214,10 +253,6 @@ object is desired, use the <code>clone()</code> method.</p>
 
 </dl>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><a href='event_doc.html'>events</a> describes how the server event cycle works</p>
-<p><a href='plugin_doc.html'>plugins</a> describes how to use plugins to modify the server</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Create a New App</span>
@@ -279,7 +314,6 @@ object is desired, use the <code>clone()</code> method.</p>
       <li><a href="#initialization">Initialization</a></li>
       <li><a href="#fields">Fields</a></li>
       <li><a href="#methods">Methods</a></li>
-      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

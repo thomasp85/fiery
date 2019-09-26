@@ -7,12 +7,6 @@
     <loc>https://fiery.data-imaginist.com/reference/Fire.html</loc>
   </url>
   <url>
-    <loc>https://fiery.data-imaginist.com/reference/delay_doc.html</loc>
-  </url>
-  <url>
-    <loc>https://fiery.data-imaginist.com/reference/event_doc.html</loc>
-  </url>
-  <url>
     <loc>https://fiery.data-imaginist.com/reference/fake_request.html</loc>
   </url>
   <url>
@@ -22,9 +16,15 @@
     <loc>https://fiery.data-imaginist.com/reference/loggers.html</loc>
   </url>
   <url>
-    <loc>https://fiery.data-imaginist.com/reference/plugin_doc.html</loc>
+    <loc>https://fiery.data-imaginist.com/reference/random_port.html</loc>
   </url>
   <url>
-    <loc>https://fiery.data-imaginist.com/reference/random_port.html</loc>
+    <loc>https://fiery.data-imaginist.com/articles/delayed.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/articles/events.html</loc>
+  </url>
+  <url>
+    <loc>https://fiery.data-imaginist.com/articles/plugins.html</loc>
   </url>
 </urlset>

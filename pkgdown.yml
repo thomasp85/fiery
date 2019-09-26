@@ -1,7 +1,10 @@
 pandoc: '2.2'
 pkgdown: 1.4.1
 pkgdown_sha: ~
-articles: []
+articles:
+  delayed: delayed.html
+  events: events.html
+  plugins: plugins.html
 urls:
   reference: https://fiery.data-imaginist.com/reference
   article: https://fiery.data-imaginist.com/articles

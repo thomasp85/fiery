@@ -89,21 +89,58 @@ handlers can be tested without having to start up a server." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li>
-  <a href="../news/index.html">Changelog</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/events.html">The event cycle</a>
+    </li>
+    <li>
+      <a href="../articles/delayed.html">Delaying code execution</a>
+    </li>
+    <li>
+      <a href="../articles/plugins.html">Creating and using plugins</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Demos</li>
+    <li>
+      <a href="https://www.data-imaginist.com/2017/setting-fire-to-deployment/">Fiery on Heroku</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.data-imaginist.com/2017/when-a-fire-starts-to-burn/">Version 1.0.0</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="../news/index.html">Change log</a>
+    </li>
+  </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/thomasp85/fiery">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/thomasp85/ggforce">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -185,8 +222,8 @@ be stripped from the path</p></td>
 <span class='co'># Cleaning up connections</span>
 <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='no'>req</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/gc.html'>gc</a></span>()</div><div class='output co'>#&gt;           used (Mb) gc trigger (Mb) max used (Mb)
-#&gt; Ncells  812354 43.4    1544472 82.5  1223912 65.4
-#&gt; Vcells 1539517 11.8    8388608 64.0  2576863 19.7</div><div class='input'>
+#&gt; Ncells  808903 43.3    1539137 82.2  1214864 64.9
+#&gt; Vcells 1532738 11.7    8388608 64.0  2558984 19.6</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
