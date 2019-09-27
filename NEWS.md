@@ -1,3 +1,5 @@
+# fiery (development version)
+
 # fiery 1.1.2
 
 * Fix bug where delayed logging would result in wrong message being logged (#39)
