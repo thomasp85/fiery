@@ -37,7 +37,7 @@ navbar:
         href: news/index.html
   right:
     - icon: fa-github fa-lg
-      href: https://github.com/thomasp85/ggforce
+      href: https://github.com/thomasp85/fiery
       
 reference:
   - title: "The Fire object"
