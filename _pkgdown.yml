@@ -36,6 +36,8 @@ navbar:
       - text: "Change log"
         href: news/index.html
   right:
+    - text: reqres
+      href: https://reqres.data-imaginist.com
     - icon: fa-github fa-lg
       href: https://github.com/thomasp85/fiery
       
