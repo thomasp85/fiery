@@ -1,4 +1,4 @@
-# fiery (development version)
+# fiery 1.1.3
 
 * Avoid tests that fails on some CRAN machines due to new testthat version
 
