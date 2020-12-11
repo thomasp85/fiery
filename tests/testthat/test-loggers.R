@@ -9,6 +9,7 @@ test_that("null logger works", {
 })
 
 test_that("console logger works", {
+    skip_on_cran()
     logger <- logger_console()
     req <- reqres::Request$new(fake_request('www.example.com'))
     expect_output(logger('error', 'error test'), "error: error test")
