@@ -6,7 +6,7 @@
 \alias{fiery-package}
 \title{fiery: A Lightweight and Flexible Web Framework}
 \description{
-\if{html}{\figure{logo.png}{options: align='right'}}
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
 A very flexible framework for building server side logic in R. The 
     framework is unopinionated when it comes to how HTTP requests and WebSocket
@@ -27,12 +27,14 @@ begin to use to greater and greater effect.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://fiery.data-imaginist.com}
   \item \url{https://github.com/thomasp85/fiery}
   \item Report bugs at \url{https://github.com/thomasp85/fiery/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com} (0000-0002-5147-4711)
+\strong{Maintainer}: Thomas Lin Pedersen \email{thomasp85@gmail.com} (\href{https://orcid.org/0000-0002-5147-4711}{ORCID})
 
 }
+\keyword{internal}

@@ -11,7 +11,11 @@
 \alias{common_log_format}
 \alias{combined_log_format}
 \title{App Logging}
-\format{An object of class \code{character} of length 1.}
+\format{
+An object of class \code{character} of length 1.
+
+An object of class \code{character} of length 1.
+}
 \usage{
 logger_null()
 
@@ -131,9 +135,9 @@ with \code{warning()} and \code{stop()} even though the latters will eventually 
 caught, as it gives you more control over the logging and what should happen
 in the case of an exception.
 
-An example of using \code{log()} in a handler could be:\preformatted{app$on('header', function(server, id, request) {
+An example of using \code{log()} in a handler could be:\preformatted{app$on('header', function(server, id, request) \{
   server$log('info', paste0('request from ', id, ' received'), request)
-})
+\})
 }
 
 Which would log the timepoint the headers of a request has been recieved.

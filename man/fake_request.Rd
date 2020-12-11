@@ -4,8 +4,14 @@
 \alias{fake_request}
 \title{Create a fake request to use in testing}
 \usage{
-fake_request(url, method = "get", appLocation = "", content = "",
-  headers = list(), ...)
+fake_request(
+  url,
+  method = "get",
+  appLocation = "",
+  content = "",
+  headers = list(),
+  ...
+)
 }
 \arguments{
 \item{url}{A complete url for the resource the request should ask for}

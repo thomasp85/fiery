@@ -46,7 +46,7 @@ object is desired, use the \code{clone()} method.
 \item{\code{refresh_rate_nb}}{The interval in seconds between run cycles when running a non-bocking server (defaults to \code{1})}
 \item{\code{trigger_dir}}{A valid folder where trigger files can be put when running a blocking server (defaults to \code{NULL})}
 \item{\code{plugins}}{A named list of the already attached plugins. \strong{Static} - can only be modified using the \code{attach()} method.}
-\item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \code{/demo/test} to \code{/test} if \code{root == '/demo'}}
+\item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \verb{/demo/test} to \verb{/test} if \code{root == '/demo'}}
 \item{\code{access_log_format}}{A \link[glue:glue]{glue} string defining how requests will be logged. For standard formats see \link{common_log_format} and \link{combined_log_format}. Defaults to the \emph{Common Log Format}}
 }
 }
@@ -141,4 +141,357 @@ app$ignite(showcase = TRUE)
 }
 
 }
-\keyword{datasets}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{Fire$new()}}
+\item \href{#method-format}{\code{Fire$format()}}
+\item \href{#method-ignite}{\code{Fire$ignite()}}
+\item \href{#method-start}{\code{Fire$start()}}
+\item \href{#method-reignite}{\code{Fire$reignite()}}
+\item \href{#method-resume}{\code{Fire$resume()}}
+\item \href{#method-extinguish}{\code{Fire$extinguish()}}
+\item \href{#method-stop}{\code{Fire$stop()}}
+\item \href{#method-on}{\code{Fire$on()}}
+\item \href{#method-off}{\code{Fire$off()}}
+\item \href{#method-trigger}{\code{Fire$trigger()}}
+\item \href{#method-send}{\code{Fire$send()}}
+\item \href{#method-close_ws_con}{\code{Fire$close_ws_con()}}
+\item \href{#method-attach}{\code{Fire$attach()}}
+\item \href{#method-has_plugin}{\code{Fire$has_plugin()}}
+\item \href{#method-header}{\code{Fire$header()}}
+\item \href{#method-set_data}{\code{Fire$set_data()}}
+\item \href{#method-get_data}{\code{Fire$get_data()}}
+\item \href{#method-remove_data}{\code{Fire$remove_data()}}
+\item \href{#method-time}{\code{Fire$time()}}
+\item \href{#method-remove_time}{\code{Fire$remove_time()}}
+\item \href{#method-delay}{\code{Fire$delay()}}
+\item \href{#method-remove_delay}{\code{Fire$remove_delay()}}
+\item \href{#method-async}{\code{Fire$async()}}
+\item \href{#method-remove_async}{\code{Fire$remove_async()}}
+\item \href{#method-set_client_id_converter}{\code{Fire$set_client_id_converter()}}
+\item \href{#method-set_logger}{\code{Fire$set_logger()}}
+\item \href{#method-log}{\code{Fire$log()}}
+\item \href{#method-is_running}{\code{Fire$is_running()}}
+\item \href{#method-test_request}{\code{Fire$test_request()}}
+\item \href{#method-test_header}{\code{Fire$test_header()}}
+\item \href{#method-test_message}{\code{Fire$test_message()}}
+\item \href{#method-test_websocket}{\code{Fire$test_websocket()}}
+\item \href{#method-clone}{\code{Fire$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
+\subsection{Method \code{new()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$new(host = "127.0.0.1", port = 8080)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-format"></a>}}
+\if{latex}{\out{\hypertarget{method-format}{}}}
+\subsection{Method \code{format()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$format(...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ignite"></a>}}
+\if{latex}{\out{\hypertarget{method-ignite}{}}}
+\subsection{Method \code{ignite()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$ignite(block = TRUE, showcase = FALSE, ..., silent = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-start"></a>}}
+\if{latex}{\out{\hypertarget{method-start}{}}}
+\subsection{Method \code{start()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$start(block = TRUE, showcase = FALSE, ..., silent = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-reignite"></a>}}
+\if{latex}{\out{\hypertarget{method-reignite}{}}}
+\subsection{Method \code{reignite()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$reignite(block = TRUE, showcase = FALSE, ..., silent = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-resume"></a>}}
+\if{latex}{\out{\hypertarget{method-resume}{}}}
+\subsection{Method \code{resume()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$resume(block = TRUE, showcase = FALSE, ..., silent = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-extinguish"></a>}}
+\if{latex}{\out{\hypertarget{method-extinguish}{}}}
+\subsection{Method \code{extinguish()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$extinguish()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-stop"></a>}}
+\if{latex}{\out{\hypertarget{method-stop}{}}}
+\subsection{Method \code{stop()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$stop()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-on"></a>}}
+\if{latex}{\out{\hypertarget{method-on}{}}}
+\subsection{Method \code{on()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$on(event, handler, pos = NULL)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-off"></a>}}
+\if{latex}{\out{\hypertarget{method-off}{}}}
+\subsection{Method \code{off()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$off(handlerId)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-trigger"></a>}}
+\if{latex}{\out{\hypertarget{method-trigger}{}}}
+\subsection{Method \code{trigger()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$trigger(event, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-send"></a>}}
+\if{latex}{\out{\hypertarget{method-send}{}}}
+\subsection{Method \code{send()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$send(message, id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-close_ws_con"></a>}}
+\if{latex}{\out{\hypertarget{method-close_ws_con}{}}}
+\subsection{Method \code{close_ws_con()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$close_ws_con(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-attach"></a>}}
+\if{latex}{\out{\hypertarget{method-attach}{}}}
+\subsection{Method \code{attach()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$attach(plugin, ..., force = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_plugin"></a>}}
+\if{latex}{\out{\hypertarget{method-has_plugin}{}}}
+\subsection{Method \code{has_plugin()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$has_plugin(name)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-header"></a>}}
+\if{latex}{\out{\hypertarget{method-header}{}}}
+\subsection{Method \code{header()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$header(name, value)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_data"></a>}}
+\if{latex}{\out{\hypertarget{method-set_data}{}}}
+\subsection{Method \code{set_data()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$set_data(name, value)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_data"></a>}}
+\if{latex}{\out{\hypertarget{method-get_data}{}}}
+\subsection{Method \code{get_data()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$get_data(name)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-remove_data"></a>}}
+\if{latex}{\out{\hypertarget{method-remove_data}{}}}
+\subsection{Method \code{remove_data()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$remove_data(name)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-time"></a>}}
+\if{latex}{\out{\hypertarget{method-time}{}}}
+\subsection{Method \code{time()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$time(expr, then, after, loop = FALSE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-remove_time"></a>}}
+\if{latex}{\out{\hypertarget{method-remove_time}{}}}
+\subsection{Method \code{remove_time()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$remove_time(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-delay"></a>}}
+\if{latex}{\out{\hypertarget{method-delay}{}}}
+\subsection{Method \code{delay()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$delay(expr, then)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-remove_delay"></a>}}
+\if{latex}{\out{\hypertarget{method-remove_delay}{}}}
+\subsection{Method \code{remove_delay()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$remove_delay(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-async"></a>}}
+\if{latex}{\out{\hypertarget{method-async}{}}}
+\subsection{Method \code{async()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$async(expr, then)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-remove_async"></a>}}
+\if{latex}{\out{\hypertarget{method-remove_async}{}}}
+\subsection{Method \code{remove_async()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$remove_async(id)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_client_id_converter"></a>}}
+\if{latex}{\out{\hypertarget{method-set_client_id_converter}{}}}
+\subsection{Method \code{set_client_id_converter()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$set_client_id_converter(converter)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set_logger"></a>}}
+\if{latex}{\out{\hypertarget{method-set_logger}{}}}
+\subsection{Method \code{set_logger()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$set_logger(logger)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-log"></a>}}
+\if{latex}{\out{\hypertarget{method-log}{}}}
+\subsection{Method \code{log()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$log(event, message, request = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_running"></a>}}
+\if{latex}{\out{\hypertarget{method-is_running}{}}}
+\subsection{Method \code{is_running()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$is_running()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-test_request"></a>}}
+\if{latex}{\out{\hypertarget{method-test_request}{}}}
+\subsection{Method \code{test_request()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$test_request(request)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-test_header"></a>}}
+\if{latex}{\out{\hypertarget{method-test_header}{}}}
+\subsection{Method \code{test_header()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$test_header(request)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-test_message"></a>}}
+\if{latex}{\out{\hypertarget{method-test_message}{}}}
+\subsection{Method \code{test_message()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$test_message(request, binary, message, withClose = TRUE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-test_websocket"></a>}}
+\if{latex}{\out{\hypertarget{method-test_websocket}{}}}
+\subsection{Method \code{test_websocket()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$test_websocket(request, message, close = TRUE)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
+}
