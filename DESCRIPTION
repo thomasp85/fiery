@@ -1,7 +1,7 @@
 Package: fiery
 Type: Package
 Title: A Lightweight and Flexible Web Framework
-Version: 1.1.3
+Version: 1.1.3.9000
 Authors@R: 
     c(person(given = "Thomas Lin",
              family = "Pedersen",
