@@ -52,10 +52,10 @@ and Shiny.
 hard work.
 - Shiny wants the main app-logic to be server-side, Fiery don't care what you 
 do.
-- Shiny uses a reactive model to define the app-logic, Fiery don't care what you
+- Shiny uses a reactive model to define the app-logic, Fiery doesn't care about what you
 do (see a pattern emerge).
 - Shiny wants you to use [htmltools](https://github.com/rstudio/htmltools) to 
-build the html, Fiery really don't care what you use.
+build the html, Fiery really doesn't care about what you use.
 
 From the above it is quite clear that Fiery to a higher degree gives you the 
 choice and responsibility of building up your app at the cost of higher 
@@ -64,11 +64,11 @@ complexity, but with the goal of giving you more power over what you can do.
 *So how is this different from [httpuv](https://github.com/rstudio/httpuv)?*
 
 Now we're getting somewhere! httpuv is sitting in the bottom of the stack for
-both Shiny and Fiery, but where Shiny build an elaborate, opinionated and 
+both Shiny and Fiery, but where Shiny builds an elaborate, opinionated and 
 complete framework on top of httpuv, Fiery "merely" adds a lot of convenience to
 running a httpuv based web server. You could say that Fiery *sits between* 
 httpuv and Shiny, and that Shiny (or an alternative framework) could in theory 
-be build on top of Fiery.
+be built on top of Fiery.
 
 ## How to install this
 Install the release from CRAN using `install.packages('fiery')` or get the 
