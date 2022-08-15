@@ -53,29 +53,37 @@ if any error is encountered.
 
 By default, \code{fiery} uses \code{logger_null()} which forwards warning and error
 messages to \code{stderr()} and ignores any other logging events. To change this
-behavior, set a different logger using the \code{set_logger()} method:\preformatted{app$set_logger(logger)
-}
+behavior, set a different logger using the \code{set_logger()} method:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$set_logger(logger)
+}\if{html}{\out{</div>}}
 
 where \code{logger} is a function taking at least the following arguments: \code{event},
 \code{message}, \code{request}, \code{time}, and \code{...}.
 
 \code{fiery} comes with some additional loggers, which either writes all logs to a
 file or to the console. A new instance of the file logger can be created with
-\code{logger_file(file)}:\preformatted{app$set_logger(logger_file('fiery_log.log'))
-}
+\code{logger_file(file)}:
 
-A new instance of the console logger can be create with \code{logger_console()}:\preformatted{app$set_logger(logger_console())
-}
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$set_logger(logger_file('fiery_log.log'))
+}\if{html}{\out{</div>}}
+
+A new instance of the console logger can be create with \code{logger_console()}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$set_logger(logger_console())
+}\if{html}{\out{</div>}}
 
 Both functions takes a \code{format} a argument that lets you customise how the
 log is written. Furthermore the console logger will style the logs with
 colour coding depending on the content if the console supports it.
 
 As a last possibility it is possible to use different loggers dependent on
-the event by using the switch logger:\preformatted{app$set_logger(logger_switch(warning =, 
+the event by using the switch logger:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$set_logger(logger_switch(warning =, 
                              error = logger_file('errors.log),
                              default = logger_file('info.log')))
-}
+}\if{html}{\out{</div>}}
 }
 
 \section{Automatic logs}{
@@ -121,8 +129,10 @@ but this can be modified by setting the \code{access_log_format} field to a
 \item{\code{id}}{The client id}
 }
 
-To change the format:\preformatted{app$access_log_format <- combined_log_format
-}
+To change the format:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$access_log_format <- combined_log_format
+}\if{html}{\out{</div>}}
 }
 
 \section{Custom logs}{
@@ -135,10 +145,12 @@ with \code{warning()} and \code{stop()} even though the latters will eventually 
 caught, as it gives you more control over the logging and what should happen
 in the case of an exception.
 
-An example of using \code{log()} in a handler could be:\preformatted{app$on('header', function(server, id, request) \{
+An example of using \code{log()} in a handler could be:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$on('header', function(server, id, request) \{
   server$log('info', paste0('request from ', id, ' received'), request)
 \})
-}
+}\if{html}{\out{</div>}}
 
 Which would log the timepoint the headers of a request has been recieved.
 }
