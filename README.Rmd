@@ -15,12 +15,10 @@ knitr::opts_chunk$set(
 <img src="man/figures/fiery.png"/>
 
 <!-- badges: start -->
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![Travis-CI Build Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery)
+[![R-CMD-check](https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery)
 [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery)
-[![Coverage Status](https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg)](https://codecov.io/github/thomasp85/fiery?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/thomasp85/fiery/branch/main/graph/badge.svg)](https://app.codecov.io/gh/thomasp85/fiery?branch=main)
 <!-- badges: end -->
 
 Fiery is a flexible and lightweight framework for building web servers in R. It 
