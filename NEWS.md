@@ -1,5 +1,7 @@
 # fiery (development version)
 
+* General upkeep (new CI, redocument, etc)
+
 # fiery 1.1.3
 
 * Avoid tests that fails on some CRAN machines due to new testthat version

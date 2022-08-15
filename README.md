@@ -5,16 +5,11 @@
 
 <!-- badges: start -->
 
-[![Lifecycle:
-stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
-[![Travis-CI Build
-Status](https://travis-ci.org/thomasp85/fiery.svg?branch=master)](https://travis-ci.org/thomasp85/fiery)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&svg=true)](https://ci.appveyor.com/project/thomasp85/fiery)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery)
-[![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery)
-[![Coverage
-Status](https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg)](https://codecov.io/github/thomasp85/fiery?branch=master)
+[![R-CMD-check](https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery)
+[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery)
+[![Codecov test
+coverage](https://codecov.io/gh/thomasp85/fiery/branch/main/graph/badge.svg)](https://app.codecov.io/gh/thomasp85/fiery?branch=main)
 <!-- badges: end -->
 
 Fiery is a flexible and lightweight framework for building web servers
@@ -45,15 +40,15 @@ Without falling too much into the trap of defining a project by how it
 differs from another, there are some very clear differences in approach
 between Fiery and Shiny.
 
-  - Shiny uses magic to make everything work from R, Fiery lets you do
+-   Shiny uses magic to make everything work from R, Fiery lets you do
     all the hard work.
-  - Shiny wants the main app-logic to be server-side, Fiery don’t care
+-   Shiny wants the main app-logic to be server-side, Fiery don’t care
     what you do.
-  - Shiny uses a reactive model to define the app-logic, Fiery don’t
-    care what you do (see a pattern emerge).
-  - Shiny wants you to use
+-   Shiny uses a reactive model to define the app-logic, Fiery doesn’t
+    care about what you do (see a pattern emerge).
+-   Shiny wants you to use
     [htmltools](https://github.com/rstudio/htmltools) to build the html,
-    Fiery really don’t care what you use.
+    Fiery really doesn’t care about what you use.
 
 From the above it is quite clear that Fiery to a higher degree gives you
 the choice and responsibility of building up your app at the cost of
@@ -63,12 +58,12 @@ you can do.
 *So how is this different from
 [httpuv](https://github.com/rstudio/httpuv)?*
 
-Now we’re getting somewhere\! httpuv is sitting in the bottom of the
-stack for both Shiny and Fiery, but where Shiny build an elaborate,
+Now we’re getting somewhere! httpuv is sitting in the bottom of the
+stack for both Shiny and Fiery, but where Shiny builds an elaborate,
 opinionated and complete framework on top of httpuv, Fiery “merely” adds
 a lot of convenience to running a httpuv based web server. You could say
 that Fiery *sits between* httpuv and Shiny, and that Shiny (or an
-alternative framework) could in theory be build on top of Fiery.
+alternative framework) could in theory be built on top of Fiery.
 
 ## How to install this
 
@@ -156,8 +151,6 @@ app$on('end', function(server) {
 
 app$ignite(showcase = TRUE)
 #> Fire started at 127.0.0.1:8080
-#> message: 1
-#>  from message(server$get_data("visits"))
 #> message: Goodbye
 #>  from message("Goodbye")
 ```
@@ -174,6 +167,5 @@ I would love some feedback on this - open an issue or reach out to me on
 ## Code of Conduct
 
 Please note that the ‘fiery’ project is released with a [Contributor
-Code of
-Conduct](https://fiery.data-imaginist.com/CODE_OF_CONDUCT.html). By
-contributing to this project, you agree to abide by its terms.
+Code of Conduct](https://fiery.data-imaginist.com/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
