@@ -154,25 +154,24 @@ semantics as <a href="https://rdrr.io/r/base/switch.html" class="external-link">
 
 <p>By default, <code>fiery</code> uses <code>logger_null()</code> which forwards warning and error
 messages to <code><a href="https://rdrr.io/r/base/showConnections.html" class="external-link">stderr()</a></code> and ignores any other logging events. To change this
-behavior, set a different logger using the <code>set_logger()</code> method:</p><div class="sourceCode"><pre><code><span><span class="va">app</span><span class="op">$</span><span class="fu">set_logger</span><span class="op">(</span><span class="va">logger</span><span class="op">)</span></span></code></pre></div>
-
+behavior, set a different logger using the <code>set_logger()</code> method:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>app<span class="sc">$</span><span class="fu">set_logger</span>(logger)</span></code></pre><p></p></div>
 <p>where <code>logger</code> is a function taking at least the following arguments: <code>event</code>,
 <code>message</code>, <code>request</code>, <code>time</code>, and <code>...</code>.</p>
 <p><code>fiery</code> comes with some additional loggers, which either writes all logs to a
 file or to the console. A new instance of the file logger can be created with
-<code>logger_file(file)</code>:</p><div class="sourceCode"><pre><code><span><span class="va">app</span><span class="op">$</span><span class="fu">set_logger</span><span class="op">(</span><span class="fu"><a href="../reference/loggers.html">logger_file</a></span><span class="op">(</span><span class="st">'fiery_log.log'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-
-<p>A new instance of the console logger can be create with <code>logger_console()</code>:</p><div class="sourceCode"><pre><code><span><span class="va">app</span><span class="op">$</span><span class="fu">set_logger</span><span class="op">(</span><span class="fu"><a href="../reference/loggers.html">logger_console</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-
+<code>logger_file(file)</code>:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>app<span class="sc">$</span><span class="fu">set_logger</span>(<span class="fu">logger_file</span>(<span class="st">'fiery_log.log'</span>))</span></code></pre><p></p></div>
+<p>A new instance of the console logger can be create with <code>logger_console()</code>:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>app<span class="sc">$</span><span class="fu">set_logger</span>(<span class="fu">logger_console</span>())</span></code></pre><p></p></div>
 <p>Both functions takes a <code>format</code> a argument that lets you customise how the
 log is written. Furthermore the console logger will style the logs with
 colour coding depending on the content if the console supports it.</p>
 <p>As a last possibility it is possible to use different loggers dependent on
-the event by using the switch logger:</p><div class="sourceCode"><pre><code>app$set_logger(logger_switch(warning =, 
-                             error = logger_file('errors.log),
-                             default = logger_file('info.log')))
-</code></pre></div>
-
+the event by using the switch logger:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>app<span class="sc">$</span><span class="fu">set_logger</span>(<span class="fu">logger_switch</span>(<span class="at">warning =</span>, </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">error =</span> <span class="fu">logger_file</span>(<span class="st">'errors.log),</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">                             default = logger_file('</span>info.log<span class="st">')))</span></span></code></pre><p></p></div>
     </div>
     <div id="automatic-logs">
     <h2>Automatic logs</h2>
@@ -240,8 +239,8 @@ but this can be modified by setting the <code>access_log_format</code> field to 
 <dd><p>The client id</p></dd>
 
 
-</dl><p>To change the format:</p><div class="sourceCode"><pre><code><span><span class="va">app</span><span class="op">$</span><span class="va">access_log_format</span> <span class="op">&lt;-</span> <span class="va">combined_log_format</span></span></code></pre></div>
-
+</dl><p>To change the format:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>app<span class="sc">$</span>access_log_format <span class="ot">&lt;-</span> combined_log_format</span></code></pre><p></p></div>
     </div>
     <div id="custom-logs">
     <h2>Custom logs</h2>
@@ -254,10 +253,10 @@ message. In general it is better to send messages through <code><a href="https:/
 with <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning()</a></code> and <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code> even though the latters will eventually be
 caught, as it gives you more control over the logging and what should happen
 in the case of an exception.</p>
-<p>An example of using <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> in a handler could be:</p><div class="sourceCode"><pre><code><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'header'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">id</span>, <span class="va">request</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">server</span><span class="op">$</span><span class="fu">log</span><span class="op">(</span><span class="st">'info'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'request from '</span>, <span class="va">id</span>, <span class="st">' received'</span><span class="op">)</span>, <span class="va">request</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-
+<p>An example of using <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> in a handler could be:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>app<span class="sc">$</span><span class="fu">on</span>(<span class="st">'header'</span>, <span class="cf">function</span>(server, id, request) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  server<span class="sc">$</span><span class="fu">log</span>(<span class="st">'info'</span>, <span class="fu">paste0</span>(<span class="st">'request from '</span>, id, <span class="st">' received'</span>), request)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>})</span></code></pre><p></p></div>
 <p>Which would log the timepoint the headers of a request has been recieved.</p>
     </div>
 
