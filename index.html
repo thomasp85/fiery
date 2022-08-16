@@ -143,12 +143,12 @@
 <ul>
 <li>Shiny uses magic to make everything work from R, Fiery lets you do all the hard work.</li>
 <li>Shiny wants the main app-logic to be server-side, Fiery don’t care what you do.</li>
-<li>Shiny uses a reactive model to define the app-logic, Fiery don’t care what you do (see a pattern emerge).</li>
-<li>Shiny wants you to use <a href="https://github.com/rstudio/htmltools" class="external-link">htmltools</a> to build the html, Fiery really don’t care what you use.</li>
+<li>Shiny uses a reactive model to define the app-logic, Fiery doesn’t care about what you do (see a pattern emerge).</li>
+<li>Shiny wants you to use <a href="https://github.com/rstudio/htmltools" class="external-link">htmltools</a> to build the html, Fiery really doesn’t care about what you use.</li>
 </ul>
 <p>From the above it is quite clear that Fiery to a higher degree gives you the choice and responsibility of building up your app at the cost of higher complexity, but with the goal of giving you more power over what you can do.</p>
 <p><em>So how is this different from <a href="https://github.com/rstudio/httpuv" class="external-link">httpuv</a>?</em></p>
-<p>Now we’re getting somewhere! httpuv is sitting in the bottom of the stack for both Shiny and Fiery, but where Shiny build an elaborate, opinionated and complete framework on top of httpuv, Fiery “merely” adds a lot of convenience to running a httpuv based web server. You could say that Fiery <em>sits between</em> httpuv and Shiny, and that Shiny (or an alternative framework) could in theory be build on top of Fiery.</p>
+<p>Now we’re getting somewhere! httpuv is sitting in the bottom of the stack for both Shiny and Fiery, but where Shiny builds an elaborate, opinionated and complete framework on top of httpuv, Fiery “merely” adds a lot of convenience to running a httpuv based web server. You could say that Fiery <em>sits between</em> httpuv and Shiny, and that Shiny (or an alternative framework) could in theory be built on top of Fiery.</p>
 </div>
 <div class="section level2">
 <h2 id="how-to-install-this">How to install this<a class="anchor" aria-label="anchor" href="#how-to-install-this"></a>
@@ -221,8 +221,6 @@
 <span></span>
 <span><span class="va">app</span><span class="op">$</span><span class="fu">ignite</span><span class="op">(</span>showcase <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Fire started at 127.0.0.1:8080</span></span>
-<span><span class="co">#&gt; message: 1</span></span>
-<span><span class="co">#&gt;  from message(server$get_data("visits"))</span></span>
 <span><span class="co">#&gt; message: Goodbye</span></span>
 <span><span class="co">#&gt;  from message("Goodbye")</span></span></code></pre></div>
 <p>In general much of the logic will happen in the <code>request</code> and <code>message</code> handlers and you are free to ignore the other life-cycle events if they are not needed.</p>
@@ -284,12 +282,10 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.tidyverse.org/lifecycle/#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
-<li><a href="https://travis-ci.org/thomasp85/fiery" class="external-link"><img src="https://travis-ci.org/thomasp85/fiery.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://ci.appveyor.com/project/thomasp85/fiery" class="external-link"><img src="https://ci.appveyor.com/api/projects/status/github/thomasp85/fiery?branch=master&amp;svg=true" alt="AppVeyor Build Status"></a></li>
+<li><a href="https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://cran.r-project.org/package=fiery" class="external-link"><img src="http://www.r-pkg.org/badges/version-ago/fiery" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://cran.r-project.org/package=fiery" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/fiery" alt="CRAN_Download_Badge"></a></li>
-<li><a href="https://codecov.io/github/thomasp85/fiery?branch=master" class="external-link"><img src="https://img.shields.io/codecov/c/github/thomasp85/fiery/master.svg" alt="Coverage Status"></a></li>
+<li><a href="https://app.codecov.io/gh/thomasp85/fiery?branch=main" class="external-link"><img src="https://codecov.io/gh/thomasp85/fiery/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 
