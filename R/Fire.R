@@ -5,6 +5,7 @@ NULL
 
 #' Generate a New App Object
 #' 
+#' @description 
 #' The Fire generator creates a new `Fire`-object, which is the class containing
 #' all the app logic. The class is based on the [R6][R6::R6Class] OO-system and
 #' is thus reference-based with methods and data attached to each object, in
@@ -15,73 +16,18 @@ NULL
 #' `fiery` servers can be modified directly or by attaching plugins. As with 
 #' events, [plugins has its own vignette](https://fiery.data-imaginist.com/articles/plugins.html).
 #' 
-#' @usage NULL
-#' @format NULL
-#' 
-#' @section Initialization:
+#' ## Initialization
 #' A new 'Fire'-object is initialized using the `new()` method on the generator:
 #' 
-#' \strong{Usage}
 #' \tabular{l}{
 #'  `app <- Fire$new(host = '127.0.0.1', port = 8080L)`
 #' }
 #' 
-#' \strong{Arguments}
-#' \tabular{lll}{
-#'  `host` \tab  \tab A string overriding the default host (see the *Fields* section below)\cr
-#'  `port` \tab  \tab An integer overriding the default port (see the *Fields* section below)
-#' }
-#' 
-#' *Copying*
+#' ## Copying
 #' 
 #' As `Fire` objects are using reference semantics new copies of an app cannot
 #' be made simply be assigning it to a new variable. If a true copy of a `Fire`
 #' object is desired, use the `clone()` method.
-#' 
-#' @section Fields:
-#' \describe{
-#'  \item{`host`}{A string giving a valid IPv4 address owned by the server, or `'0.0.0.0'` to listen on all addresses. The default is `'127.0.0.1'`}
-#'  \item{`port`}{An integer giving the port number the server should listen on (defaults to `8080L`)}
-#'  \item{`refresh_rate`}{The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)}
-#'  \item{`refresh_rate_nb`}{The interval in seconds between run cycles when running a non-bocking server (defaults to `1`)}
-#'  \item{`trigger_dir`}{A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`)}
-#'  \item{`plugins`}{A named list of the already attached plugins. **Static** - can only be modified using the `attach()` method.}
-#'  \item{`root`}{The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`}
-#'  \item{`access_log_format`}{A [glue][glue::glue] string defining how requests will be logged. For standard formats see [common_log_format] and [combined_log_format]. Defaults to the *Common Log Format*}
-#' }
-#' 
-#' @section Methods:
-#' \describe{
-#'  \item{`ignite(block = TRUE, showcase = FALSE, ...)`}{Begins the server, either blocking the console if `block = TRUE` or not. If `showcase = TRUE` a browser window is opened directing at the server address. `...` will be redirected to the `start` handler(s)}
-#'  \item{`start(block = TRUE, showcase = FALSE, ...)`}{A less dramatic synonym of for `ignite()`}
-#'  \item{`reignite(block = TRUE, showcase = FALSE, ...)`}{As `ignite` but additionally triggers the `resume` event after the `start` event}
-#'  \item{`resume(block = TRUE, showcase = FALSE, ...)`}{Another less dramatic synonym, this time for `reignite()`}
-#'  \item{`extinguish()`}{Stops a running server}
-#'  \item{`stop()`}{Boring synonym for `extinguish()`}
-#'  \item{`is_running()`}{Check if the server is currently running}
-#'  \item{`on(event, handler, pos = NULL)`}{Add a `handler` function to to an `event` at the given position (`pos`) in the handler stack. Returns a string uniquely identifying the handler. See the [event vignette](https://fiery.data-imaginist.com/articles/events.html) for more information.}
-#'  \item{`off(handlerId)`}{Remove the handler tied to the given `id`}
-#'  \item{`trigger(event, ...)`}{Triggers an `event` passing the additional arguments to the potential handlers}
-#'  \item{`send(message, id)`}{Sends a websocket `message` to the client with the given `id`, or to all connected clients if `id` is missing}
-#'  \item{`log(event, message, request, ...)`}{Send a `message` to the logger. The `event` defines the type of message you are passing on, while `request` is the related `Request` object if applicable.}
-#'  \item{`close_ws_con(id)`}{Closes the websocket connection started from the client with the given `id`, firing the `websocket-closed` event}
-#'  \item{`attach(plugin, ..., force = FALSE)`}{Attaches a `plugin` to the server. See the [plugin vignette](https://fiery.data-imaginist.com/articles/plugins.html) for more information. Plugins can only get attached once unless `force = TRUE`}
-#'  \item{`has_plugin(name)`}{Check whether a plugin with the given `name` has been attached}
-#'  \item{`header(name, value)`}{Add a global `header` to the server that will be set on all responses. Remove by setting `value = NULL`}
-#'  \item{`set_data(name, value)`}{Adds data to the servers internal data store}
-#'  \item{`get_data(name)`}{Extracts data from the internal data store}
-#'  \item{`remove_data(name)`}{Removes the data with the given `name` from the internal data store}
-#'  \item{`time(expr, then, after, loop = FALSE)`}{Add a timed evaluation (`expr`) that will be evaluated after the given number of seconds (`after`), potentially repeating if `loop = TRUE`. After the expression has evaluated the `then` function will get called with the result of the expression and the server object as arguments.}
-#'  \item{`remove_time(id)`}{Removes the timed evaluation identified by the `id` (returned when adding the evaluation)}
-#'  \item{`delay(expr, then)`}{Similar to `time()`, except the `expr` is evaluated immediately at the end of the loop cycle ([see here](https://fiery.data-imaginist.com/articles/delayed.html) for detailed explanation of delayed evaluation in fiery).}
-#'  \item{`remove_delay(id)`}{Removes the delayed evaluation identified by the `id`}
-#'  \item{`async(expr, then)`}{As `delay()` and `time()` except the expression is evaluated asynchronously. The progress of evaluation is checked at the end of each loop cycle}
-#'  \item{`remove_async(id)`}{Removes the async evaluation identified by the `id`. The evaluation is not necessarily stopped but the then function will not get called.}
-#'  \item{`set_client_id_converter(converter)`}{Sets the function that converts an HTTP request into a specific client id}
-#'  \item{`set_logger(logger)`}{Sets the function that takes care of logging}
-#'  \item{`set_client_id_converter(converter)`}{Sets the function that converts an HTTP request into a specific client id}
-#'  \item{`clone()`}{Create a copy of the full `Fire` object and return that}
-#' }
 #' 
 #' @importFrom R6 R6Class
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
@@ -93,7 +39,6 @@ NULL
 #' @importFrom stringi stri_pad_left
 #' 
 #' @export
-#' @docType class
 #' 
 #' @examples 
 #' # Create a New App
@@ -152,6 +97,10 @@ NULL
 Fire <- R6Class('Fire',
   public = list(
     # Methods
+    #' @description Create a new `Fire` app
+    #' @param host A string overriding the default host
+    #' @param port An port number overriding the default port
+    #' @return A `Fire` object
     initialize = function(host = '127.0.0.1', port = 8080) {
       self$host <- host
       self$port <- port
@@ -164,6 +113,9 @@ Fire <- R6Class('Fire',
       private$ASYNC <- AsyncStack$new(self)
       private$LOG_QUEUE <- DelayStack$new(self)
     },
+    #' @description Human readable description of the app
+    #' @param ... ignored
+    #' @return A character vector
     format = function(...) {
       text <- c(
         '\U0001f525 A fiery webserver',
@@ -187,20 +139,32 @@ Fire <- R6Class('Fire',
       mat[, 1] <- stri_pad_left(mat[, 1], max(nchar(mat[,1])))
       c(text, paste0('\U0001f525 ', apply(mat, 1, paste, collapse = '')))
     },
+    #' @description Begin running the server. Will trigger the `start` event
+    #' @param block Should the console be blocked while running (alternative is to run in the background)
+    #' @param showcase Should the default browser open up at the server address
+    #' @param ... Arguments passed on to the `start` handler
+    #' @param silent Should startup messaging by silenced
     ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
       private$run(block = block, showcase = showcase, ..., silent = silent)
       invisible(NULL)
     },
-    start = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-      self$ignite(block = block, showcase = showcase, ..., silent = silent)
+    #' @description Synonymous method to `ignite()`
+    #' @param ... passed on to `ignite()`
+    start = function(...) {
+      self$ignite(...)
     },
-    reignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-      private$run(block = block, resume = TRUE, showcase = showcase, ..., silent = silent)
+    #' @description Resume a session. This is equivalent to `ignite()` but will also trigger the `resume` event
+    #' @param ... passed on to `ignite()`
+    reignite = function(...) {
+      private$run(..., resume = TRUE)
       invisible(NULL)
     },
-    resume = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
-      self$reignite(block = block, showcase = showcase, ..., silent = silent)
+    #' @description Synonymous method to `reignite()`
+    #' @param ... passed on to `ignite()`
+    resume = function(...) {
+      self$reignite(...)
     },
+    #' @description Stop the server. Will trigger the `end` event
     extinguish = function() {
       if (private$running) {
         if (!is.null(private$server)) {
@@ -220,9 +184,15 @@ Fire <- R6Class('Fire',
       }
       invisible(NULL)
     },
+    #' @description Synonymous method to `extinguish()`
     stop = function() {
       self$extinguish()
     },
+    #' @description Add a handler to an event. See the [*The event cycle in fiery* vignette](https://fiery.data-imaginist.com/articles/events.html) for more information.
+    #' @param event The name of the event that should trigger the handler
+    #' @param handler The handler function that should be triggered
+    #' @param pos The position in the handler stack to place it at. `NULL` will place it at the end.
+    #' @return A unique string identifying the handler
     on = function(event, handler, pos = NULL) {
       check_string(event)
       check_function(handler)
@@ -232,12 +202,18 @@ Fire <- R6Class('Fire',
       
       invisible(handlerId)
     },
+    #' @description Remove an event handler from the app.
+    #' @param handlerId The unique id identifying the handler
     off = function(handlerId) {
       check_string(handlerId)
       private$remove_handler(handlerId)
       private$handlerMap[[handlerId]] <- NULL
       invisible(NULL)
     },
+    #' @description Trigger an event in the app. This will cause any handler attached to the event to be called. See the [*The event cycle in fiery* vignette](https://fiery.data-imaginist.com/articles/events.html) for more information.
+    #' @param event The name of the event
+    #' @param ... Arguments passed on to the handlers
+    #' @return A named list containing the return values of all handlers attached to the event
     trigger = function(event, ...) {
       check_string(event)
       if (event %in% private$privateTriggers) {
@@ -246,11 +222,16 @@ Fire <- R6Class('Fire',
         private$p_trigger(event, server = self, ...)
       }
     },
+    #' @description Send a Websocket message to a client. Will trigger the `send` event.
+    #' @param message The message to send
+    #' @param id The id of the client to send to. If missing, the message will be send to all clients
     send = function(message, id) {
       private$send_ws(message, id)
       private$p_trigger('send', server = self, id = id, message = message)
       invisible(NULL)
     },
+    #' @description Close a Websocket connection. Will trigger the `websocket-closed` event
+    #' @param id The id of the client to close the websocket connection to
     close_ws_con = function(id) {
       check_string(id)
       ws <- private$websockets[[id]]
@@ -258,6 +239,10 @@ Fire <- R6Class('Fire',
         private$close_ws(id)
       }
     },
+    #' @description Attach a plugin to the app. See the [*Creating and using fiery plugins* vignette](https://fiery.data-imaginist.com/articles/plugins.html) for more information
+    #' @param plugin The plugin to attach
+    #' @param ... Arguments to pass into the plugins `on_attach()` method
+    #' @param force If the plugin has already been attached an error is thrown, unless `force = TRUE` which tells the app to reattach it
     attach = function(plugin, ..., force = FALSE) {
       name <- plugin$name
       check_string(name, arg = 'plugin$name')
@@ -285,9 +270,15 @@ Fire <- R6Class('Fire',
       private$add_plugin(plugin, name)
       invisible(NULL)
     },
+    #' @description Check if the app has a plugin attached
+    #' @param name The name of the plugin
+    #' @return A boolean indicating if the given plugin is already attached
     has_plugin = function(name) {
       name %in% names(private$pluginList)
     },
+    #' @description Add a global http header that will be applied to all responses
+    #' @param name The name of the header
+    #' @param value The value of the header. Use `NULL` to remove the global header
     header = function(name, value) {
       check_string(name)
       if (missing(value)) return(private$headers[[name]])
@@ -295,49 +286,86 @@ Fire <- R6Class('Fire',
       private$headers[[name]] <- value
       invisible(NULL)
     },
+    #' @description Add data to the global data store
+    #' @param name The name identifying the data
+    #' @param value The data to add 
     set_data = function(name, value) {
       check_string(name)
       assign(name, value, envir = private$data)
       invisible(NULL)
     },
+    #' @description Retrieve data from the global data store
+    #' @param name The name identifying the data
+    #' @return The data requested. Returns `NULL` if the store does not contain the requested data
     get_data = function(name) {
       check_string(name)
       private$data[[name]]
     },
+    #' @description Remove data from the global data store
+    #' @param name The name identifying the data to be removed
     remove_data = function(name) {
       check_string(name)
       rm(list = name, envir = private$data)
       invisible(NULL)
     },
+    #' @description Add a timed evaluation that will be evaluated after the given number of seconds. See the [*Delaying code execution in Fiery* vignette](https://fiery.data-imaginist.com/articles/delayed.html) for more information
+    #' @param expr The expression to evaluate when the time has passed
+    #' @param then A handler to call once `expr` has been evaluated
+    #' @param after The time in second to wait before evaluating `expr`
+    #' @param loop Should `expr` be called repeatedly with the interval given by `after`
+    #' @return A unique id identifying the handler
     time = function(expr, then, after, loop = FALSE) {
       private$TIME$add(substitute(expr), then, after, loop, substituted = TRUE)
     },
+    #' @description Remove a timed evaluation
+    #' @param id The unique id identifying the handler
     remove_time = function(id) {
       private$TIME$remove(id)
     },
+    #' @description Add a delayed evaluation to be evaluated immediately at the end of the loop cycle. See the [*Delaying code execution in Fiery* vignette](https://fiery.data-imaginist.com/articles/delayed.html) for more information
+    #' @param expr The expression to evaluate at the end of the cycle
+    #' @param then A handler to call once `expr` has been evaluated
+    #' @return A unique id identifying the handler
     delay = function(expr, then) {
       private$DELAY$add(substitute(expr), then, substituted = TRUE)
     },
+    #' @description Remove a delayed evaluation
+    #' @param id The unique id identifying the handler
     remove_delay = function(id) {
       private$DELAY$remove(id)
     },
+    #' @description Add an asynchronous evaluation to be evaluated in another process without blocking the server. See the [*Delaying code execution in Fiery* vignette](https://fiery.data-imaginist.com/articles/delayed.html) for more information
+    #' @param expr The expression to evaluate at the end of the cycle
+    #' @param then A handler to call once `expr` has been evaluated
+    #' @return A unique id identifying the handler
     async = function(expr, then) {
       private$ASYNC$add(substitute(expr), then, substituted = TRUE)
     },
+    #' @description Remove an async evaluation
+    #' @param id The unique id identifying the handler
     remove_async = function(id) {
       private$ASYNC$remove(id)
     },
+    #' @description Sets the function that converts an HTTP request into a specific client id
+    #' @param converter A function with the argument `request`
     set_client_id_converter = function(converter) {
       check_args(converter, 'request')
       private$client_id <- converter
       invisible(NULL)
     },
+    #' @description Sets the logging function to use
+    #' @param logger A function with the arguments `event`, `message`, `request`, and `...`
     set_logger = function(logger) {
       check_function(logger)
       check_args(logger, c('event', 'message', 'request', '...'))
       private$logger <- list(logger)
       invisible(NULL)
     },
+    #' @description Log a message with the logger attached to the app. See [loggers] for build in functionality
+    #' @param event The event associated with the message
+    #' @param message The message to log
+    #' @param request The `Request` object associated with the message, if any.
+    #' @param ... Additional arguments passed on to the logger.
     log = function(event, message, request = NULL, ...) {
       time <- Sys.time()
       force(message)
@@ -348,15 +376,25 @@ Fire <- R6Class('Fire',
       }
       invisible(NULL)
     },
+    #' @description Test if an app is running
     is_running = function() {
       private$running
     },
+    #' @description Send a request directly to the request logic of a non-running app. Only intended for testing the request logic
+    #' @param request The request to send
     test_request = function(request) {
       private$request_logic(request)
     },
+    #' @description Send a request directly to the header logic of a non-running app. Only intended for testing the request logic
+    #' @param request The request to send
     test_header = function(request) {
       private$header_logic(request)
     },
+    #' @description Send a message directly **to** the message logic of a non-running app. Only intended for testing the websocket logic
+    #' @param request The request to use to establish the connection
+    #' @param binary Is the message send in binary or character format
+    #' @param message The message to send. If `binary = FALSE` a character vector, if `binary = TRUE` a raw vector
+    #' @param withClose Should the websocket connection be closed at the end by the client
     test_message = function(request, binary, message, withClose = TRUE) {
       id <- private$client_id(request)
       message_fun <- private$message_logic(id, request)
@@ -366,6 +404,10 @@ Fire <- R6Class('Fire',
         close_fun()
       }
     },
+    #' @description Send a message directly **from** a non-running app. Only intended for testing the websocket logic
+    #' @param request The request to use to establish the connection
+    #' @param message The message to send from the app
+    #' @param close Should the websocket connection be closed at the end by the server
     test_websocket = function(request, message, close = TRUE) {
       ws <- list(
         request = request,
@@ -380,37 +422,44 @@ Fire <- R6Class('Fire',
     }
   ),
   active = list(
+    #' @field host A string giving a valid IPv4 address owned by the server, or `'0.0.0.0'` to listen on all addresses. The default is `'127.0.0.1'`
     host = function(address) {
       if (missing(address)) return(private$HOST)
       check_string(address)
       private$HOST <- address
     },
+    #' @field port An integer giving the port number the server should listen on (defaults to `8080L`)
     port = function(n) {
       if (missing(n)) return(private$PORT)
       check_number_whole(n, min = 1)
       private$PORT <- n
     },
+    #' @field refresh_rate The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)
     refresh_rate = function(rate) {
       if (missing(rate)) return(private$REFRESHRATE)
       check_number_decimal(rate)
       private$REFRESHRATE <- rate
     },
+    #' @field refresh_rate_nb The interval in seconds between run cycles when running a non-blocking server (defaults to `1`)
     refresh_rate_nb = function(rate) {
       if (missing(rate)) return(private$REFRESHRATENB)
       check_number_decimal(rate)
       private$REFRESHRATENB <- rate
     },
+    #' @field trigger_dir A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`). See the [*The event cycle in fiery* vignette](https://fiery.data-imaginist.com/articles/events.html) for more information.
     trigger_dir = function(dir) {
       if (missing(dir)) return(private$TRIGGERDIR)
       check_dir(dir, allow_null = TRUE)
       private$TRIGGERDIR <- dir
     },
+    #' @field plugins A named list of the already attached plugins. **Read Only** - can only be modified using the `attach()` method.
     plugins = function(plugin) {
       if (!missing(plugin)) {
         cli::cli_abort('Use the {.fn attach} method to add plugins')
       }
       private$pluginList
     },
+    #' @field root The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`
     root = function(path) {
       if (missing(path)) return(private$ROOT)
       check_string(path)
@@ -418,6 +467,7 @@ Fire <- R6Class('Fire',
       if (path != '') path <- paste0('/', sub('^/+', '', path))
       private$ROOT <- path
     },
+    #' @field access_log_format A [glue][glue::glue] string defining how requests will be logged. For standard formats see [common_log_format] and [combined_log_format]. Defaults to the *Common Log Format*
     access_log_format = function(format) {
       if (missing(format)) return(private$ACCESS_LOG_FORMAT)
       check_string(format)
@@ -461,6 +511,7 @@ Fire <- R6Class('Fire',
       check_bool(block)
       check_bool(resume)
       check_bool(showcase)
+      check_bool(silent)
       if (!private$running) {
         private$running <- TRUE
         private$TIME$reset()
