@@ -1,5 +1,3 @@
-context("loggers")
-
 test_that("null logger works", {
     logger <- logger_null()
     expect_message(logger('error', 'error test'), "error: error test")

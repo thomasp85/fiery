@@ -1,5 +1,3 @@
-context("HandlerStack")
-
 fun1 <- function(...) {
     length(list(...))
 }
@@ -74,7 +72,7 @@ test_that('Assertions throw errors', {
 test_that('Dispatch works', {
     stack <- HandlerStack$new()
     args <- 1:10
-    expect_is(stack$dispatch(args), 'list')
+    expect_type(stack$dispatch(args), 'list')
     expect_length(stack$dispatch(args), 0)
     expect_named(stack$dispatch(args), character())
     
@@ -82,7 +80,7 @@ test_that('Dispatch works', {
     stack$add(mean, 'mean')
     stack$add(max, 'max')
     
-    expect_is(stack$dispatch(args), 'list')
+    expect_type(stack$dispatch(args), 'list')
     expect_length(stack$dispatch(args), 3)
     expect_named(stack$dispatch(args), c('min', 'mean', 'max'))
     expect_equal(stack$dispatch(args), list(min = min(args), mean = mean(args), max = max(args)))

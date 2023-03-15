@@ -84,7 +84,6 @@ NULL
 #' }
 #' 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat is.string is.count is.number has_args assert_that is.dir is.flag has_name is.error
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
 #' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
@@ -225,10 +224,8 @@ Fire <- R6Class('Fire',
       self$extinguish()
     },
     on = function(event, handler, pos = NULL) {
-      assert_that(
-        is.string(event),
-        is.function(handler)
-      )
+      check_string(event)
+      check_function(handler)
       handlerId <- UUIDgenerate()
       private$handlerMap[[handlerId]] <- event
       private$add_handler(event, handler, pos, handlerId)
@@ -236,15 +233,15 @@ Fire <- R6Class('Fire',
       invisible(handlerId)
     },
     off = function(handlerId) {
-      assert_that(is.string(handlerId))
+      check_string(handlerId)
       private$remove_handler(handlerId)
       private$handlerMap[[handlerId]] <- NULL
       invisible(NULL)
     },
     trigger = function(event, ...) {
-      assert_that(is.string(event))
+      check_string(event)
       if (event %in% private$privateTriggers) {
-        stop(event, ' and other protected events cannot be triggered manually', call. = FALSE)
+        cli::cli_abort('{val {event}} and other protected events cannot be triggered manually')
       } else {
         private$p_trigger(event, server = self, ...)
       }
@@ -255,7 +252,7 @@ Fire <- R6Class('Fire',
       invisible(NULL)
     },
     close_ws_con = function(id) {
-      assert_that(is.string(id))
+      check_string(id)
       ws <- private$websockets[[id]]
       if (!is.null(ws)) {
         private$close_ws(id)
@@ -263,23 +260,28 @@ Fire <- R6Class('Fire',
     },
     attach = function(plugin, ..., force = FALSE) {
       name <- plugin$name
-      assert_that(is.string(name))
+      check_string(name, arg = 'plugin$name')
       
       if (!force && self$has_plugin(name)) {
-        stop('The ', name, ' plugin is already loaded. Use `force = TRUE` to reapply it.', call. = FALSE)
+        cli::cli_abort(c(
+          'The {.arg {name}} plugin is already loaded.',
+          i = 'Use {.code force = TRUE} to reapply it.'
+        ))
       }
       requires <- plugin$require
       if (!is.null(requires)) {
-        assert_that(is.character(requires))
+        check_character(requires)
         exists <- vapply(requires, self$has_plugin, logical(1))
         if (!all(exists)) {
-          stop('The ', name, ' plugin requires the following plugins: ', paste(requires[!exists], collapse = ', '), '.', call. = FALSE)
+          cli::cli_abort('The {.arg {name}} plugin requires the following {cli::qty(requires[!exists])} plugin{?s}: {requires[!exists]}')
         }
       }
-      has_error <- tri(plugin$on_attach(self, ...))
-      if (is.error_cond(has_error)) {
-        stop('The ', name, ' plugin failed to attach with the following error: ', conditionMessage(has_error), call. = FALSE)
-      }
+      try_fetch(
+        plugin$on_attach(self, ...),
+        error = function(cnd) {
+          cli::cli_abort('The {.arg {name}} plugin failed to attach to the app', parent = cnd)
+        }
+      )
       private$add_plugin(plugin, name)
       invisible(NULL)
     },
@@ -287,23 +289,23 @@ Fire <- R6Class('Fire',
       name %in% names(private$pluginList)
     },
     header = function(name, value) {
-      assert_that(is.string(name))
+      check_string(name)
       if (missing(value)) return(private$headers[[name]])
-      if (!is.null(value)) assert_that(is.string(value))
+      check_string(value, allow_null = TRUE)
       private$headers[[name]] <- value
       invisible(NULL)
     },
     set_data = function(name, value) {
-      assert_that(is.string(name))
+      check_string(name)
       assign(name, value, envir = private$data)
       invisible(NULL)
     },
     get_data = function(name) {
-      assert_that(is.string(name))
+      check_string(name)
       private$data[[name]]
     },
     remove_data = function(name) {
-      assert_that(is.string(name))
+      check_string(name)
       rm(list = name, envir = private$data)
       invisible(NULL)
     },
@@ -326,13 +328,13 @@ Fire <- R6Class('Fire',
       private$ASYNC$remove(id)
     },
     set_client_id_converter = function(converter) {
-      assert_that(has_args(converter, 'request'))
+      check_args(converter, 'request')
       private$client_id <- converter
       invisible(NULL)
     },
     set_logger = function(logger) {
-      assert_that(is.function(logger))
-      assert_that(has_args(logger, c('event', 'message', 'request', '...')))
+      check_function(logger)
+      check_args(logger, c('event', 'message', 'request', '...'))
       private$logger <- list(logger)
       invisible(NULL)
     },
@@ -380,47 +382,45 @@ Fire <- R6Class('Fire',
   active = list(
     host = function(address) {
       if (missing(address)) return(private$HOST)
-      assert_that(is.string(address))
+      check_string(address)
       private$HOST <- address
     },
     port = function(n) {
       if (missing(n)) return(private$PORT)
-      assert_that(is.count(n))
+      check_number_whole(n, min = 1)
       private$PORT <- n
     },
     refresh_rate = function(rate) {
       if (missing(rate)) return(private$REFRESHRATE)
-      assert_that(is.number(rate))
+      check_number_decimal(rate)
       private$REFRESHRATE <- rate
     },
     refresh_rate_nb = function(rate) {
       if (missing(rate)) return(private$REFRESHRATENB)
-      assert_that(is.number(rate))
+      check_number_decimal(rate)
       private$REFRESHRATENB <- rate
     },
     trigger_dir = function(dir) {
       if (missing(dir)) return(private$TRIGGERDIR)
-      if (!is.null(dir)) {
-        assert_that(is.dir(dir))
-      }
+      check_dir(dir, allow_null = TRUE)
       private$TRIGGERDIR <- dir
     },
     plugins = function(plugin) {
       if (!missing(plugin)) {
-        stop('Use the `attach` method to add plugins', call. = FALSE)
+        cli::cli_abort('Use the {.fn attach} method to add plugins')
       }
       private$pluginList
     },
     root = function(path) {
       if (missing(path)) return(private$ROOT)
-      assert_that(is.string(path))
+      check_string(path)
       path <- sub('/$', '', path)
       if (path != '') path <- paste0('/', sub('^/+', '', path))
       private$ROOT <- path
     },
     access_log_format = function(format) {
       if (missing(format)) return(private$ACCESS_LOG_FORMAT)
-      assert_that(is.string(format))
+      check_string(format)
       private$ACCESS_LOG_FORMAT <- format
     }
   ),
@@ -458,11 +458,9 @@ Fire <- R6Class('Fire',
     
     # Methods
     run = function(block = TRUE, resume = FALSE, showcase = FALSE, ..., silent = FALSE) {
-      assert_that(
-        is.flag(block),
-        is.flag(resume),
-        is.flag(showcase)
-      )
+      check_bool(block)
+      check_bool(resume)
+      check_bool(showcase)
       if (!private$running) {
         private$running <- TRUE
         private$TIME$reset()
@@ -557,7 +555,9 @@ Fire <- R6Class('Fire',
       }
     },
     mount_request = function(req) {
-      if (req$SCRIPT_NAME != self$root && !grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) stop('URL not matching mount point', call. = FALSE)
+      if (req$SCRIPT_NAME != self$root && !grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) {
+        cli::cli_abort('URL ({req$PATH_INFO}) not matching mount point ({self$root})')
+      }
       req$SCRIPT_NAME <- self$root
       req$PATH_INFO <- sub(paste0('^', self$root, ''), '', req$PATH_INFO)
       req
@@ -611,7 +611,7 @@ Fire <- R6Class('Fire',
           NULL
         } else {
           continue <- tail(response, 1)[[1]]
-          assert_that(is.flag(continue))
+          check_bool(continue)
           if (continue) {
             NULL
           } else {
@@ -732,10 +732,7 @@ Fire <- R6Class('Fire',
     },
     send_ws = function(message, id) {
       if (!is.raw(message)) {
-        assert_that(
-          is.string(message),
-          is.scalar(message)
-        )
+        check_string(message)
       }
       if (missing(id) || is.null(id)) {
         id <- ls(envir = private$websockets)

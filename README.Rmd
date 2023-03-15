@@ -70,11 +70,11 @@ be built on top of Fiery.
 
 ## How to install this
 Install the release from CRAN using `install.packages('fiery')` or get the 
-development version directly from GitHub using `devtools`:
+development version directly from GitHub using `pak`:
 
 ```{r, eval=FALSE}
-# install.packages('devtools')
-devtools::install_github('thomasp85/fiery')
+# install.packages('pak')
+pak::pak('thomasp85/fiery')
 ```
 
 ## Design

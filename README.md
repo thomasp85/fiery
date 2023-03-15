@@ -40,15 +40,15 @@ Without falling too much into the trap of defining a project by how it
 differs from another, there are some very clear differences in approach
 between Fiery and Shiny.
 
--   Shiny uses magic to make everything work from R, Fiery lets you do
-    all the hard work.
--   Shiny wants the main app-logic to be server-side, Fiery don’t care
-    what you do.
--   Shiny uses a reactive model to define the app-logic, Fiery doesn’t
-    care about what you do (see a pattern emerge).
--   Shiny wants you to use
-    [htmltools](https://github.com/rstudio/htmltools) to build the html,
-    Fiery really doesn’t care about what you use.
+- Shiny uses magic to make everything work from R, Fiery lets you do all
+  the hard work.
+- Shiny wants the main app-logic to be server-side, Fiery don’t care
+  what you do.
+- Shiny uses a reactive model to define the app-logic, Fiery doesn’t
+  care about what you do (see a pattern emerge).
+- Shiny wants you to use
+  [htmltools](https://github.com/rstudio/htmltools) to build the html,
+  Fiery really doesn’t care about what you use.
 
 From the above it is quite clear that Fiery to a higher degree gives you
 the choice and responsibility of building up your app at the cost of
@@ -68,11 +68,11 @@ alternative framework) could in theory be built on top of Fiery.
 ## How to install this
 
 Install the release from CRAN using `install.packages('fiery')` or get
-the development version directly from GitHub using `devtools`:
+the development version directly from GitHub using `pak`:
 
 ``` r
-# install.packages('devtools')
-devtools::install_github('thomasp85/fiery')
+# install.packages('pak')
+pak::pak('thomasp85/fiery')
 ```
 
 ## Design
@@ -151,6 +151,10 @@ app$on('end', function(server) {
 
 app$ignite(showcase = TRUE)
 #> Fire started at 127.0.0.1:8080
+#> message: 1
+#>  from message(server$get_data("visits"))
+#> message: 2
+#>  from message(server$get_data("visits"))
 #> message: Goodbye
 #>  from message("Goodbye")
 ```

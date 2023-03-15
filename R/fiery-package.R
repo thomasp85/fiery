@@ -8,3 +8,8 @@
 #' begin to use to greater and greater effect.
 #' @keywords internal
 '_PACKAGE'
+
+## usethis namespace: start
+#' @import rlang
+## usethis namespace: end
+NULL

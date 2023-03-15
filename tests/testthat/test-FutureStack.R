@@ -1,5 +1,3 @@
-context("FutureStack")
-
 app <- Fire$new(port = random_port())
 
 test_that('DelayStack works', {

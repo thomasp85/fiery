@@ -4,7 +4,6 @@ NULL
 #' A Class mimicking InputStream from httpuv
 #' 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat assert_that is.string
 #' 
 #' @noRd
 #' 
@@ -12,7 +11,7 @@ InputStreamFake <- R6Class('InputStreamFake',
   public = list(
     initialize = function(content) {
       if (!is.raw(content)) {
-        assert_that(is.character(content))
+        check_character(content)
         content <- paste(content, collapse = '\n')
         content <- paste0(content, '\n')
         content <- charToRaw(content)
@@ -108,7 +107,6 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #' @return A Rook-compliant environment
 #' 
 #' @importFrom utils packageVersion
-#' @importFrom assertthat assert_that is.scalar
 #' 
 #' @export
 #' @keywords internal
@@ -144,7 +142,7 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
     appLocation <- sub('/$', '', appLocation)
     appLocReg <- paste0('^', appLocation)
     if (!grepl(appLocReg, url$path)) {
-      stop('appLocation must correspond to the beginning of the path')
+      cli::cli_abort('{.arg appLocation} must correspond to the beginning of the path')
     }
     rook$SCRIPT_NAME <- appLocation
     url$path <- sub(appLocReg, '', url$path)
@@ -163,7 +161,7 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
   if (length(headers) > 0) {
     names(headers) <- paste0('HTTP_', sub('^HTTP_', '', toupper(names(headers))))
     for (i in names(headers)) {
-      assert_that(is.scalar(headers[[i]]))
+      check_scalar(headers[[i]])
       assign(i, as.character(headers[[i]]), envir = rook)
     }
   }

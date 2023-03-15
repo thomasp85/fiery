@@ -1,23 +1,21 @@
-context("Fire")
-
 test_that('handlers can be added, triggered and removed', {
     app <- Fire$new(port = random_port())
     
     triggerRes <- app$trigger('test')
-    expect_is(triggerRes, 'list')
+    expect_type(triggerRes, 'list')
     expect_length(triggerRes, 0)
     expect_named(triggerRes, character())
     
     id1 <- app$on('test', function(...) 10)
     triggerRes <- app$trigger('test')
-    expect_is(triggerRes, 'list')
+    expect_type(triggerRes, 'list')
     expect_length(triggerRes, 1)
     expect_named(triggerRes, id1)
     expect_equal(triggerRes[[1]], 10)
     
     app$off(id1)
     triggerRes <- app$trigger('test')
-    expect_is(triggerRes, 'list')
+    expect_type(triggerRes, 'list')
     expect_length(triggerRes, 0)
     expect_named(triggerRes, character())
 })
@@ -94,7 +92,7 @@ test_that('plugins are being attached', {
         on_attach = function(...) {stop('test')},
         name = 'plugin3'
     )
-    expect_error(app$attach(plugin3), 'The plugin3 plugin failed to attach with the following error:')
+    expect_snapshot_error(app$attach(plugin3))
 })
 
 test_that('id converter can be set and gets called', {
@@ -475,7 +473,7 @@ test_that('global headers are assigned and used', {
 
 test_that('app can be mounted at path', {
     app <- Fire$new(port = random_port())
-    app$set_logger(logger_console())
+    app$set_logger(logger_console('{message}'))
     
     expect_equal(app$root, '')
     expect_error(app$root <- 123)
@@ -493,15 +491,15 @@ test_that('app can be mounted at path', {
     expect_message(app$test_websocket(req, 'test'), 'test')
     expect_equal(req$PATH_INFO, '/testing')
     
-    app$set_logger(logger_console())
+    app$set_logger(logger_console('{message}'))
     req <- fake_request('http://example.com/testing')
-    expect_output(res <- app$test_request(req), 'URL not matching mount point')
+    expect_snapshot_output(res <- app$test_request(req))
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
-    expect_output(res <- app$test_header(req), 'URL not matching mount point')
+    expect_snapshot_output(res <- app$test_header(req))
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
-    expect_output(app$test_websocket(req, 'test'), 'URL not matching mount point')
+    expect_snapshot_output(app$test_websocket(req, 'test'))
 })
 
 test_that("Logging can be configured", {

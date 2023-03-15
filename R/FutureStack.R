@@ -4,7 +4,6 @@ NULL
 #' @importFrom R6 R6Class
 #' @importFrom uuid UUIDgenerate
 #' @importFrom future future resolved value
-#' @importFrom assertthat assert_that
 #' 
 FutureStack <- R6Class('FutureStack',
   public = list(
@@ -58,7 +57,7 @@ FutureStack <- R6Class('FutureStack',
       if (missing(then)) {
         then <- private$null_fun
       } else {
-        assert_that(is.function(then))
+        check_function(then)
       }
       list(
         expr = do.call(private$catcher,
@@ -93,18 +92,26 @@ DelayStack <- R6Class('DelayStack',
   )
 )
 
+can_fork <- NULL
+#' @importFrom parallelly availableCores
+on_load({can_fork <- availableCores("multicore") > 1L})
+
+#' @importFrom future multicore multisession
+multiprocess <- function(...) {
+  if (can_fork) multicore(...)
+  else multisession(...)
+}
+
 #' @importFrom R6 R6Class
-#' @importFrom future multiprocess
 #' 
 AsyncStack <- R6Class('AsyncStack',
   inherit = FutureStack,
   private = list(
-    catcher = 'multiprocess'
+    catcher = multiprocess
   )
 )
 
 #' @importFrom R6 R6Class
-#' @importFrom assertthat assert_that is.number is.flag
 #' 
 TimeStack <- R6Class('TimeStack',
   inherit = DelayStack,
@@ -120,10 +127,8 @@ TimeStack <- R6Class('TimeStack',
   ),
   private = list(
     make_future = function(expr, then, after, loop = FALSE) {
-      assert_that(
-        is.number(after),
-        is.flag(loop)
-      )
+      check_number_decimal(after)
+      check_bool(loop)
       super$make_future(expr = expr, then = then, after = after, 
                         loop = loop, at = Sys.time() + after)
     },

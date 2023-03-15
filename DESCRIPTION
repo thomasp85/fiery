@@ -1,50 +1,56 @@
-Package: fiery
 Type: Package
+Package: fiery
 Title: A Lightweight and Flexible Web Framework
 Version: 1.1.4.9000
 Authors@R: 
-    c(person(given = "Thomas Lin",
-             family = "Pedersen",
-             role = c("cre", "aut"),
-             email = "thomasp85@gmail.com",
-             comment = c(ORCID = "0000-0002-5147-4711")))
+    person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0002-5147-4711"))
 Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
-Description: A very flexible framework for building server side logic in R. The 
-    framework is unopinionated when it comes to how HTTP requests and WebSocket
-    messages are handled and supports all levels of app complexity; from serving
-    static content to full-blown dynamic web-apps. Fiery does not hold your hand
-    as much as e.g. the shiny package does, but instead sets you free to create
-    your web app the way you want.
+Description: A very flexible framework for building server side logic in
+    R. The framework is unopinionated when it comes to how HTTP requests
+    and WebSocket messages are handled and supports all levels of app
+    complexity; from serving static content to full-blown dynamic
+    web-apps. Fiery does not hold your hand as much as e.g. the shiny
+    package does, but instead sets you free to create your web app the way
+    you want.
 License: MIT + file LICENSE
-Encoding: UTF-8
+URL: https://fiery.data-imaginist.com, https://github.com/thomasp85/fiery
+BugReports: https://github.com/thomasp85/fiery/issues
 Imports:
-    R6,
-    assertthat,
-    httpuv,
-    uuid,
-    utils,
-    stringi,
+    cli,
+    crayon,
     future,
-    later,
-    stats,
-    reqres,
     glue,
-    crayon
+    httpuv,
+    later,
+    parallelly,
+    R6,
+    reqres,
+    rlang,
+    stats,
+    stringi,
+    utils,
+    uuid
+Suggests:
+    covr,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
 Collate:
     'loggers.R'
     'aaa.R'
     'HandlerStack.R'
     'Fire.R'
     'FutureStack.R'
+    'additional_type_checks.R'
     'fake_request.R'
     'fiery-package.R'
-RoxygenNote: 7.2.1
-Suggests:
-    testthat,
-    covr,
-    knitr,
-    rmarkdown
-Roxygen: list(markdown = TRUE)
-URL: https://fiery.data-imaginist.com, https://github.com/thomasp85/fiery
-BugReports: https://github.com/thomasp85/fiery/issues
-VignetteBuilder: knitr
+    'import-standalone-obj-type.R'
+    'import-standalone-types-check.R'
+    'zzz.R'
+Config/testthat/edition: 3

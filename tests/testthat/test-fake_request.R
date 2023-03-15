@@ -1,5 +1,3 @@
-context("fake_request")
-
 test_that('URL parsing works', {
     req <- fake_request('http://www.example.com')
     expect_equal(req[['rook.url_scheme']], 'http')
@@ -68,14 +66,14 @@ test_that('Headers are assigned', {
 
 test_that('Content gets assigned', {
     req <- fake_request('http://www.example.com')
-    expect_is(req$rook.input, 'NullInputStreamFake')
+    expect_s3_class(req$rook.input, 'NullInputStreamFake')
     expect_equal(req$rook.input$read_lines(), character())
     expect_equal(req$rook.input$read(), raw())
     expect_null(req$rook.input$rewind())
     expect_equal(req$rook.input$read(l = 0), raw())
     expect_null(req$rook.input$close())
     
-    expect_is(req$rook.errors, 'ErrorStreamFake')
+    expect_s3_class(req$rook.errors, 'ErrorStreamFake')
     expect_null(req$rook.errors$cat())
     expect_null(req$rook.errors$flush())
     
