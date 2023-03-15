@@ -608,22 +608,26 @@ object is desired, use the <code>clone()</code> method.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create a New App</span></span></span>
 <span class="r-in"><span><span class="va">app</span> <span class="op">&lt;-</span> <span class="va">Fire</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>port <span class="op">=</span> <span class="fl">4689</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in .standalone_types_check_dot_call(ffi_standalone_check_number_1.0.7,     x, allow_decimal = FALSE, min, max, allow_infinite, allow_na,     allow_null):</span> object 'ffi_standalone_check_number_1.0.7' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Setup the data every time it starts</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'start'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">server</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="st">'visits'</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="va">server</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="st">'cycles'</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Count the number of cycles</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'cycle-start'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">server</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="st">'cycles'</span>, <span class="va">server</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="st">'cycles'</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Count the number of requests</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'before-request'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">server</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="st">'visits'</span>, <span class="va">server</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="st">'visits'</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Handle requests</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'request'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -633,12 +637,14 @@ object is desired, use the <code>clone()</code> method.</p>
 <span class="r-in"><span>        body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">'This is indeed a test. You are number'</span>, <span class="va">server</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="st">'visits'</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Show number of requests in the console</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'after-request'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">server</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="st">'visits'</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/flush.console.html" class="external-link">flush.console</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Terminate the server after 300 cycles</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'cycle-end'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -648,12 +654,14 @@ object is desired, use the <code>clone()</code> method.</p>
 <span class="r-in"><span>        <span class="va">server</span><span class="op">$</span><span class="fu">extinguish</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Be polite</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'end'</span>, <span class="kw">function</span><span class="op">(</span><span class="va">server</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">'Goodbye'</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/utils/flush.console.html" class="external-link">flush.console</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'app' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">app</span><span class="op">$</span><span class="fu">ignite</span><span class="op">(</span>showcase <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -673,7 +681,7 @@ object is desired, use the <code>clone()</code> method.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

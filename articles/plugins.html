@@ -134,32 +134,58 @@
 
     
     
-<p>In order to facilitate encapsulate functionality that can be shared between fiery servers fiery implements a plugin interface. Indeed, the reason why fiery is so minimal in functionality is because it is intended as a foundation for separate plugins that can add convenience and power. This approach allows fiery itself to remain unopinionated and flexible.</p>
+<p>In order to facilitate encapsulate functionality that can be shared
+between fiery servers fiery implements a plugin interface. Indeed, the
+reason why fiery is so minimal in functionality is because it is
+intended as a foundation for separate plugins that can add convenience
+and power. This approach allows fiery itself to remain unopinionated and
+flexible.</p>
 <div class="section level2">
 <h2 id="using-plugins">Using Plugins<a class="anchor" aria-label="anchor" href="#using-plugins"></a>
 </h2>
-<p>Plugins are added to a <code>Fire</code> object using the <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method. Any parameters passed along with the plugin to the <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method will be passed on to the plugins <code>on_attach()</code> method (see below).</p>
+<p>Plugins are added to a <code>Fire</code> object using the
+<code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method. Any parameters passed along with the
+plugin to the <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method will be passed on to the
+plugins <code>on_attach()</code> method (see below).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="creating-plugins">Creating Plugins<a class="anchor" aria-label="anchor" href="#creating-plugins"></a>
 </h2>
-<p>The fiery plugin specification is rather simple. A plugin is either a list or environment (e.g. a <code>RefClas</code> or <code>R6</code> object) with the following elements:</p>
+<p>The fiery plugin specification is rather simple. A plugin is either a
+list or environment (e.g. a <code>RefClas</code> or <code>R6</code>
+object) with the following elements:</p>
 <ul>
 <li>
-<code>on_attach(server, ...)</code>: A function that will get called when the plugin is attached to the server. It is passed the server object as the first argument along with any arguments passed to the <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method.</li>
+<code>on_attach(server, ...)</code>: A function that will get called
+when the plugin is attached to the server. It is passed the server
+object as the first argument along with any arguments passed to the
+<code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method.</li>
 <li>
 <code>name</code>: A string giving the name of the plugin.</li>
 <li>
-<code>require</code>: <strong>Optional</strong> A character vector giving names of other plugins that must be attached for this plugin to work.</li>
+<code>require</code>: <strong>Optional</strong> A character vector
+giving names of other plugins that must be attached for this plugin to
+work.</li>
 </ul>
-<p>Apart from this, the list/environment can contain anything you desires. For an example of a relatively complex plugin, have a look at the source code for the <a href="https://github.com/thomasp85/routr" class="external-link"><code>routr</code></a> package.</p>
+<p>Apart from this, the list/environment can contain anything you
+desires. For an example of a relatively complex plugin, have a look at
+the source code for the <a href="https://github.com/thomasp85/routr" class="external-link"><code>routr</code></a>
+package.</p>
 </div>
 <div class="section level2">
 <h2 id="accessing-plugins">Accessing Plugins<a class="anchor" aria-label="anchor" href="#accessing-plugins"></a>
 </h2>
-<p>When a plugin is attached to a <code>Fire</code> object, two things happens. First, the <code>on_attach()</code> function in the plugin is called modifying the server in different ways, then the plugin object is saved internally, so that it can later be retrieved. All plugins are accessible in the <code>plugins</code> field under the name of the plugin. This is useful for plugins that modifies other plugins, or are dependent on functionality in other plugins. A minimal example of a plugin using another plugin could be (This will add a route that prints “Hello” to the console everytime any ressource is requested):</p>
+<p>When a plugin is attached to a <code>Fire</code> object, two things
+happens. First, the <code>on_attach()</code> function in the plugin is
+called modifying the server in different ways, then the plugin object is
+saved internally, so that it can later be retrieved. All plugins are
+accessible in the <code>plugins</code> field under the name of the
+plugin. This is useful for plugins that modifies other plugins, or are
+dependent on functionality in other plugins. A minimal example of a
+plugin using another plugin could be (This will add a route that prints
+“Hello” to the console everytime any ressource is requested):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plugin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  on_attach <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">server</span><span class="op">)</span> <span class="op">{</span></span>
@@ -174,8 +200,16 @@
 <span>  name <span class="op">=</span> <span class="st">'Hello_plugin'</span>,</span>
 <span>  require <span class="op">=</span> <span class="st">'request_routr'</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The <code>Hello_plugin</code> depends on the routr plugin for its functionality as it modifies the request router to always say hello when processing requests. If the <code>reques_routr</code> plugin has not already been attached it is not possible to use the <code>Hello_plugin</code> plugin.</p>
-<p>It is also possible to have a soft dependency to another plugin, by not listing it in <code>require</code> and instead use the <code>has_plugin()</code> method in the server to modify the behaviour of the plugin. We could rewrite the <code>Hello_plugin</code> to add the routr plugin by itself if missing:</p>
+<p>The <code>Hello_plugin</code> depends on the routr plugin for its
+functionality as it modifies the request router to always say hello when
+processing requests. If the <code>reques_routr</code> plugin has not
+already been attached it is not possible to use the
+<code>Hello_plugin</code> plugin.</p>
+<p>It is also possible to have a soft dependency to another plugin, by
+not listing it in <code>require</code> and instead use the
+<code>has_plugin()</code> method in the server to modify the behaviour
+of the plugin. We could rewrite the <code>Hello_plugin</code> to add the
+routr plugin by itself if missing:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plugin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  on_attach <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">server</span><span class="op">)</span> <span class="op">{</span></span>
@@ -212,7 +246,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

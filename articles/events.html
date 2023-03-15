@@ -134,46 +134,154 @@
 
     
     
-<p>fiery is using an event-based model to allow you to program the logic. During the life cycle of an app a range of different events will be triggered and it is possible to add event handlers to these using the <code>on()</code> method. An event handler is simply a function that will get called every time an event is fired. Apart from the predefined life cycle events it is also possible to trigger custom events using the <code>trigger()</code> method. Manual triggering of life cycle events is not allowed.</p>
+<p>fiery is using an event-based model to allow you to program the
+logic. During the life cycle of an app a range of different events will
+be triggered and it is possible to add event handlers to these using the
+<code>on()</code> method. An event handler is simply a function that
+will get called every time an event is fired. Apart from the predefined
+life cycle events it is also possible to trigger custom events using the
+<code>trigger()</code> method. Manual triggering of life cycle events is
+not allowed.</p>
 <div class="section level2">
 <h2 id="life-cycle-events">Life cycle Events<a class="anchor" aria-label="anchor" href="#life-cycle-events"></a>
 </h2>
-<p>Following is a list of all life cycle events. These cannot be triggered manually, but is fired as part of the normal lifetime of a fiery server:</p>
+<p>Following is a list of all life cycle events. These cannot be
+triggered manually, but is fired as part of the normal lifetime of a
+fiery server:</p>
 <ul>
 <li>
-<code>start</code>: Will trigger once when the app is started but before it is running. The handlers will receive the app itself as the <code>server</code> argument as well as any argument passed on from the <code>ignite()</code> method. Any return value is discarded.</li>
+<code>start</code>: Will trigger once when the app is started but
+before it is running. The handlers will receive the app itself as the
+<code>server</code> argument as well as any argument passed on from the
+<code>ignite()</code> method. Any return value is discarded.</li>
 <li>
-<code>resume</code>: Will trigger once after the start event if the app has been started using the <code>reignite()</code> method. The handlers will receive the app itself as the <code>server</code> argument as well as any argument passed on from the <code>reignite()</code> method. Any return value is discarded.</li>
+<code>resume</code>: Will trigger once after the start event if the
+app has been started using the <code>reignite()</code> method. The
+handlers will receive the app itself as the <code>server</code> argument
+as well as any argument passed on from the <code>reignite()</code>
+method. Any return value is discarded.</li>
 <li>
-<code>end</code>: Will trigger once after the app is stopped. The handlers will receive the app itself as the <code>server</code> argument. Any return value is discarded.</li>
+<code>end</code>: Will trigger once after the app is stopped. The
+handlers will receive the app itself as the <code>server</code>
+argument. Any return value is discarded.</li>
 <li>
-<code>cycle-start</code>: Will trigger in the beginning of each loop, before the request queue is flushed. The handlers will receive the app itself as the <code>server</code> argument. Any return value is discarded.</li>
+<code>cycle-start</code>: Will trigger in the beginning of each
+loop, before the request queue is flushed. The handlers will receive the
+app itself as the <code>server</code> argument. Any return value is
+discarded.</li>
 <li>
-<code>cycle-end</code>: Will trigger in the end of each loop, after the request queue is flushed and all delayed, timed, and asynchronous calls have been executed. The handlers will receive the app itself as the <code>server</code> argument. Any return value is discarded.</li>
+<code>cycle-end</code>: Will trigger in the end of each loop, after
+the request queue is flushed and all delayed, timed, and asynchronous
+calls have been executed. The handlers will receive the app itself as
+the <code>server</code> argument. Any return value is discarded.</li>
 <li>
-<code>header</code>: Will trigger every time the header of a request is received. The return value of the last called handler is used to determine if further processing of the request will be done. If the return value is <code>TRUE</code> the request will continue on to normal processing. If the return value is <code>FALSE</code> the response will be send back and the connection will be closed without retrieving the payload. The handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument and the request object as the <code>request</code> argument.</li>
+<code>header</code>: Will trigger every time the header of a request
+is received. The return value of the last called handler is used to
+determine if further processing of the request will be done. If the
+return value is <code>TRUE</code> the request will continue on to normal
+processing. If the return value is <code>FALSE</code> the response will
+be send back and the connection will be closed without retrieving the
+payload. The handlers will receive the app itself as the
+<code>server</code> argument, the client id as the <code>id</code>
+argument and the request object as the <code>request</code>
+argument.</li>
 <li>
-<code>before-request</code>: Will trigger prior to handling of a request (that is, every time a request is received unless it is short-circuited by the <code>header</code> handlers). The return values of the handlers will be passed on to the request handlers and can thus be used to inject data into the request handlers (e.g. session specific data). The handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument and the request object as the <code>request</code> argument.</li>
+<code>before-request</code>: Will trigger prior to handling of a
+request (that is, every time a request is received unless it is
+short-circuited by the <code>header</code> handlers). The return values
+of the handlers will be passed on to the request handlers and can thus
+be used to inject data into the request handlers (e.g. session specific
+data). The handlers will receive the app itself as the
+<code>server</code> argument, the client id as the <code>id</code>
+argument and the request object as the <code>request</code>
+argument.</li>
 <li>
-<code>request</code>: Will trigger after the <code>before-request</code> event. This is where the main request handling is done. The return value of the last handler is send back to the client as response. If no handler is registered a <code>404</code> error is returned automatically. If the return value is not a valid response, a <code>500</code> server error is returned instead. The handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument, the request object as the <code>request</code> argument, and the list of values created by the before-event handlers as the <code>arg_list</code> argument.</li>
+<code>request</code>: Will trigger after the
+<code>before-request</code> event. This is where the main request
+handling is done. The return value of the last handler is send back to
+the client as response. If no handler is registered a <code>404</code>
+error is returned automatically. If the return value is not a valid
+response, a <code>500</code> server error is returned instead. The
+handlers will receive the app itself as the <code>server</code>
+argument, the client id as the <code>id</code> argument, the request
+object as the <code>request</code> argument, and the list of values
+created by the before-event handlers as the <code>arg_list</code>
+argument.</li>
 <li>
-<code>after-request</code>: Will trigger after the <code>request</code> event. This can be used to inspect the response (but not modify it) before it is send to the client. The handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument, the request object as the <code>request</code> argument, and the response as the <code>response</code> argument. Any return value is discarded.</li>
+<code>after-request</code>: Will trigger after the
+<code>request</code> event. This can be used to inspect the response
+(but not modify it) before it is send to the client. The handlers will
+receive the app itself as the <code>server</code> argument, the client
+id as the <code>id</code> argument, the request object as the
+<code>request</code> argument, and the response as the
+<code>response</code> argument. Any return value is discarded.</li>
 <li>
-<code>before-message</code>: This event is triggered when a websocket message is received. As with the <code>before-request</code> event the return values of the handlers are passed on to the <code>message</code> handlers. Specifically if a <code>'binary'</code> and <code>'message'</code> value is returned they will override the original values in the <code>message</code> and <code>after-message</code> handler arguments. This can e.g. be used to decode the message once before passing it through the <code>message</code> handlers. The <code>before-message</code> handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument, a flag indicating whether the message is binary as the <code>binary</code> argument, the message itself as the <code>message</code> argument, and the request object used to establish the connection with the client as the <code>request</code> argument.</li>
+<code>before-message</code>: This event is triggered when a
+websocket message is received. As with the <code>before-request</code>
+event the return values of the handlers are passed on to the
+<code>message</code> handlers. Specifically if a <code>'binary'</code>
+and <code>'message'</code> value is returned they will override the
+original values in the <code>message</code> and
+<code>after-message</code> handler arguments. This can e.g. be used to
+decode the message once before passing it through the
+<code>message</code> handlers. The <code>before-message</code> handlers
+will receive the app itself as the <code>server</code> argument, the
+client id as the <code>id</code> argument, a flag indicating whether the
+message is binary as the <code>binary</code> argument, the message
+itself as the <code>message</code> argument, and the request object used
+to establish the connection with the client as the <code>request</code>
+argument.</li>
 <li>
-<code>message</code>: This event is triggered after the <code>before-message</code> event and is used for the primary websocket message handling. As with the <code>request</code> event, the handlers for the <code>message</code> event receives the return values from the <code>before-message</code> handlers which can be used to e.g. inject session specific data. The message handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument, a flag indicating whether the message is binary as the <code>binary</code> argument, the message itself as the <code>message</code> argument, the request object used to establish the connection with the client as the <code>request</code> argument, and the values returned by the before-message handlers as the <code>arg_list</code> argument. Contrary to the <code>request</code> event the return values of the handlers are ignored as websocket communication is bidirectional.</li>
+<code>message</code>: This event is triggered after the
+<code>before-message</code> event and is used for the primary websocket
+message handling. As with the <code>request</code> event, the handlers
+for the <code>message</code> event receives the return values from the
+<code>before-message</code> handlers which can be used to e.g. inject
+session specific data. The message handlers will receive the app itself
+as the <code>server</code> argument, the client id as the
+<code>id</code> argument, a flag indicating whether the message is
+binary as the <code>binary</code> argument, the message itself as the
+<code>message</code> argument, the request object used to establish the
+connection with the client as the <code>request</code> argument, and the
+values returned by the before-message handlers as the
+<code>arg_list</code> argument. Contrary to the <code>request</code>
+event the return values of the handlers are ignored as websocket
+communication is bidirectional.</li>
 <li>
-<code>after-message</code>: This event is triggered after the <code>message</code> event. It is provided more as an equivalent to the <code>after-request</code> event than out of necessity as there is no final response to inspect and handler can thus just as well be attached to the <code>message</code> event. For clear division of server logic, message specific handlers should be attached to the <code>message</code> event, whereas general handlers should, if possible, be attached to the <code>after-message</code> event. The <code>after-message</code> handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument, a flag indicating whether the message is binary as the <code>binary</code> argument, the message itself as the <code>message</code> argument, and the request object used to establish the connection with the client as the <code>request</code> argument.</li>
+<code>after-message</code>: This event is triggered after the
+<code>message</code> event. It is provided more as an equivalent to the
+<code>after-request</code> event than out of necessity as there is no
+final response to inspect and handler can thus just as well be attached
+to the <code>message</code> event. For clear division of server logic,
+message specific handlers should be attached to the <code>message</code>
+event, whereas general handlers should, if possible, be attached to the
+<code>after-message</code> event. The <code>after-message</code>
+handlers will receive the app itself as the <code>server</code>
+argument, the client id as the <code>id</code> argument, a flag
+indicating whether the message is binary as the <code>binary</code>
+argument, the message itself as the <code>message</code> argument, and
+the request object used to establish the connection with the client as
+the <code>request</code> argument.</li>
 <li>
-<code>send</code>: This event is triggered after a websocket message is send to a client. The handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument and the send message as the <code>message</code> argument. Any return value is discarded.</li>
+<code>send</code>: This event is triggered after a websocket message
+is send to a client. The handlers will receive the app itself as the
+<code>server</code> argument, the client id as the <code>id</code>
+argument and the send message as the <code>message</code> argument. Any
+return value is discarded.</li>
 <li>
-<code>websocket-closed</code>: This event will be triggered every time a websocket connection is closed. The handlers will receive the app itself as the <code>server</code> argument, the client id as the <code>id</code> argument and request used to establish the closed connection as the <code>request</code> argument. Any return value is discarded.</li>
+<code>websocket-closed</code>: This event will be triggered every
+time a websocket connection is closed. The handlers will receive the app
+itself as the <code>server</code> argument, the client id as the
+<code>id</code> argument and request used to establish the closed
+connection as the <code>request</code> argument. Any return value is
+discarded.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="custom-events">Custom Events<a class="anchor" aria-label="anchor" href="#custom-events"></a>
 </h2>
-<p>Apart from the predefined events, it is also possible to trigger and listen to custom events. The syntax is as follows:</p>
+<p>Apart from the predefined events, it is also possible to trigger and
+listen to custom events. The syntax is as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add a handler to the 'new-event' event</span></span>
 <span><span class="va">id</span> <span class="op">&lt;-</span> <span class="va">app</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="st">'new-event'</span>, <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
@@ -185,15 +293,31 @@
 <span></span>
 <span><span class="co"># Remove the handler</span></span>
 <span><span class="va">app</span><span class="op">$</span><span class="fu">off</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span></code></pre></div>
-<p>Additional parameters passed on to the <code>trigger()</code> method will be passed on to the handler. There is no limit to the number of handlers that can be attached to custom events. When an event is triggered they will simply be called in the order they have been added. Triggering a non-existing event is not an error, so plugins are free to fire off events without worrying about whether handlers have been added.</p>
+<p>Additional parameters passed on to the <code>trigger()</code> method
+will be passed on to the handler. There is no limit to the number of
+handlers that can be attached to custom events. When an event is
+triggered they will simply be called in the order they have been added.
+Triggering a non-existing event is not an error, so plugins are free to
+fire off events without worrying about whether handlers have been
+added.</p>
 </div>
 <div class="section level2">
 <h2 id="triggering-events-externally">Triggering Events Externally:<a class="anchor" aria-label="anchor" href="#triggering-events-externally"></a>
 </h2>
-<p>If a fiery server is running in blocking mode it is not possible to communicate with it using the <code>trigger()</code> method (though these can be fired by other callbacks in the server logic). Instead it is possible to assign a directory to look in for event trigger instructions. The trigger directory is set using the <code>trigger_dir</code> field, e.g.:</p>
+<p>If a fiery server is running in blocking mode it is not possible to
+communicate with it using the <code>trigger()</code> method (though
+these can be fired by other callbacks in the server logic). Instead it
+is possible to assign a directory to look in for event trigger
+instructions. The trigger directory is set using the
+<code>trigger_dir</code> field, e.g.:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app</span><span class="op">$</span><span class="va">trigger_dir</span> <span class="op">&lt;-</span> <span class="st">'/some/path/to/dir/'</span></span></code></pre></div>
-<p>Events are triggered by placing an <code>rds</code> file named after the event in the trigger directory. The file must contain a list, and the elements of the list will be passed on as arguments to the event handlers. After the event has been triggered the file will be deleted. The following command will trigger the <code>external-event</code> on a server looking in <code>'/some/path/to/dir/'</code>:</p>
+<p>Events are triggered by placing an <code>rds</code> file named after
+the event in the trigger directory. The file must contain a list, and
+the elements of the list will be passed on as arguments to the event
+handlers. After the event has been triggered the file will be deleted.
+The following command will trigger the <code>external-event</code> on a
+server looking in <code>'/some/path/to/dir/'</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>arg1 <span class="op">=</span> <span class="st">'test'</span><span class="op">)</span>, <span class="st">'/some/path/to/dir/external-event.rds'</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -216,7 +340,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
