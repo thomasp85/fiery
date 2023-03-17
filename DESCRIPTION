@@ -26,7 +26,7 @@ Imports:
     parallelly,
     R6,
     reqres,
-    rlang,
+    rlang (>= 1.1.0),
     stats,
     stringi,
     utils,
