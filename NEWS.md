@@ -1,4 +1,4 @@
-# fiery (development version)
+# fiery 1.2.0
 
 * Update to work with new future release
 * Move from assertthat to rlang based type checking
