@@ -1,4 +1,4 @@
-General upkeep
+General upkeep. Fix an issue due to deprecation of a function in future
 
 ## revdepcheck results
 

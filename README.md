@@ -153,8 +153,6 @@ app$ignite(showcase = TRUE)
 #> Fire started at 127.0.0.1:8080
 #> message: 1
 #>  from message(server$get_data("visits"))
-#> message: 2
-#>  from message(server$get_data("visits"))
 #> message: Goodbye
 #>  from message("Goodbye")
 ```
