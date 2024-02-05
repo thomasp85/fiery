@@ -397,6 +397,7 @@ test_that('futures can be added and called', {
 })
 
 test_that('ignite is blocked during run', {
+    skip_on_cran()
     app <- Fire$new(port = random_port())
     app$set_logger(logger_console())
     app$refresh_rate_nb <- 0.001

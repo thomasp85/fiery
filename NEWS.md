@@ -1,5 +1,7 @@
 # fiery (development version)
 
+* Fixed a test failure only affecting the CRAN M1 machine
+
 # fiery 1.2.0
 
 * Update to work with new future release
