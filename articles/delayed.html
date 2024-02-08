@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">fiery</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
@@ -189,7 +189,7 @@ does not help to simply push back execution to the end of the cycle as
 this will block requests while the code is evaluating. Instead it is
 possible to use the <code>async()</code> method to evaluate the
 expression in another thread. This method uses
-<code><a href="https://future.futureverse.org/reference/multiprocess.html" class="external-link">future::multiprocess()</a></code> to evaluate the expression and may
+<code>future::multiprocess()</code> to evaluate the expression and may
 thus fork the current R process if supported (Unix systems) or start
 another R session (Windows). At the end of each cycle all async
 evaluations are checked for completion, and if completed the
