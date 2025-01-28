@@ -9,61 +9,13 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery)
 [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery)
 [![Codecov test
-coverage](https://codecov.io/gh/thomasp85/fiery/branch/main/graph/badge.svg)](https://app.codecov.io/gh/thomasp85/fiery?branch=main)
+coverage](https://codecov.io/gh/thomasp85/fiery/graph/badge.svg)](https://app.codecov.io/gh/thomasp85/fiery)
 <!-- badges: end -->
 
 Fiery is a flexible and lightweight framework for building web servers
 in R. It is relatively unopinionated about how you chose to build your
 server logic and supports many use cases, from serving static files to
 being used as a base for a model-view-controller based setup.
-
-### The shiny elephant in the room
-
-Before going any further I will briefly address what most people are
-thinking of when they think R+web:
-[Shiny](https://github.com/rstudio/shiny):
-
-*Is this a competing framework to Shiny?*
-
-In a way, yes. Any package that provides functionality for creating web
-applications in R will be competing for the developers who wish to make
-web apps. This is of course reinforced by the name of the package, which
-is a gently jab at Shiny. But mostly no. I believe Shiny and Fiery will
-appeal to vastly different use cases, in the same way as automakers and
-motorbike makers are in theory competing for the customers who wish to
-acquire the means to transport themselves, but would never be seen as
-truly competing.
-
-*So what is so different about Fiery?*
-
-Without falling too much into the trap of defining a project by how it
-differs from another, there are some very clear differences in approach
-between Fiery and Shiny.
-
-- Shiny uses magic to make everything work from R, Fiery lets you do all
-  the hard work.
-- Shiny wants the main app-logic to be server-side, Fiery don’t care
-  what you do.
-- Shiny uses a reactive model to define the app-logic, Fiery doesn’t
-  care about what you do (see a pattern emerge).
-- Shiny wants you to use
-  [htmltools](https://github.com/rstudio/htmltools) to build the html,
-  Fiery really doesn’t care about what you use.
-
-From the above it is quite clear that Fiery to a higher degree gives you
-the choice and responsibility of building up your app at the cost of
-higher complexity, but with the goal of giving you more power over what
-you can do.
-
-*So how is this different from
-[httpuv](https://github.com/rstudio/httpuv)?*
-
-Now we’re getting somewhere! httpuv is sitting in the bottom of the
-stack for both Shiny and Fiery, but where Shiny builds an elaborate,
-opinionated and complete framework on top of httpuv, Fiery “merely” adds
-a lot of convenience to running a httpuv based web server. You could say
-that Fiery *sits between* httpuv and Shiny, and that Shiny (or an
-alternative framework) could in theory be built on top of Fiery.
 
 ## How to install this
 
@@ -160,11 +112,6 @@ app$ignite(showcase = TRUE)
 In general much of the logic will happen in the `request` and `message`
 handlers and you are free to ignore the other life-cycle events if they
 are not needed.
-
-## Feedback
-
-I would love some feedback on this - open an issue or reach out to me on
-[twitter](https://twitter.com/thomasp85).
 
 ## Code of Conduct
 
