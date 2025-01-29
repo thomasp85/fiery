@@ -817,17 +817,18 @@ Fire <- R6Class('Fire',
       }
     },
     safe_call = function(expr) {
-      withCallingHandlers(
-        tryCatch(expr, error = function(e) {
-          self$log('error', paste0(conditionMessage(e), ' from ', deparse(conditionCall(e), nlines = 1)))
-        }),
+      try_fetch(
+        expr,
+        error = function(e) {
+          self$log('error', paste0(cnd_message(e), ' from ', deparse(conditionCall(e), nlines = 1)))
+        },
         warning = function(w) {
-          self$log('warning', paste0(conditionMessage(w), ' from ', deparse(conditionCall(w), nlines = 1)))
-          invokeRestart('muffleWarning')
+          self$log('warning', paste0(cnd_message(w), ' from ', deparse(conditionCall(w), nlines = 1)))
+          cnd_muffle(w)
         },
         message = function(m) {
-          self$log('message', paste0(conditionMessage(m), ' from ', deparse(conditionCall(m), nlines = 1)))
-          invokeRestart('muffleMessage')
+          self$log('message', paste0(cnd_message(m), ' from ', deparse(conditionCall(m), nlines = 1)))
+          cnd_muffle(m)
         }
       )
     },

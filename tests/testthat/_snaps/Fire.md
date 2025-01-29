@@ -483,14 +483,18 @@
     Code
       private$safe_call(stop("error test"))
     Message
-      message: error: error test from doTryCatch(return(expr), name, parentenv, handler) from NULL
+      message: error: error test from withCallingHandlers(expr, condition = function(cnd) { from NULL
+    Output
+      NULL
 
 ---
 
     Code
       private$safe_call(warning("warning test"))
     Message
-      message: warning: warning test from doTryCatch(return(expr), name, parentenv, handler) from NULL
+      message: warning: warning test from withCallingHandlers(expr, condition = function(cnd) { from NULL
+    Output
+      [1] "warning test"
 
 ---
 
@@ -498,4 +502,6 @@
       private$safe_call(message("message test"))
     Message
       message: message test from message("message test")
+    Output
+      NULL
 
