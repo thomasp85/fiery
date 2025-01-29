@@ -811,7 +811,7 @@ Fire <- R6Class('Fire',
         } else {
           args$event <- event
           args$server <- self
-          do.call(private$p_trigger, args)
+          inject(private$p_trigger(!!!args))
         }
         triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
       }

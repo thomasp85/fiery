@@ -4,7 +4,7 @@ NULL
 #' @importFrom R6 R6Class
 #' @importFrom uuid UUIDgenerate
 #' @importFrom future future resolved value
-#' 
+#'
 FutureStack <- R6Class('FutureStack',
   public = list(
     # Methods
@@ -35,7 +35,7 @@ FutureStack <- R6Class('FutureStack',
           if (is.error_cond(res)) {
             private$server$log('error', conditionMessage(res))
           }
-          res <- tri(do.call(private$futures[[i]]$then, list(res = res, ...)))
+          res <- tri(private$futures[[i]]$then(res = res, ...))
           if (is.error_cond(res)) {
             private$server$log('error', conditionMessage(res))
           }
@@ -51,7 +51,7 @@ FutureStack <- R6Class('FutureStack',
     catcher = 'future',
     lazy = FALSE,
     server = NULL,
-    
+
     # Methods
     make_future = function(expr, then, ...) {
       if (missing(then)) {
@@ -60,8 +60,7 @@ FutureStack <- R6Class('FutureStack',
         check_function(then)
       }
       list(
-        expr = do.call(private$catcher,
-                       list(expr = expr, lazy = private$lazy)),
+        expr = eval_bare(call2(private$catcher, expr = expr, lazy = private$lazy)),
         then = then,
         ...
       )
@@ -83,7 +82,7 @@ FutureStack <- R6Class('FutureStack',
 
 #' @importFrom R6 R6Class
 #' @importFrom future sequential
-#' 
+#'
 DelayStack <- R6Class('DelayStack',
   inherit = FutureStack,
   private = list(
@@ -103,7 +102,7 @@ multiprocess <- function(...) {
 }
 
 #' @importFrom R6 R6Class
-#' 
+#'
 AsyncStack <- R6Class('AsyncStack',
   inherit = FutureStack,
   private = list(
@@ -112,7 +111,7 @@ AsyncStack <- R6Class('AsyncStack',
 )
 
 #' @importFrom R6 R6Class
-#' 
+#'
 TimeStack <- R6Class('TimeStack',
   inherit = DelayStack,
   public = list(
@@ -129,7 +128,7 @@ TimeStack <- R6Class('TimeStack',
     make_future = function(expr, then, after, loop = FALSE) {
       check_number_decimal(after)
       check_bool(loop)
-      super$make_future(expr = expr, then = then, after = after, 
+      super$make_future(expr = expr, then = then, after = after,
                         loop = loop, at = Sys.time() + after)
     },
     do_eval = function(id) {
@@ -140,7 +139,7 @@ TimeStack <- R6Class('TimeStack',
         remove <- sapply(ids, function(id) {
           if (private$futures[[id]]$loop) {
             private$restore(private$futures[[id]]$expr)
-            private$futures[[id]]$at <- private$futures[[id]]$at + 
+            private$futures[[id]]$at <- private$futures[[id]]$at +
               private$futures[[id]]$after
             FALSE
           } else {

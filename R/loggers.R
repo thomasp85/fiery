@@ -195,7 +195,7 @@ logger_switch <- function(..., default = logger_null()) {
   args <- c(args, list(default))
   function(event, message, request = NULL, time = Sys.time(), ...) {
     loc_args <- c(list(event), args)
-    do.call(switch, loc_args)(event = event, message = message, request = request, time = time, ...)
+    inject(switch(!!!loc_args))(event = event, message = message, request = request, time = time, ...)
   }
 }
 #' @rdname loggers
