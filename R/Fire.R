@@ -518,10 +518,10 @@ Fire <- R6Class('Fire',
         private$p_trigger('start', server = self, ...)
         if (resume) {
           private$p_trigger('resume', server = self, ...)
-          if (!silent) message('Fire restarted at ', self$host, ':', self$port, self$root)
+          if (!silent) cli::cli_inform('Fire restarted at {.url {self$host}:{self$port}{self$root}}')
           self$log('resume', paste0(self$host, ':', self$port, self$root))
         } else {
-          if (!silent) message('Fire started at ', self$host, ':', self$port, self$root)
+          if (!silent) cli::cli_inform('Fire started at {.url {self$host}:{self$port}{self$root}}')
           self$log('start', paste0(self$host, ':', self$port, self$root))
         }
 

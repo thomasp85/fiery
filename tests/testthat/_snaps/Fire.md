@@ -321,25 +321,22 @@
     Code
       app$ignite(silent = TRUE)
     Message
-      message: 10
-       from message(res)
+      message: 10 from message(res)
 
 ---
 
     Code
       app$ignite(silent = TRUE)
     Message
-      message: 10
-       from message(res)
+      message: 10 from message(res)
 
 ---
 
     Code
       app$ignite()
     Message
-      Fire started at 127.0.0.1:49925
-      message: 10
-       from message(res)
+      Fire started at <127.0.0.1:49925>
+      message: 10 from message(res)
 
 # ignite is blocked during run
 
@@ -392,7 +389,7 @@
     Code
       app$ignite(showcase = TRUE)
     Message
-      Fire started at 127.0.0.1:49925
+      Fire started at <127.0.0.1:49925>
       Open browser
 
 ---
@@ -400,7 +397,7 @@
     Code
       app$ignite(showcase = TRUE, block = FALSE)
     Message
-      Fire started at 127.0.0.1:49925
+      Fire started at <127.0.0.1:49925>
       Open browser
 
 # app can be mounted at path
@@ -486,22 +483,19 @@
     Code
       private$safe_call(stop("error test"))
     Message
-      message: error: error test from doTryCatch(return(expr), name, parentenv, handler)
-       from message(event, ": ", trimws(message), sep = "")
+      message: error: error test from doTryCatch(return(expr), name, parentenv, handler) from NULL
 
 ---
 
     Code
       private$safe_call(warning("warning test"))
     Message
-      message: warning: warning test from doTryCatch(return(expr), name, parentenv, handler)
-       from message(event, ": ", trimws(message), sep = "")
+      message: warning: warning test from doTryCatch(return(expr), name, parentenv, handler) from NULL
 
 ---
 
     Code
       private$safe_call(message("message test"))
     Message
-      message: message test
-       from message("message test")
+      message: message test from message("message test")
 
