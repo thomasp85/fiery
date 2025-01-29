@@ -168,16 +168,11 @@ Fire <- R6Class('Fire',
     extinguish = function() {
       if (private$running) {
         if (!is.null(private$server)) {
-          if (private$nb_cycle) {
-            warning('Cannot stop server from within a non-blocking event cycle', call. = FALSE)
-            return(invisible(NULL))
-          } else {
-            private$running <- FALSE
-            private$p_trigger('end', server = self)
-            stopDaemonizedServer(private$server)
-            private$server <- NULL
-            self$log('stop', paste0(self$host, ':', self$port, self$root))
-          }
+          private$running <- FALSE
+          private$p_trigger('end', server = self)
+          stopServer(private$server)
+          private$server <- NULL
+          self$log('stop', paste0(self$host, ':', self$port, self$root))
         } else {
           private$quitting <- TRUE
         }
@@ -192,11 +187,16 @@ Fire <- R6Class('Fire',
     #' @param event The name of the event that should trigger the handler
     #' @param handler The handler function that should be triggered
     #' @param pos The position in the handler stack to place it at. `NULL` will place it at the end.
-    #' @return A unique string identifying the handler
-    on = function(event, handler, pos = NULL) {
+    #' @param id An optional id to use to identify the handler
+    #' @return A unique string identifying the handler (either `id` or generated for you)
+    on = function(event, handler, pos = NULL, id = NULL) {
       check_string(event)
       check_function(handler)
-      handlerId <- UUIDgenerate()
+      check_string(id, allow_null = TRUE)
+      if (!is.null(id) && id %in% names(private$handlerMap)) {
+        cli::cli_abort("{.arg id} must be unique. A handler with this id has already been added")
+      }
+      handlerId <- id %||% UUIDgenerate()
       private$handlerMap[[handlerId]] <- event
       private$add_handler(event, handler, pos, handlerId)
 
@@ -238,6 +238,50 @@ Fire <- R6Class('Fire',
       if (!is.null(ws)) {
         private$close_ws(id)
       }
+    },
+    #' @description Serve a file or directory of files at a specified url path. Requests matching a file on the system never enters into the request loop but are served directly (and fast). Due to this, logging for these requests are also turned off
+    #' @param at The url path to listen to requests on
+    #' @param path The path to the file or directory on the file system
+    #' @param use_index Should an `index.html` file be served if present when a client requests the folder
+    #' @param fallthrough Should requests that doesn't match a file enter the request loop or have a 404 response send directly
+    #' @param html_charset The charset to report for serving html files
+    #' @param headers A list of headers to add to the response. Will be combined with the global headers of the app
+    #' @inheritParams httpuv::staticPath
+    serve_static = function(at, path, use_index = TRUE, fallthrough = FALSE, html_charset = "utf-8", headers = list(), validation = NULL) {
+      check_string(at)
+      check_string(path)
+      if (!file.exists(path)) {
+        cli::cli_abort("{.arg {path}} does not point to an existing file or directory")
+      }
+      check_bool(use_index)
+      check_bool(fallthrough)
+      check_string(html_charset)
+      if (!(rlang::is_bare_list(headers) && rlang::is_named2(headers))) {
+        stop_input_type(headers, "a named list")
+      }
+      for (i in names(headers)) {
+        check_string(headers[[i]])
+      }
+      check_string(validation, allow_null = TRUE)
+      if (at %in% names(private$staticList)) {
+        cli::cli_inform("Overwriting static url path {.field {at}}")
+      }
+      private$staticList[[at]] <- httpuv::staticPath(
+        path = path,
+        indexhtml = use_index,
+        fallthrough = fallthrough,
+        html_charset = html_charset,
+        headers = headers,
+        validation = validation %||% character(0L)
+      )
+      invisible(NULL)
+    },
+    #' @description Exclude a url path from serving static content. Only meaningful to exclude sub paths of path that are set to serve static content
+    #' @param at The url path to exclude from static serving. Request to this path will enter the normal request loop
+    exclude_static = function(at) {
+      check_string(at)
+      private$staticList[[at]] <- httpuv::excludeStaticPath()
+      invisible(NULL)
     },
     #' @description Attach a plugin to the app. See the [*Creating and using fiery plugins* vignette](https://fiery.data-imaginist.com/articles/plugins.html) for more information
     #' @param plugin The plugin to attach
@@ -485,7 +529,6 @@ Fire <- R6Class('Fire',
     ACCESS_LOG_FORMAT = common_log_format,
 
     running = FALSE,
-    nb_cycle = FALSE,
     quitting = FALSE,
     privateTriggers = c('start', 'resume', 'cycle-start', 'header',
                         'before-request', 'request', 'after-request',
@@ -496,6 +539,7 @@ Fire <- R6Class('Fire',
     handlers = NULL,
     handlerMap = list(),
     pluginList = list(),
+    staticList = list(),
     websockets = NULL,
     server = NULL,
     client_id = NULL,
@@ -546,7 +590,11 @@ Fire <- R6Class('Fire',
         list(
           call = private$request_logic,
           onHeaders = private$header_logic,
-          onWSOpen = private$websocket_logic
+          onWSOpen = private$websocket_logic,
+          staticPaths = lapply(private$staticList, function(p) {
+            attr(p, "headers") <- c(attr(p, "headers"), private$headers)
+            p
+          })
         )
       )
 
@@ -573,13 +621,17 @@ Fire <- R6Class('Fire',
       }
     },
     run_allowing_server = function(showcase = FALSE) {
-      private$server <- startDaemonizedServer(
+      private$server <- startServer(
         self$host,
         self$port,
         list(
           call = private$request_logic,
           onHeaders = private$header_logic,
-          onWSOpen = private$websocket_logic
+          onWSOpen = private$websocket_logic,
+          staticPaths = lapply(private$staticList, function(p) {
+            attr(p, "headers") <- c(attr(p, "headers"), private$headers)
+            p
+          })
         )
       )
 
@@ -591,7 +643,6 @@ Fire <- R6Class('Fire',
     },
     allowing_cycle = function() {
       if (private$running) {
-        private$nb_cycle <- TRUE # To hinder stopDeamonizedServer from crashing session
         private$p_trigger('cycle-start', server = self)
         private$external_triggers()
         private$safe_call(private$DELAY$eval(server = self))
@@ -599,7 +650,6 @@ Fire <- R6Class('Fire',
         private$safe_call(private$ASYNC$eval(server = self))
         tri(private$LOG_QUEUE$eval(server = self))
         private$p_trigger('cycle-end', server = self)
-        private$nb_cycle <- FALSE
         later(function() {
           private$allowing_cycle()
         }, private$REFRESHRATENB)
