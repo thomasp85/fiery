@@ -1,19 +1,19 @@
 test_that("null logger works", {
     logger <- logger_null()
-    expect_message(logger('error', 'error test'), "error: error test")
-    expect_message(logger('warning', 'warning test'), "warning: warning test")
-    expect_message(logger('message', 'message test'), "message: message test")
+    expect_snapshot(logger('error', 'error test'))
+    expect_snapshot(logger('warning', 'warning test'))
+    expect_snapshot(logger('message', 'message test'))
     expect_silent(logger('info', 'info test'))
 })
 
 test_that("console logger works", {
     skip_on_cran()
-    logger <- logger_console()
+    logger <- logger_console("{event}: {message}")
     req <- reqres::Request$new(fake_request('www.example.com'))
-    expect_output(logger('error', 'error test'), "error: error test")
-    expect_output(logger('warning', 'warning test'), "warning: warning test")
-    expect_output(logger('info', 'info test'), 'info: info test')
-    expect_output(logger('request', 'request test', req), 'request: request test')
+    expect_snapshot(logger('error', 'error test'))
+    expect_snapshot(logger('warning', 'warning test'))
+    expect_snapshot(logger('info', 'info test'))
+    expect_snapshot(logger('request', 'request test', req))
 })
 
 test_that("file logger works", {
@@ -30,12 +30,12 @@ test_that("file logger works", {
 
 test_that("switch logger works", {
     logfile <- tempfile()
-    logger <- logger_switch(test = , info = logger_console(), 
+    logger <- logger_switch(test = , info = logger_console("{event}: {message}"),
                             error = logger_file(logfile),
                             default = logger_null())
-    expect_output(logger('test', 'test test'), "test: test test")
-    expect_output(logger('info', 'info test'), "info: info test")
-    expect_message(logger('warning', 'warning test'), "warning: warning test")
+    expect_snapshot(logger('test', 'test test'))
+    expect_snapshot(logger('info', 'info test'))
+    expect_snapshot(logger('warning', 'warning test'))
     logger('error', 'error test')
     logs <- readLines(logfile)
     expect_match(logs[1], "error: error test")

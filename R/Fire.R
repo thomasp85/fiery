@@ -4,31 +4,31 @@
 NULL
 
 #' Generate a New App Object
-#' 
-#' @description 
+#'
+#' @description
 #' The Fire generator creates a new `Fire`-object, which is the class containing
 #' all the app logic. The class is based on the [R6][R6::R6Class] OO-system and
 #' is thus reference-based with methods and data attached to each object, in
 #' contrast to the more well known S3 and S4 systems. A `fiery` server is event
 #' driven, which means that it is build up and manipulated by adding event
 #' handlers and triggering events. To learn more about the `fiery` event model,
-#' read the [event vignette](https://fiery.data-imaginist.com/articles/events.html). 
-#' `fiery` servers can be modified directly or by attaching plugins. As with 
+#' read the [event vignette](https://fiery.data-imaginist.com/articles/events.html).
+#' `fiery` servers can be modified directly or by attaching plugins. As with
 #' events, [plugins has its own vignette](https://fiery.data-imaginist.com/articles/plugins.html).
-#' 
+#'
 #' ## Initialization
 #' A new 'Fire'-object is initialized using the `new()` method on the generator:
-#' 
+#'
 #' \tabular{l}{
 #'  `app <- Fire$new(host = '127.0.0.1', port = 8080L)`
 #' }
-#' 
+#'
 #' ## Copying
-#' 
+#'
 #' As `Fire` objects are using reference semantics new copies of an app cannot
 #' be made simply be assigning it to a new variable. If a true copy of a `Fire`
 #' object is desired, use the `clone()` method.
-#' 
+#'
 #' @importFrom R6 R6Class
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
 #' @importFrom uuid UUIDgenerate
@@ -37,29 +37,29 @@ NULL
 #' @importFrom stats setNames
 #' @importFrom reqres Request
 #' @importFrom stringi stri_pad_left
-#' 
+#'
 #' @export
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Create a New App
 #' app <- Fire$new(port = 4689)
-#' 
+#'
 #' # Setup the data every time it starts
 #' app$on('start', function(server, ...) {
 #'     server$set_data('visits', 0)
 #'     server$set_data('cycles', 0)
 #' })
-#' 
+#'
 #' # Count the number of cycles
 #' app$on('cycle-start', function(server, ...) {
 #'     server$set_data('cycles', server$get_data('cycles') + 1)
 #' })
-#' 
+#'
 #' # Count the number of requests
 #' app$on('before-request', function(server, ...) {
 #'     server$set_data('visits', server$get_data('visits') + 1)
 #' })
-#' 
+#'
 #' # Handle requests
 #' app$on('request', function(server, ...) {
 #'     list(
@@ -68,13 +68,13 @@ NULL
 #'         body = paste('This is indeed a test. You are number', server$get_data('visits'))
 #'     )
 #' })
-#' 
+#'
 #' # Show number of requests in the console
 #' app$on('after-request', function(server, ...) {
 #'     message(server$get_data('visits'))
 #'     flush.console()
 #' })
-#' 
+#'
 #' # Terminate the server after 300 cycles
 #' app$on('cycle-end', function(server, ...) {
 #'     if (server$get_data('cycles') > 300) {
@@ -83,17 +83,17 @@ NULL
 #'         server$extinguish()
 #'     }
 #' })
-#' 
+#'
 #' # Be polite
 #' app$on('end', function(server) {
 #'     message('Goodbye')
 #'     flush.console()
 #' })
-#' 
+#'
 #' \dontrun{
 #' app$ignite(showcase = TRUE)
 #' }
-#' 
+#'
 Fire <- R6Class('Fire',
   public = list(
     # Methods
@@ -199,7 +199,7 @@ Fire <- R6Class('Fire',
       handlerId <- UUIDgenerate()
       private$handlerMap[[handlerId]] <- event
       private$add_handler(event, handler, pos, handlerId)
-      
+
       invisible(handlerId)
     },
     #' @description Remove an event handler from the app.
@@ -217,7 +217,7 @@ Fire <- R6Class('Fire',
     trigger = function(event, ...) {
       check_string(event)
       if (event %in% private$privateTriggers) {
-        cli::cli_abort('{val {event}} and other protected events cannot be triggered manually')
+        cli::cli_abort('{.val {event}} and other protected events cannot be triggered manually')
       } else {
         private$p_trigger(event, server = self, ...)
       }
@@ -246,7 +246,7 @@ Fire <- R6Class('Fire',
     attach = function(plugin, ..., force = FALSE) {
       name <- plugin$name
       check_string(name, arg = 'plugin$name')
-      
+
       if (!force && self$has_plugin(name)) {
         cli::cli_abort(c(
           'The {.arg {name}} plugin is already loaded.',
@@ -288,7 +288,7 @@ Fire <- R6Class('Fire',
     },
     #' @description Add data to the global data store
     #' @param name The name identifying the data
-    #' @param value The data to add 
+    #' @param value The data to add
     set_data = function(name, value) {
       check_string(name)
       assign(name, value, envir = private$data)
@@ -483,13 +483,13 @@ Fire <- R6Class('Fire',
     TRIGGERDIR = NULL,
     ROOT = '',
     ACCESS_LOG_FORMAT = common_log_format,
-    
+
     running = FALSE,
     nb_cycle = FALSE,
     quitting = FALSE,
-    privateTriggers = c('start', 'resume', 'cycle-start', 'header', 
-                        'before-request', 'request', 'after-request', 
-                        'before-message', 'message', 'after-message', 
+    privateTriggers = c('start', 'resume', 'cycle-start', 'header',
+                        'before-request', 'request', 'after-request',
+                        'before-message', 'message', 'after-message',
                         'websocket-closed', 'send', 'cycle-end', 'end'),
     data = NULL,
     headers = list(),
@@ -500,12 +500,12 @@ Fire <- R6Class('Fire',
     server = NULL,
     client_id = NULL,
     logger = list(logger_null()),
-    
+
     DELAY = NULL,
     TIME = NULL,
     ASYNC = NULL,
     LOG_QUEUE = NULL,
-    
+
     # Methods
     run = function(block = TRUE, resume = FALSE, showcase = FALSE, ..., silent = FALSE) {
       check_bool(block)
@@ -524,7 +524,7 @@ Fire <- R6Class('Fire',
           if (!silent) message('Fire started at ', self$host, ':', self$port, self$root)
           self$log('start', paste0(self$host, ':', self$port, self$root))
         }
-        
+
         if (block) {
           on.exit({
             private$running <- FALSE
@@ -541,21 +541,21 @@ Fire <- R6Class('Fire',
     },
     run_blocking_server = function(showcase = FALSE) {
       server <- startServer(
-        self$host, 
-        self$port, 
+        self$host,
+        self$port,
         list(
           call = private$request_logic,
           onHeaders = private$header_logic,
           onWSOpen = private$websocket_logic
         )
       )
-      
+
       on.exit(stopServer(server))
-      
+
       if (showcase) {
         private$open_browser()
       }
-      
+
       while (TRUE) {
         private$p_trigger('cycle-start', server = self)
         service()
@@ -574,19 +574,19 @@ Fire <- R6Class('Fire',
     },
     run_allowing_server = function(showcase = FALSE) {
       private$server <- startDaemonizedServer(
-        self$host, 
-        self$port, 
+        self$host,
+        self$port,
         list(
           call = private$request_logic,
           onHeaders = private$header_logic,
           onWSOpen = private$websocket_logic
         )
       )
-      
+
       if (showcase) {
         private$open_browser()
       }
-      
+
       private$allowing_cycle()
     },
     allowing_cycle = function() {
@@ -627,9 +627,9 @@ Fire <- R6Class('Fire',
         id <- private$client_id(req)
         args <- unlist(
           unname(
-            private$p_trigger('before-request', server = self, id = id, 
+            private$p_trigger('before-request', server = self, id = id,
                               request = req)
-          ), 
+          ),
           recursive = FALSE
         )
         private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
@@ -692,7 +692,7 @@ Fire <- R6Class('Fire',
       id <- private$client_id(req)
       assign(id, ws, envir = private$websockets)
       self$log('websocket', paste0('connection established to ', id), req)
-      
+
       ws$onMessage(private$message_logic(id, req))
       ws$onClose(private$close_ws_logic(id, req))
     },
@@ -701,8 +701,8 @@ Fire <- R6Class('Fire',
         start <- Sys.time()
         args <- unlist(
           unname(
-            private$p_trigger('before-message', server = self, 
-                              id = id, binary = binary, 
+            private$p_trigger('before-message', server = self,
+                              id = id, binary = binary,
                               message = msg, request = request)
           ),
           recursive = FALSE
@@ -711,11 +711,11 @@ Fire <- R6Class('Fire',
         if ('binary' %in% names(args)) binary <- args$binary
         if ('message' %in% names(args)) msg <- args$message
         args <- modifyList(args, list(binary = NULL, message = NULL))
-        
+
         private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args)
-        
+
         private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request)
-        
+
         self$log('websocket', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, message = msg)
       }
     },
@@ -749,7 +749,7 @@ Fire <- R6Class('Fire',
     },
     external_triggers = function() {
       if (is.null(private$TRIGGERDIR)) return()
-      
+
       triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
       while (length(triggerFiles) > 0) {
         nextFile <- order(file.info(triggerFiles)$ctime)[1]

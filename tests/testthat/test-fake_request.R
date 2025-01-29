@@ -5,7 +5,7 @@ test_that('URL parsing works', {
     expect_equal(req[['rook.url_scheme']], 'http')
     req <- fake_request('https://www.example.com')
     expect_equal(req[['rook.url_scheme']], 'https')
-    
+
     req <- fake_request('http://www.example.com')
     expect_equal(req[['SERVER_NAME']], 'www.example.com')
     req <- fake_request('http://www.example.com:80')
@@ -16,7 +16,7 @@ test_that('URL parsing works', {
     expect_equal(req[['SERVER_NAME']], 'www.sub.example.com')
     req <- fake_request('http://www.example.com?qurey=string')
     expect_equal(req[['SERVER_NAME']], 'www.example.com')
-    
+
     req <- fake_request('http://www.example.com')
     expect_equal(req[['SERVER_PORT']], '80')
     req <- fake_request('https://www.example.com')
@@ -27,7 +27,7 @@ test_that('URL parsing works', {
     expect_equal(req[['SERVER_PORT']], '8080')
     req <- fake_request('http://www.example.com:8080?query=string')
     expect_equal(req[['SERVER_PORT']], '8080')
-    
+
     req <- fake_request('http://www.example.com')
     expect_equal(req[['PATH_INFO']], '/')
     req <- fake_request('http://www.example.com/')
@@ -46,8 +46,8 @@ test_that('URL parsing works', {
     expect_equal(req[['PATH_INFO']], '/')
     req <- fake_request('http://www.example.com/a/mount/', appLocation = '/a/')
     expect_equal(req[['PATH_INFO']], '/mount/')
-    expect_error(fake_request('http://www.example.com/a/mount/', appLocation = '/wrong/mount/'))
-    
+    expect_snapshot(fake_request('http://www.example.com/a/mount/', appLocation = '/wrong/mount/'), error = TRUE)
+
     req <- fake_request('http://www.example.com')
     expect_equal(req[['QUERY_STRING']], '')
     req <- fake_request('http://www.example.com?query=string')
@@ -59,7 +59,7 @@ test_that('URL parsing works', {
 test_that('Headers are assigned', {
     req <- fake_request('http://www.example.com', headers = list('accept_encoding' = 'gzip, deflate'))
     expect_equal(req[['HTTP_ACCEPT_ENCODING']], 'gzip, deflate')
-    expect_error(fake_request('http://www.example.com', headers = list('accept_encoding' = letters[1:4])))
+    expect_snapshot(fake_request('http://www.example.com', headers = list('accept_encoding' = letters[1:4])), error = TRUE)
     req <- fake_request('http://www.example.com', headers = list('dnt' = 1))
     expect_equal(req[['HTTP_DNT']], '1')
 })
@@ -72,18 +72,18 @@ test_that('Content gets assigned', {
     expect_null(req$rook.input$rewind())
     expect_equal(req$rook.input$read(l = 0), raw())
     expect_null(req$rook.input$close())
-    
+
     expect_s3_class(req$rook.errors, 'ErrorStreamFake')
     expect_null(req$rook.errors$cat())
     expect_null(req$rook.errors$flush())
-    
+
     req <- fake_request('http://www.example.com', content = 'Multiple\nlines\nof content')
     expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
     expect_equal(req$rook.input$rewind(), 26)
     expect_equal(rawToChar(req$rook.input$read()), 'Multiple\nlines\nof content\n')
     expect_equal(req$rook.input$read(l = 0), raw())
     expect_null(req$rook.input$close())
-    
+
     req <- fake_request('http://www.example.com', content = c('Multiple', 'lines', 'of content'))
     expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
     req$rook.input$close()

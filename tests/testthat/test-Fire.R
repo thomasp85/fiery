@@ -1,18 +1,27 @@
+standard_app <- function(silent = TRUE) {
+    app <- Fire$new(port = 49925)
+    if (!silent) {
+        app$set_logger(logger_console("{event}: {message}"))
+    }
+    app$access_log_format <- '{request$ip} - {id} [29/Jan/2025:08:17:44 +0100] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
+    app
+}
+
 test_that('handlers can be added, triggered and removed', {
-    app <- Fire$new(port = random_port())
-    
+    app <- standard_app()
+
     triggerRes <- app$trigger('test')
     expect_type(triggerRes, 'list')
     expect_length(triggerRes, 0)
     expect_named(triggerRes, character())
-    
+
     id1 <- app$on('test', function(...) 10)
     triggerRes <- app$trigger('test')
     expect_type(triggerRes, 'list')
     expect_length(triggerRes, 1)
     expect_named(triggerRes, id1)
     expect_equal(triggerRes[[1]], 10)
-    
+
     app$off(id1)
     triggerRes <- app$trigger('test')
     expect_type(triggerRes, 'list')
@@ -21,7 +30,9 @@ test_that('handlers can be added, triggered and removed', {
 })
 
 test_that('Fire objects are printed', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
+    expect_snapshot(app$format())
+
     app$attach(list(
         name = 'test',
         on_attach = function(...) {}
@@ -29,122 +40,115 @@ test_that('Fire objects are printed', {
     app$on('start', function(...){})
     app$on('request', function(...){})
     app$on('request', function(...){})
-    
-    expect_output(print(app), 'A fiery webserver')
-    expect_output(print(app), 'Plugins attached: test')
-    expect_output(print(app), 'start: 1')
-    expect_output(print(app), 'request: 2')
-    
-    app <- Fire$new(port = random_port())
-    expect_output(print(app), 'Plugins attached: none')
-    expect_output(print(app), 'Event handlers added: none')
+
+    expect_snapshot(app$format())
 })
 
 test_that('protected events cannot be triggered', {
-    app <- Fire$new(port = random_port())
-    
-    protected <- c('start', 'resume', 'end', 'cycle-start', 
-                   'cycle-end', 'header', 'before-request', 'request', 
-                   'after-request', 'before-message', 'message', 
+    app <- standard_app()
+
+    protected <- c('start', 'resume', 'end', 'cycle-start',
+                   'cycle-end', 'header', 'before-request', 'request',
+                   'after-request', 'before-message', 'message',
                    'after-message', 'websocket-closed', 'send')
-    
+
     for (i in protected) {
-        expect_error(app$trigger(i))
+        expect_snapshot(app$trigger(i), error = TRUE)
     }
 })
 
 test_that('data can be set, get and removed', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     expect_null(app$get_data('test'))
     testdata <- list(a = 1, b = 1:10, c = letters[6:10])
     app$set_data('test', testdata)
     expect_equal(app$get_data('test'), testdata)
-    expect_error(app$get_data(1))
-    expect_error(app$get_data(c('test', 'test2')))
+    expect_snapshot(app$get_data(1), error = TRUE)
+    expect_snapshot(app$get_data(c('test', 'test2')), error = TRUE)
     app$remove_data('test')
     expect_null(app$get_data('test'))
 })
 
 test_that('plugins are being attached', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     app$set_data('test', 10)
     plugin <- list(
         on_attach = function(server, extraPar) {
-            server$on('test', function(...){10 + extraPar})
+            server$on('test', function(...) 10 + extraPar)
         }
     )
-    expect_error(app$attach(plugin, 15))
+    expect_snapshot(app$attach(plugin, 15), error = TRUE)
     plugin$name <- 'plugin'
     app$attach(plugin, 15)
-    expect_error(app$attach(plugin, 10))
+    expect_snapshot(app$attach(plugin, 10), error = TRUE)
     expect_equal(app$trigger('test')[[1]], 25)
     plugin2 <- list(
-        on_attach = function(...) {message('test')},
+        on_attach = function(...) message('test'),
         name = 'plugin2',
         require = c('plugin', 'test')
     )
-    expect_error(app$attach(plugin2))
+    expect_snapshot(app$attach(plugin2), error = TRUE)
     plugin2$require <- 'plugin'
-    expect_message(app$attach(plugin2), 'test')
+    expect_snapshot(app$attach(plugin2))
     expect_equal(plugin, app$plugins$plugin)
-    expect_error(app$plugins$test <- plugin)
+    expect_snapshot(app$plugins$test <- plugin, error = TRUE)
     plugin3 <- list(
-        on_attach = function(...) {stop('test')},
+        on_attach = function(...) stop('test'),
         name = 'plugin3'
     )
-    expect_snapshot_error(app$attach(plugin3))
+    expect_snapshot(app$attach(plugin3), error = TRUE)
 })
 
 test_that('id converter can be set and gets called', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     app$on('request', function(server, id, ...) {
         server$set_data('id', id)
     })
     request <- fake_request('http://www.example.com', REMOTE_ADDR = '127.0.0.1')
     app$test_request(request)
     expect_equal(app$get_data('id'), client_to_id(reqres::Request$new(request)))
-    
+
     app$set_client_id_converter(function(request) {
         10
     })
     app$test_request(request)
     expect_equal(app$get_data('id'), 10)
-    
-    expect_error(app$set_client_id_converter('test'))
-    expect_error(app$set_client_id_converter(function(test) {10}))
+
+    expect_snapshot(app$set_client_id_converter('test'), error = TRUE)
+    expect_snapshot(app$set_client_id_converter(function(test) {10}), error = TRUE)
 })
 
 test_that('active bindings work', {
-    app <- Fire$new(port = random_port())
-    expect_error(app$host <- 10)
-    expect_error(app$host <- letters[1:3])
+    app <- standard_app()
+    expect_snapshot(app$host <- 10, error = TRUE)
+    expect_snapshot(app$host <- letters[1:3], error = TRUE)
     app$host <- 'test'
     expect_equal(app$host, 'test')
-    
-    expect_error(app$port <- 'test')
-    expect_error(app$port <- 1.5)
+
+    expect_snapshot(app$port <- 'test', error = TRUE)
+    expect_snapshot(app$port <- 1.5, error = TRUE)
     app$port <- 10
     expect_equal(app$port, 10)
-    
-    expect_error(app$refresh_rate <- 'test')
-    expect_error(app$refresh_rate <- 1:5)
+
+    expect_snapshot(app$refresh_rate <- 'test', error = TRUE)
+    expect_snapshot(app$refresh_rate <- 1:5, error = TRUE)
     app$refresh_rate <- 10.5
     expect_equal(app$refresh_rate, 10.5)
-    
-    expect_error(app$refresh_rate_nb <- 'test')
-    expect_error(app$refresh_rate_nb <- 1:5)
+
+    expect_snapshot(app$refresh_rate_nb <- 'test', error = TRUE)
+    expect_snapshot(app$refresh_rate_nb <- 1:5, error = TRUE)
     app$refresh_rate_nb <- 10.5
     expect_equal(app$refresh_rate_nb, 10.5)
-    
-    expect_error(app$trigger_dir <- 'test')
-    expect_error(app$trigger_dir <- 1:5)
+
+    expect_snapshot(app$trigger_dir <- 'test', error = TRUE)
+    expect_snapshot(app$trigger_dir <- 1:5, error = TRUE)
     dir <- tempdir()
     app$trigger_dir <- dir
     expect_equal(app$trigger_dir, dir)
 })
 
 test_that('life cycle events get fired', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     app$on('start', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'start'))
     })
@@ -163,27 +167,27 @@ test_that('life cycle events get fired', {
     app$on('end', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'end'))
     })
-    app$ignite()
+    app$ignite(silent = TRUE)
     igniteRes <- app$get_data('events')
     app$remove_data('events')
-    app$start()
+    app$start(silent = TRUE)
     startRes <- app$get_data('events')
     app$remove_data('events')
-    app$reignite()
+    app$reignite(silent = TRUE)
     reigniteRes <- app$get_data('events')
     app$remove_data('events')
-    app$resume()
+    app$resume(silent = TRUE)
     resumeRes <- app$get_data('events')
     app$remove_data('events')
-    
+
     expect_equal(igniteRes, startRes)
     expect_equal(igniteRes, c('start', 'cycle-start', 'cycle-end', 'cycle-start', 'cycle-end', 'end'))
     expect_equal(reigniteRes, resumeRes)
     expect_equal(reigniteRes, c('start', 'resume', 'cycle-start', 'cycle-end', 'cycle-start', 'cycle-end', 'end'))
-    
+
     app$refresh_rate_nb <- 0.001
-    app$ignite(block = FALSE)
-    # This no longer works in later. Messages generated during run_now() can't 
+    app$ignite(block = FALSE, silent = TRUE)
+    # This no longer works in later. Messages generated during run_now() can't
     # get captured
 #    expect_silent({ # Need to force some cycles to happen
 #        Sys.sleep(.1)
@@ -195,7 +199,7 @@ test_that('life cycle events get fired', {
     igniteResNoBlock <- app$get_data('events')
     app$remove_data('events')
     expect_equal(unique(igniteResNoBlock), c('start', 'cycle-start', 'cycle-end', 'end'))
-    app$reignite(block = FALSE)
+    app$reignite(block = FALSE, silent = TRUE)
     app$extinguish()
     reigniteResNoBlock <- app$get_data('events')
     app$remove_data('events')
@@ -203,9 +207,9 @@ test_that('life cycle events get fired', {
 })
 
 test_that('request events fire', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     request <- fake_request('http://www.example.com')
-    
+
     app$on('before-request', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'before'))
         list(test = 4)
@@ -220,16 +224,16 @@ test_that('request events fire', {
         server$set_data('passed_response', request$respond()$as_list())
     })
     response <- app$test_request(request)
-    
+
     expect_equal(app$get_data('events'), c('before', 'during', 'after'))
     expect_equal(app$get_data('passed_args'), 4)
     expect_equal(app$get_data('passed_response'), response)
 })
 
 test_that('message events fire', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     request <- fake_request('http://www.example.com')
-    
+
     app$on('before-message', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'before'))
         list(test = 4, message = 'test2', binary = FALSE)
@@ -242,13 +246,13 @@ test_that('message events fire', {
         server$set_data('events', c(server$get_data('events'), 'after'))
     })
     app$test_message(request, FALSE, 'test')
-    
+
     expect_equal(app$get_data('events'), c('before', 'during', 'after'))
     expect_equal(app$get_data('passed_args'), list(test = 4, message = 'test2'))
-    
-    app <- Fire$new(port = random_port())
+
+    app <- standard_app()
     request <- fake_request('http://www.example.com')
-    
+
     app$on('message', function(server, message, arg_list, ...) {
         server$set_data('events', c(server$get_data('events'), 'during'))
         server$set_data('passed_args', list(test = arg_list$test, message = message))
@@ -257,12 +261,12 @@ test_that('message events fire', {
         server$set_data('events', c(server$get_data('events'), 'after'))
     })
     app$test_message(request, FALSE, 'test')
-    
+
     expect_equal(app$get_data('events'), c('during', 'after'))
 })
 
 test_that('header event fire', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     request <- fake_request('http://www.example.com')
     expect_true(is.null(app$test_header(request)))
     app$on('header', function(server, ...) {
@@ -280,30 +284,28 @@ test_that('header event fire', {
 })
 
 test_that('errors in start and resume gets caught', {
-    app <- Fire$new(port = random_port())
-    app$set_logger(logger_console())
+    app <- standard_app()
     app$on('start', function(...) {
         stop('Testing an error')
     })
-    expect_output({
+    expect_snapshot({
         app$ignite(silent = TRUE, block = FALSE)
         later::run_now()
-    }, 'Testing an error')
+    })
     capture_output(app$extinguish())
-    app <- Fire$new(port = random_port())
-    app$set_logger(logger_console())
+    app <- standard_app()
     app$on('resume', function(...) {
         stop('Testing an error')
     })
-    expect_output({
+    expect_snapshot({
         app$reignite(silent = TRUE, block = FALSE)
         later::run_now()
-    }, 'Testing an error')
+    })
     capture_output(app$extinguish())
 })
 
 test_that('futures can be added and called', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
 
     app$delay({
         10
@@ -314,8 +316,8 @@ test_that('futures can be added and called', {
     app$on('cycle-end', function(server, ...) {
         server$extinguish()
     })
-    expect_message(app$ignite(), '10')
-    
+    expect_snapshot(app$ignite(silent = TRUE))
+
     id <- app$delay({
         10
     }, function(res, server, ...) {
@@ -328,7 +330,7 @@ test_that('futures can be added and called', {
     app$remove_delay(id)
     expect_silent(app$ignite(silent = TRUE))
 
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     app$time({
         10
     }, function(res, server, ...) {
@@ -342,9 +344,9 @@ test_that('futures can be added and called', {
             server$extinguish()
         }
     })
-    expect_message(app$ignite(), '10')
+    expect_snapshot(app$ignite(silent = TRUE))
 
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     id <- app$time({
         10
     }, function(res, server, ...) {
@@ -362,7 +364,7 @@ test_that('futures can be added and called', {
     expect_silent(app$ignite(silent = TRUE))
 
     skip_on_os('windows') # The async stuff fail on windows builders though it works fine locally
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     id <- app$async({
         10
     }, function(res, server, ...) {
@@ -378,8 +380,8 @@ test_that('futures can be added and called', {
         }
     })
     expect_silent(app$ignite(silent = TRUE))
-    
-    app <- Fire$new(port = random_port())
+
+    app <- standard_app()
     app$async({
         10
     }, function(res, server, ...) {
@@ -393,26 +395,24 @@ test_that('futures can be added and called', {
             server$extinguish()
         }
     })
-    expect_message(app$ignite(), '10')
+    expect_snapshot(app$ignite())
 })
 
 test_that('ignite is blocked during run', {
     skip_on_cran()
-    app <- Fire$new(port = random_port())
-    app$set_logger(logger_console())
+    app <- standard_app()
     app$refresh_rate_nb <- 0.001
 
-    capture_output(app$ignite(block = FALSE))
-    expect_output({
+    app$ignite(block = FALSE, silent = TRUE)
+    expect_snapshot({
         app$ignite()
         later::run_now()
-    }, 'Server is already running and cannot be started')
-    capture_output(app$extinguish())
+    })
+    app$extinguish()
 })
 
 test_that('external triggers are fired', {
-    app <- Fire$new(port = random_port())
-    app$set_logger(logger_console())
+    app <- standard_app()
 
     dir <- tempdir()
     app$trigger_dir <- dir
@@ -422,24 +422,24 @@ test_that('external triggers are fired', {
     })
     saveRDS(4, file.path(dir, 'testfail.rds'))
     saveRDS(list(test = 'test'), file.path(dir, 'test.rds'))
-    expect_output({
+    expect_snapshot({
         app$ignite(silent = TRUE, block = FALSE)
         later::run_now()
         app$extinguish()
-    }, 'External triggers must be an rds file containing a list')
+    })
     expect_equal(list(test = 'test'), app$get_data('ext_args'))
 })
 
 test_that('websockets are attached, and removed', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     req <- fake_request('http://www.example.com')
     app$on('send', function(server, ...) {server$set_data('send', TRUE)})
     expect_null(app$get_data('send'))
-    expect_message(app$test_websocket(req, 'test', FALSE), 'test')
+    expect_snapshot(app$test_websocket(req, 'test', FALSE))
     expect_true(app$get_data('send'))
-    expect_message(app$send('keep testing', client_to_id(req)), 'keep testing')
-    expect_message(app$send('keep testing again'), 'keep testing again')
-    expect_message(app$close_ws_con(client_to_id(req)), 'closing')
+    expect_snapshot(app$send('keep testing', client_to_id(req)))
+    expect_snapshot(app$send('keep testing again'))
+    expect_snapshot(app$close_ws_con(client_to_id(req)))
     expect_silent(app$close_ws_con(client_to_id(req)))
     expect_silent(app$send('keep testing', client_to_id(req)))
     expect_silent(app$send('keep testing again'))
@@ -447,18 +447,18 @@ test_that('websockets are attached, and removed', {
 
 test_that('showcase opens a browser', {
     oldopt <- options(browser = function(url) message('Open browser'))
-    
-    app <- Fire$new(port = random_port())
+
+    app <- standard_app()
     app$on('cycle-end', function(server, ...) server$extinguish())
-    
-    expect_message(app$ignite(showcase = TRUE), 'Open browser')
-    expect_message(app$ignite(showcase = TRUE, block = FALSE), 'Open browser')
+
+    expect_snapshot(app$ignite(showcase = TRUE))
+    expect_snapshot(app$ignite(showcase = TRUE, block = FALSE))
     app$extinguish()
     options(oldopt)
 })
 
 test_that('global headers are assigned and used', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     app$header('X-Powered-By', 'fiery')
     app$header('X-XSS-Protection', '1; mode=block')
     app$on('request', function(request, ...) {
@@ -473,12 +473,11 @@ test_that('global headers are assigned and used', {
 })
 
 test_that('app can be mounted at path', {
-    app <- Fire$new(port = random_port())
-    app$set_logger(logger_console('{message}'))
-    
+    app <- standard_app()
+
     expect_equal(app$root, '')
-    expect_error(app$root <- 123)
-    expect_error(app$root <- c('test', 'test2'))
+    expect_snapshot(app$root <- 123, error = TRUE)
+    expect_snapshot(app$root <- c('test', 'test2'), error = TRUE)
     app$root <- '//test/'
     expect_equal(app$root, '/test')
     req <- fake_request('http://example.com/test/testing')
@@ -489,37 +488,35 @@ test_that('app can be mounted at path', {
     expect_equal(req$PATH_INFO, '/testing')
     req <- fake_request('http://example.com/test/testing')
     app$set_logger(logger_null())
-    expect_message(app$test_websocket(req, 'test'), 'test')
+    expect_snapshot(app$test_websocket(req, 'test'))
     expect_equal(req$PATH_INFO, '/testing')
-    
-    app$set_logger(logger_console('{message}'))
+
     req <- fake_request('http://example.com/testing')
-    expect_snapshot_output(res <- app$test_request(req))
+    expect_snapshot(res <- app$test_request(req))
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
-    expect_snapshot_output(res <- app$test_header(req))
+    expect_snapshot(res <- app$test_header(req))
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
-    expect_snapshot_output(app$test_websocket(req, 'test'))
+    expect_snapshot(app$test_websocket(req, 'test'))
 })
 
 test_that("Logging can be configured", {
-    app <- Fire$new(port = random_port())
-    expect_equal(app$access_log_format, common_log_format)
+    app <- standard_app(FALSE)
+    old_format <- app$access_log_format
     app$access_log_format <- combined_log_format
     expect_equal(app$access_log_format, combined_log_format)
     app$on('test', function(server, ...) {
         server$log('test', 'this is a test')
     })
-    app$set_logger(logger_console())
-    expect_output(app$trigger('test'), 'test: this is a test')
-    
-    app$access_log_format <- common_log_format
-    expect_output(app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')), 'request: test - ID_test \\[\\d{2}/\\w+/\\d{4}:\\d{2}:\\d{2}:\\d{2} +|-\\d{4}\\] "GET /path HTTP/1\\.1" 404 0')
+    expect_snapshot(res <- app$trigger('test'))
+
+    app$access_log_format <- old_format
+    expect_snapshot(app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')))
 })
 
 test_that('is_running works', {
-    app <- Fire$new(port = random_port())
+    app <- standard_app()
     expect_false(app$is_running())
     app$on('cycle-start', function(server, ...) {
         server$log('message', server$is_running())
@@ -527,20 +524,20 @@ test_that('is_running works', {
     app$on('cycle-end', function(server, ...) {
         server$extinguish()
     })
-    expect_message(app$ignite(), 'message: TRUE')
+    expect_snapshot(app$ignite(silent = TRUE))
     expect_false(app$is_running())
-    
-    app <- Fire$new(port = random_port())
-    app$ignite(block = FALSE)
+
+    app <- standard_app()
+    app$ignite(block = FALSE, silent = TRUE)
     expect_true(app$is_running())
     app$extinguish()
     expect_false(app$is_running())
 })
 
 test_that('safe_call catches conditions', {
-  app <- Fire$new(port = random_port())
+  app <- standard_app()
   private <- environment(app$clone)$private
-  expect_message(private$safe_call(stop('error test')), 'error: error test')
-  expect_message(private$safe_call(warning('warning test')), 'warning: warning test')
-  expect_message(private$safe_call(message('message test')), 'message: message test')
+  expect_snapshot(private$safe_call(stop('error test')))
+  expect_snapshot(private$safe_call(warning('warning test')))
+  expect_snapshot(private$safe_call(message('message test')))
 })

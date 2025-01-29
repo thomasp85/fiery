@@ -21,7 +21,7 @@ test_that("Handlers can be added and removed", {
     expect_false(stack$contains('c'))
     expect_equal(stack$position('b'), 2)
     expect_equal(stack$position(c('a', 'c')), c(1, NA_integer_))
-    
+
     fun1return <- stack$remove('a')
     expect_equal(stack$length(), 1)
     expect_false(stack$contains('a'))
@@ -29,7 +29,7 @@ test_that("Handlers can be added and removed", {
     expect_equal(stack$position('b'), 1)
     expect_equal(stack$position(c('a', 'c')), c(NA_integer_, NA_integer_))
     expect_equal(fun1return, fun1)
-    
+
     fun2return <- stack$remove('b')
     expect_equal(stack$length(), 0)
     expect_false(stack$contains('a'))
@@ -43,30 +43,30 @@ test_that('Inserting at position works', {
     stack$add(length, 'length')
     stack$add(str, 'str')
     stack$add(sum, 'sum')
-    
+
     stack$add(min, 'min', 1)
     expect_equal(stack$position('min'), 1)
-    
+
     stack$add(max, 'max', 100)
     expect_equal(stack$position('max'), 5)
-    
+
     stack$add(mean, 'mean', 3)
     expect_equal(stack$position('mean'), 3)
 })
 
 test_that('Assertions throw errors', {
     stack <- HandlerStack$new()
-    expect_error(stack$add('string', 'id'))
-    expect_error(stack$add(c(min, max), 'id'))
-    expect_error(stack$add(min, 3))
-    expect_error(stack$add(min, 3:5))
-    expect_error(stack$add(min, 'min', 'position'))
-    expect_error(stack$add(min, 'min', 1:4))
-    expect_error(stack(add(min, 'min', 1.5)))
-    expect_error(stack$remove(1))
-    expect_error(stack$remove(c('1', '2')))
-    expect_error(stack$position(1))
-    expect_error(stack$contains(1))
+    expect_snapshot(stack$add('string', 'id'), error = TRUE)
+    expect_snapshot(stack$add(c(min, max), 'id'), error = TRUE)
+    expect_snapshot(stack$add(min, 3), error = TRUE)
+    expect_snapshot(stack$add(min, 3:5), error = TRUE)
+    expect_snapshot(stack$add(min, 'min', 'position'), error = TRUE)
+    expect_snapshot(stack$add(min, 'min', 1:4), error = TRUE)
+    expect_snapshot(stack(add(min, 'min', 1.5)), error = TRUE)
+    expect_snapshot(stack$remove(1), error = TRUE)
+    expect_snapshot(stack$remove(c('1', '2')), error = TRUE)
+    expect_snapshot(stack$position(1), error = TRUE)
+    expect_snapshot(stack$contains(1), error = TRUE)
 })
 
 test_that('Dispatch works', {
@@ -75,11 +75,11 @@ test_that('Dispatch works', {
     expect_type(stack$dispatch(args), 'list')
     expect_length(stack$dispatch(args), 0)
     expect_named(stack$dispatch(args), character())
-    
+
     stack$add(min, 'min')
     stack$add(mean, 'mean')
     stack$add(max, 'max')
-    
+
     expect_type(stack$dispatch(args), 'list')
     expect_length(stack$dispatch(args), 3)
     expect_named(stack$dispatch(args), c('min', 'mean', 'max'))
