@@ -6,8 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/thomasp85/fiery/actions/workflows/R-CMD-check.yaml)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-ago/fiery)](https://cran.r-project.org/package=fiery)
-[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/fiery)](https://cran.r-project.org/package=fiery)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/fiery)](https://CRAN.R-project.org/package=fiery)
 [![Codecov test
 coverage](https://codecov.io/gh/thomasp85/fiery/graph/badge.svg)](https://app.codecov.io/gh/thomasp85/fiery)
 <!-- badges: end -->
@@ -102,11 +102,8 @@ app$on('end', function(server) {
 })
 
 app$ignite(showcase = TRUE)
-#> Fire started at 127.0.0.1:8080
-#> message: 1
-#>  from message(server$get_data("visits"))
-#> message: Goodbye
-#>  from message("Goodbye")
+#> Fire started at <127.0.0.1:8080>
+#> message: Goodbye from message("Goodbye")
 ```
 
 In general much of the logic will happen in the `request` and `message`
