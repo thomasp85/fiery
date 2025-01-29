@@ -30,6 +30,8 @@ test_that('handlers can be added, triggered and removed', {
 })
 
 test_that('Fire objects are printed', {
+    skip_on_os("windows") # Windows not a fan of unicode
+
     app <- standard_app()
     expect_snapshot(app$format())
 
