@@ -6,8 +6,8 @@ authors:
     href: https://data-imaginist.com
 
 template:
-  params:
-    bootswatch: simplex
+  bootstrap: 5
+  bootswatch: simplex
 
 navbar:
   left:
@@ -42,7 +42,7 @@ navbar:
       href: https://routr.data-imaginist.com
     - icon: fa-github fa-lg
       href: https://github.com/thomasp85/fiery
-      
+
 reference:
   - title: "The Fire object"
     desc: >
@@ -54,7 +54,7 @@ reference:
   - title: "Logging"
     desc: >
       Logs are an important part of many servers and fiery has a central logging
-      facility where callbacks and handlers can send logging information to 
+      facility where callbacks and handlers can send logging information to
       without worrying about where and how the logs get written.
     contents:
       - loggers
@@ -67,7 +67,7 @@ reference:
   - title: "Routing"
     desc: >
       A central part of many servers is the router that takes care of recieving
-      requests and directing them at the right handlers for further processing. 
-      Being the minimal server framework that it is, fiery doesn't include 
-      router functionality itself, but the 
+      requests and directing them at the right handlers for further processing.
+      Being the minimal server framework that it is, fiery doesn't include
+      router functionality itself, but the
       [routr](https://github.com/thomasp85/routr) package.
