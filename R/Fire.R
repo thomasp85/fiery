@@ -676,11 +676,9 @@ Fire <- R6Class('Fire',
         req <- Request$new(request)
         id <- private$client_id(req)
         args <- unlist(
-          unname(
-            private$p_trigger('before-request', server = self, id = id,
-                              request = req)
-          ),
-          recursive = FALSE
+          private$p_trigger('before-request', server = self, id = id, request = req),
+          recursive = FALSE,
+          use.names = FALSE
         )
         private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
         response <- req$respond()
@@ -793,7 +791,7 @@ Fire <- R6Class('Fire',
         res <- private$safe_call(private$handlers[[event]]$dispatch(...))
         for (val in res) if (is.error_cond(val)) self$log('error', paste0(conditionMessage(val), ' from ', deparse(conditionCall(val), nlines = 1)))
       } else {
-        res <- setNames(list(), character())
+        res <- set_names(list())
       }
       res
     },
