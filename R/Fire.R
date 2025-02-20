@@ -683,7 +683,15 @@ Fire <- R6Class('Fire',
         private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
         response <- req$respond()
         for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
-        response <- response$as_list()
+        response <- tri(response$as_list())
+        # On the off-chance that reqres throws an error during conversion of response
+        if (is.error_cond(response)) {
+          response <- list(
+            status = 500L,
+            headers = list("Content-Type" = "text/plain"),
+            body = "Internal Server Error"
+          )
+        }
         private$p_trigger('after-request', server = self, id = id, request = req)
       }
       end_time <- Sys.time()
@@ -706,16 +714,23 @@ Fire <- R6Class('Fire',
         req <- Request$new(request)
         id <- private$client_id(req)
         response <- private$p_trigger('header', server = self, id = id, request = req)
-        response <- if (length(response) == 0) {
-          NULL
+        if (length(response) == 0) {
+          response <- NULL
         } else {
           continue <- tail(response, 1)[[1]]
           check_bool(continue)
           if (continue) {
-            NULL
+            response <- NULL
           } else {
             self$log('request', 'denied after header', req)
-            req$respond()$as_list()
+            response <- tri(req$respond()$as_list())
+            if (is.error_cond(response)) {
+              response <- list(
+                status = 500L,
+                headers = list("Content-Type" = "text/plain"),
+                body = "Internal Server Error"
+              )
+            }
           }
         }
       }
