@@ -676,9 +676,8 @@ Fire <- R6Class('Fire',
         req <- Request$new(request)
         id <- private$client_id(req)
         args <- unlist(
-          private$p_trigger('before-request', server = self, id = id, request = req),
-          recursive = FALSE,
-          use.names = FALSE
+          unname(private$p_trigger('before-request', server = self, id = id, request = req)),
+          recursive = FALSE
         )
         private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
         response <- req$respond()
