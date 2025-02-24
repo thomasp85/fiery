@@ -121,6 +121,8 @@ app$ignite(showcase = TRUE)
 \item \href{#method-Fire-trigger}{\code{Fire$trigger()}}
 \item \href{#method-Fire-send}{\code{Fire$send()}}
 \item \href{#method-Fire-close_ws_con}{\code{Fire$close_ws_con()}}
+\item \href{#method-Fire-serve_static}{\code{Fire$serve_static()}}
+\item \href{#method-Fire-exclude_static}{\code{Fire$exclude_static()}}
 \item \href{#method-Fire-attach}{\code{Fire$attach()}}
 \item \href{#method-Fire-has_plugin}{\code{Fire$has_plugin()}}
 \item \href{#method-Fire-header}{\code{Fire$header()}}
@@ -286,7 +288,7 @@ Synonymous method to \code{extinguish()}
 \subsection{Method \code{on()}}{
 Add a handler to an event. See the \href{https://fiery.data-imaginist.com/articles/events.html}{\emph{The event cycle in fiery} vignette} for more information.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Fire$on(event, handler, pos = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Fire$on(event, handler, pos = NULL, id = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -297,11 +299,13 @@ Add a handler to an event. See the \href{https://fiery.data-imaginist.com/articl
 \item{\code{handler}}{The handler function that should be triggered}
 
 \item{\code{pos}}{The position in the handler stack to place it at. \code{NULL} will place it at the end.}
+
+\item{\code{id}}{An optional id to use to identify the handler}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A unique string identifying the handler
+A unique string identifying the handler (either \code{id} or generated for you)
 }
 }
 \if{html}{\out{<hr>}}
@@ -375,6 +379,60 @@ Close a Websocket connection. Will trigger the \code{websocket-closed} event
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{id}}{The id of the client to close the websocket connection to}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Fire-serve_static"></a>}}
+\if{latex}{\out{\hypertarget{method-Fire-serve_static}{}}}
+\subsection{Method \code{serve_static()}}{
+Serve a file or directory of files at a specified url path. Requests matching a file on the system never enters into the request loop but are served directly (and fast). Due to this, logging for these requests are also turned off
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$serve_static(
+  at,
+  path,
+  use_index = TRUE,
+  fallthrough = FALSE,
+  html_charset = "utf-8",
+  headers = list(),
+  validation = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{at}}{The url path to listen to requests on}
+
+\item{\code{path}}{The path to the file or directory on the file system}
+
+\item{\code{use_index}}{Should an \code{index.html} file be served if present when a client requests the folder}
+
+\item{\code{fallthrough}}{Should requests that doesn't match a file enter the request loop or have a 404 response send directly}
+
+\item{\code{html_charset}}{The charset to report for serving html files}
+
+\item{\code{headers}}{A list of headers to add to the response. Will be combined with the global headers of the app}
+
+\item{\code{validation}}{An optional validation pattern. Presently, the only type of validation supported is an exact string match of a header. For example, if validation is \code{"abc" = "xyz"}, then HTTP requests must have a header named \code{abc} (case-insensitive) with the value \code{"xyz"} (case-sensitive). If a request does not have a matching header, than httpuv will give a 403 Forbidden response. If \code{character(0)} (the default), then no validation check will be performed.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Fire-exclude_static"></a>}}
+\if{latex}{\out{\hypertarget{method-Fire-exclude_static}{}}}
+\subsection{Method \code{exclude_static()}}{
+Exclude a url path from serving static content. Only meaningful to exclude sub paths of path that are set to serve static content
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$exclude_static(at)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{at}}{The url path to exclude from static serving. Request to this path will enter the normal request loop}
 }
 \if{html}{\out{</div>}}
 }

@@ -80,7 +80,7 @@ colour coding depending on the content if the console supports it.
 As a last possibility it is possible to use different loggers dependent on
 the event by using the switch logger:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{app$set_logger(logger_switch(warning =, 
+\if{html}{\out{<div class="sourceCode">}}\preformatted{app$set_logger(logger_switch(warning =,
                              error = logger_file('errors.log),
                              default = logger_file('info.log')))
 }\if{html}{\out{</div>}}

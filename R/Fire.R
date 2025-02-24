@@ -246,7 +246,7 @@ Fire <- R6Class('Fire',
     #' @param fallthrough Should requests that doesn't match a file enter the request loop or have a 404 response send directly
     #' @param html_charset The charset to report for serving html files
     #' @param headers A list of headers to add to the response. Will be combined with the global headers of the app
-    #' @inheritParams httpuv::staticPath
+    #' @param validation An optional validation pattern. Presently, the only type of validation supported is an exact string match of a header. For example, if validation is `"abc" = "xyz"`, then HTTP requests must have a header named `abc` (case-insensitive) with the value `"xyz"` (case-sensitive). If a request does not have a matching header, than httpuv will give a 403 Forbidden response. If `character(0)` (the default), then no validation check will be performed.
     serve_static = function(at, path, use_index = TRUE, fallthrough = FALSE, html_charset = "utf-8", headers = list(), validation = NULL) {
       check_string(at)
       check_string(path)
