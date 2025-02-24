@@ -187,6 +187,8 @@ object is desired, use the <code>clone()</code> method.</p>
 <li><p><a href="#method-Fire-trigger"><code>Fire$trigger()</code></a></p></li>
 <li><p><a href="#method-Fire-send"><code>Fire$send()</code></a></p></li>
 <li><p><a href="#method-Fire-close_ws_con"><code>Fire$close_ws_con()</code></a></p></li>
+<li><p><a href="#method-Fire-serve_static"><code>Fire$serve_static()</code></a></p></li>
+<li><p><a href="#method-Fire-exclude_static"><code>Fire$exclude_static()</code></a></p></li>
 <li><p><a href="#method-Fire-attach"><code>Fire$attach()</code></a></p></li>
 <li><p><a href="#method-Fire-has_plugin"><code>Fire$has_plugin()</code></a></p></li>
 <li><p><a href="#method-Fire-header"><code>Fire$header()</code></a></p></li>
@@ -348,7 +350,7 @@ object is desired, use the <code>clone()</code> method.</p>
 <h3 id="method-on-">Method <code>on()</code><a class="anchor" aria-label="anchor" href="#method-on-"></a></h3>
 <p>Add a handler to an event. See the <a href="https://fiery.data-imaginist.com/articles/events.html"><em>The event cycle in fiery</em> vignette</a> for more information.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="va">event</span>, <span class="va">handler</span>, pos <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">on</span><span class="op">(</span><span class="va">event</span>, <span class="va">handler</span>, pos <span class="op">=</span> <span class="cn">NULL</span>, id <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -365,11 +367,15 @@ object is desired, use the <code>clone()</code> method.</p>
 <dd><p>The position in the handler stack to place it at. <code>NULL</code> will place it at the end.</p></dd>
 
 
+<dt><code>id</code></dt>
+<dd><p>An optional id to use to identify the handler</p></dd>
+
+
 </dl><p></p></div>
 </div>
 <div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
-<p>A unique string identifying the handler</p>
+<p>A unique string identifying the handler (either <code>id</code> or generated for you)</p>
 </div>
 
 </div><p></p><hr><a id="method-Fire-off"></a><div class="section">
@@ -448,15 +454,79 @@ object is desired, use the <code>clone()</code> method.</p>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Fire-attach"></a><div class="section">
-<h3 id="method-attach-">Method <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code><a class="anchor" aria-label="anchor" href="#method-attach-"></a></h3>
-<p>Attach a plugin to the app. See the <a href="https://fiery.data-imaginist.com/articles/plugins.html"><em>Creating and using fiery plugins</em> vignette</a> for more information</p><div class="section">
+</div><p></p><hr><a id="method-Fire-serve_static"></a><div class="section">
+<h3 id="method-serve-static-">Method <code>serve_static()</code><a class="anchor" aria-label="anchor" href="#method-serve-static-"></a></h3>
+<p>Serve a file or directory of files at a specified url path. Requests matching a file on the system never enters into the request loop but are served directly (and fast). Due to this, logging for these requests are also turned off</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span>, <span class="va">...</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">serve_static</span><span class="op">(</span></span>
+<span>  <span class="va">at</span>,</span>
+<span>  <span class="va">path</span>,</span>
+<span>  use_index <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  fallthrough <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  html_charset <span class="op">=</span> <span class="st">"utf-8"</span>,</span>
+<span>  headers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  validation <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>at</code></dt>
+<dd><p>The url path to listen to requests on</p></dd>
+
+
+<dt><code>path</code></dt>
+<dd><p>The path to the file or directory on the file system</p></dd>
+
+
+<dt><code>use_index</code></dt>
+<dd><p>Should an <code>index.html</code> file be served if present when a client requests the folder</p></dd>
+
+
+<dt><code>fallthrough</code></dt>
+<dd><p>Should requests that doesn't match a file enter the request loop or have a 404 response send directly</p></dd>
+
+
+<dt><code>html_charset</code></dt>
+<dd><p>The charset to report for serving html files</p></dd>
+
+
+<dt><code>headers</code></dt>
+<dd><p>A list of headers to add to the response. Will be combined with the global headers of the app</p></dd>
+
+
+<dt><code>validation</code></dt>
+<dd><p>An optional validation pattern. Presently, the only type of validation supported is an exact string match of a header. For example, if validation is <code>"abc" = "xyz"</code>, then HTTP requests must have a header named <code>abc</code> (case-insensitive) with the value <code>"xyz"</code> (case-sensitive). If a request does not have a matching header, than httpuv will give a 403 Forbidden response. If <code>character(0)</code> (the default), then no validation check will be performed.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Fire-exclude_static"></a><div class="section">
+<h3 id="method-exclude-static-">Method <code>exclude_static()</code><a class="anchor" aria-label="anchor" href="#method-exclude-static-"></a></h3>
+<p>Exclude a url path from serving static content. Only meaningful to exclude sub paths of path that are set to serve static content</p><div class="section">
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">exclude_static</span><span class="op">(</span><span class="va">at</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>at</code></dt>
+<dd><p>The url path to exclude from static serving. Request to this path will enter the normal request loop</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Fire-attach"></a><div class="section">
+<h3 id="method-attach-">Method <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code><a class="anchor" aria-label="anchor" href="#method-attach-"></a></h3>
+<p>Attach a plugin to the app. See the <a href="https://fiery.data-imaginist.com/articles/plugins.html"><em>Creating and using fiery plugins</em> vignette</a> for more information</p><div class="section">
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span>, <span class="va">...</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>plugin</code></dt>
 <dd><p>The plugin to attach</p></dd>
 
@@ -475,12 +545,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-has_plugin"></a><div class="section">
 <h3 id="method-has-plugin-">Method <code>has_plugin()</code><a class="anchor" aria-label="anchor" href="#method-has-plugin-"></a></h3>
 <p>Check if the app has a plugin attached</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">has_plugin</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>The name of the plugin</p></dd>
 
@@ -495,12 +565,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-header"></a><div class="section">
 <h3 id="method-header-">Method <code>header()</code><a class="anchor" aria-label="anchor" href="#method-header-"></a></h3>
 <p>Add a global http header that will be applied to all responses</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">header</span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
+<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>The name of the header</p></dd>
 
@@ -515,12 +585,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-set_data"></a><div class="section">
 <h3 id="method-set-data-">Method <code>set_data()</code><a class="anchor" aria-label="anchor" href="#method-set-data-"></a></h3>
 <p>Add data to the global data store</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">set_data</span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
+<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>The name identifying the data</p></dd>
 
@@ -535,12 +605,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-get_data"></a><div class="section">
 <h3 id="method-get-data-">Method <code>get_data()</code><a class="anchor" aria-label="anchor" href="#method-get-data-"></a></h3>
 <p>Retrieve data from the global data store</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">get_data</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
+<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>The name identifying the data</p></dd>
 
@@ -555,12 +625,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-remove_data"></a><div class="section">
 <h3 id="method-remove-data-">Method <code>remove_data()</code><a class="anchor" aria-label="anchor" href="#method-remove-data-"></a></h3>
 <p>Remove data from the global data store</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">remove_data</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>name</code></dt>
 <dd><p>The name identifying the data to be removed</p></dd>
 
@@ -571,12 +641,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-time"></a><div class="section">
 <h3 id="method-time-">Method <code><a href="https://rdrr.io/r/stats/time.html" class="external-link">time()</a></code><a class="anchor" aria-label="anchor" href="#method-time-"></a></h3>
 <p>Add a timed evaluation that will be evaluated after the given number of seconds. See the <a href="https://fiery.data-imaginist.com/articles/delayed.html"><em>Delaying code execution in Fiery</em> vignette</a> for more information</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">time</span><span class="op">(</span><span class="va">expr</span>, <span class="va">then</span>, <span class="va">after</span>, loop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
+<h4 id="arguments-19">Arguments<a class="anchor" aria-label="anchor" href="#arguments-19"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>expr</code></dt>
 <dd><p>The expression to evaluate when the time has passed</p></dd>
 
@@ -603,12 +673,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-remove_time"></a><div class="section">
 <h3 id="method-remove-time-">Method <code>remove_time()</code><a class="anchor" aria-label="anchor" href="#method-remove-time-"></a></h3>
 <p>Remove a timed evaluation</p><div class="section">
-<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
+<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">remove_time</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
+<h4 id="arguments-20">Arguments<a class="anchor" aria-label="anchor" href="#arguments-20"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>The unique id identifying the handler</p></dd>
 
@@ -619,12 +689,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-delay"></a><div class="section">
 <h3 id="method-delay-">Method <code>delay()</code><a class="anchor" aria-label="anchor" href="#method-delay-"></a></h3>
 <p>Add a delayed evaluation to be evaluated immediately at the end of the loop cycle. See the <a href="https://fiery.data-imaginist.com/articles/delayed.html"><em>Delaying code execution in Fiery</em> vignette</a> for more information</p><div class="section">
-<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
+<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">delay</span><span class="op">(</span><span class="va">expr</span>, <span class="va">then</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-19">Arguments<a class="anchor" aria-label="anchor" href="#arguments-19"></a></h4>
+<h4 id="arguments-21">Arguments<a class="anchor" aria-label="anchor" href="#arguments-21"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>expr</code></dt>
 <dd><p>The expression to evaluate at the end of the cycle</p></dd>
 
@@ -643,12 +713,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-remove_delay"></a><div class="section">
 <h3 id="method-remove-delay-">Method <code>remove_delay()</code><a class="anchor" aria-label="anchor" href="#method-remove-delay-"></a></h3>
 <p>Remove a delayed evaluation</p><div class="section">
-<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">remove_delay</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-20">Arguments<a class="anchor" aria-label="anchor" href="#arguments-20"></a></h4>
+<h4 id="arguments-22">Arguments<a class="anchor" aria-label="anchor" href="#arguments-22"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>The unique id identifying the handler</p></dd>
 
@@ -659,12 +729,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-async"></a><div class="section">
 <h3 id="method-async-">Method <code>async()</code><a class="anchor" aria-label="anchor" href="#method-async-"></a></h3>
 <p>Add an asynchronous evaluation to be evaluated in another process without blocking the server. See the <a href="https://fiery.data-imaginist.com/articles/delayed.html"><em>Delaying code execution in Fiery</em> vignette</a> for more information</p><div class="section">
-<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
+<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">async</span><span class="op">(</span><span class="va">expr</span>, <span class="va">then</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-21">Arguments<a class="anchor" aria-label="anchor" href="#arguments-21"></a></h4>
+<h4 id="arguments-23">Arguments<a class="anchor" aria-label="anchor" href="#arguments-23"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>expr</code></dt>
 <dd><p>The expression to evaluate at the end of the cycle</p></dd>
 
@@ -683,12 +753,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-remove_async"></a><div class="section">
 <h3 id="method-remove-async-">Method <code>remove_async()</code><a class="anchor" aria-label="anchor" href="#method-remove-async-"></a></h3>
 <p>Remove an async evaluation</p><div class="section">
-<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
+<h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">remove_async</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-22">Arguments<a class="anchor" aria-label="anchor" href="#arguments-22"></a></h4>
+<h4 id="arguments-24">Arguments<a class="anchor" aria-label="anchor" href="#arguments-24"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>id</code></dt>
 <dd><p>The unique id identifying the handler</p></dd>
 
@@ -699,12 +769,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-set_client_id_converter"></a><div class="section">
 <h3 id="method-set-client-id-converter-">Method <code>set_client_id_converter()</code><a class="anchor" aria-label="anchor" href="#method-set-client-id-converter-"></a></h3>
 <p>Sets the function that converts an HTTP request into a specific client id</p><div class="section">
-<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
+<h4 id="usage-27">Usage<a class="anchor" aria-label="anchor" href="#usage-27"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">set_client_id_converter</span><span class="op">(</span><span class="va">converter</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-23">Arguments<a class="anchor" aria-label="anchor" href="#arguments-23"></a></h4>
+<h4 id="arguments-25">Arguments<a class="anchor" aria-label="anchor" href="#arguments-25"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>converter</code></dt>
 <dd><p>A function with the argument <code>request</code></p></dd>
 
@@ -715,12 +785,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-set_logger"></a><div class="section">
 <h3 id="method-set-logger-">Method <code>set_logger()</code><a class="anchor" aria-label="anchor" href="#method-set-logger-"></a></h3>
 <p>Sets the logging function to use</p><div class="section">
-<h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
+<h4 id="usage-28">Usage<a class="anchor" aria-label="anchor" href="#usage-28"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">set_logger</span><span class="op">(</span><span class="va">logger</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-24">Arguments<a class="anchor" aria-label="anchor" href="#arguments-24"></a></h4>
+<h4 id="arguments-26">Arguments<a class="anchor" aria-label="anchor" href="#arguments-26"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>logger</code></dt>
 <dd><p>A function with the arguments <code>event</code>, <code>message</code>, <code>request</code>, and <code>...</code></p></dd>
 
@@ -731,12 +801,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-log"></a><div class="section">
 <h3 id="method-log-">Method <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code><a class="anchor" aria-label="anchor" href="#method-log-"></a></h3>
 <p>Log a message with the logger attached to the app. See <a href="loggers.html">loggers</a> for build in functionality</p><div class="section">
-<h4 id="usage-27">Usage<a class="anchor" aria-label="anchor" href="#usage-27"></a></h4>
+<h4 id="usage-29">Usage<a class="anchor" aria-label="anchor" href="#usage-29"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">log</span><span class="op">(</span><span class="va">event</span>, <span class="va">message</span>, request <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-25">Arguments<a class="anchor" aria-label="anchor" href="#arguments-25"></a></h4>
+<h4 id="arguments-27">Arguments<a class="anchor" aria-label="anchor" href="#arguments-27"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>event</code></dt>
 <dd><p>The event associated with the message</p></dd>
 
@@ -759,7 +829,7 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-is_running"></a><div class="section">
 <h3 id="method-is-running-">Method <code>is_running()</code><a class="anchor" aria-label="anchor" href="#method-is-running-"></a></h3>
 <p>Test if an app is running</p><div class="section">
-<h4 id="usage-28">Usage<a class="anchor" aria-label="anchor" href="#usage-28"></a></h4>
+<h4 id="usage-30">Usage<a class="anchor" aria-label="anchor" href="#usage-30"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">is_running</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -767,12 +837,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-test_request"></a><div class="section">
 <h3 id="method-test-request-">Method <code>test_request()</code><a class="anchor" aria-label="anchor" href="#method-test-request-"></a></h3>
 <p>Send a request directly to the request logic of a non-running app. Only intended for testing the request logic</p><div class="section">
-<h4 id="usage-29">Usage<a class="anchor" aria-label="anchor" href="#usage-29"></a></h4>
+<h4 id="usage-31">Usage<a class="anchor" aria-label="anchor" href="#usage-31"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_request</span><span class="op">(</span><span class="va">request</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-26">Arguments<a class="anchor" aria-label="anchor" href="#arguments-26"></a></h4>
+<h4 id="arguments-28">Arguments<a class="anchor" aria-label="anchor" href="#arguments-28"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>request</code></dt>
 <dd><p>The request to send</p></dd>
 
@@ -783,12 +853,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-test_header"></a><div class="section">
 <h3 id="method-test-header-">Method <code>test_header()</code><a class="anchor" aria-label="anchor" href="#method-test-header-"></a></h3>
 <p>Send a request directly to the header logic of a non-running app. Only intended for testing the request logic</p><div class="section">
-<h4 id="usage-30">Usage<a class="anchor" aria-label="anchor" href="#usage-30"></a></h4>
+<h4 id="usage-32">Usage<a class="anchor" aria-label="anchor" href="#usage-32"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_header</span><span class="op">(</span><span class="va">request</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-27">Arguments<a class="anchor" aria-label="anchor" href="#arguments-27"></a></h4>
+<h4 id="arguments-29">Arguments<a class="anchor" aria-label="anchor" href="#arguments-29"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>request</code></dt>
 <dd><p>The request to send</p></dd>
 
@@ -799,12 +869,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-test_message"></a><div class="section">
 <h3 id="method-test-message-">Method <code>test_message()</code><a class="anchor" aria-label="anchor" href="#method-test-message-"></a></h3>
 <p>Send a message directly <strong>to</strong> the message logic of a non-running app. Only intended for testing the websocket logic</p><div class="section">
-<h4 id="usage-31">Usage<a class="anchor" aria-label="anchor" href="#usage-31"></a></h4>
+<h4 id="usage-33">Usage<a class="anchor" aria-label="anchor" href="#usage-33"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_message</span><span class="op">(</span><span class="va">request</span>, <span class="va">binary</span>, <span class="va">message</span>, withClose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-28">Arguments<a class="anchor" aria-label="anchor" href="#arguments-28"></a></h4>
+<h4 id="arguments-30">Arguments<a class="anchor" aria-label="anchor" href="#arguments-30"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>request</code></dt>
 <dd><p>The request to use to establish the connection</p></dd>
 
@@ -827,12 +897,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-test_websocket"></a><div class="section">
 <h3 id="method-test-websocket-">Method <code>test_websocket()</code><a class="anchor" aria-label="anchor" href="#method-test-websocket-"></a></h3>
 <p>Send a message directly <strong>from</strong> a non-running app. Only intended for testing the websocket logic</p><div class="section">
-<h4 id="usage-32">Usage<a class="anchor" aria-label="anchor" href="#usage-32"></a></h4>
+<h4 id="usage-34">Usage<a class="anchor" aria-label="anchor" href="#usage-34"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_websocket</span><span class="op">(</span><span class="va">request</span>, <span class="va">message</span>, close <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-29">Arguments<a class="anchor" aria-label="anchor" href="#arguments-29"></a></h4>
+<h4 id="arguments-31">Arguments<a class="anchor" aria-label="anchor" href="#arguments-31"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>request</code></dt>
 <dd><p>The request to use to establish the connection</p></dd>
 
@@ -851,12 +921,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-33">Usage<a class="anchor" aria-label="anchor" href="#usage-33"></a></h4>
+<h4 id="usage-35">Usage<a class="anchor" aria-label="anchor" href="#usage-35"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-30">Arguments<a class="anchor" aria-label="anchor" href="#arguments-30"></a></h4>
+<h4 id="arguments-32">Arguments<a class="anchor" aria-label="anchor" href="#arguments-32"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
