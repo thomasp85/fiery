@@ -456,20 +456,9 @@
 ---
 
     Code
-      app$test_request(fake_request("www.example.com/path", REMOTE_ADDR = "test"))
+      res <- app$test_request(fake_request("www.example.com/path", REMOTE_ADDR = "test"))
     Output
       request: test - ID_test [29/Jan/2025:08:17:44 +0100] "GET /path HTTP/1.1" 404 0
-      $status
-      [1] 404
-      
-      $headers
-      $headers$`Content-Type`
-      [1] "text/plain"
-      
-      
-      $body
-      [1] ""
-      
 
 # is_running works
 

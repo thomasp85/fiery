@@ -467,10 +467,10 @@ test_that('global headers are assigned and used', {
         request$respond()$status_with_text(200L)
     })
     response <- app$test_request(fake_request('www.example.com'))
-    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery', 'X-XSS-Protection' = '1; mode=block'))
+    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery', 'Date' = response$headers$Date, 'X-XSS-Protection' = '1; mode=block'))
     app$header('X-XSS-Protection', NULL)
     response <- app$test_request(fake_request('www.example.com'))
-    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery'))
+    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery', 'Date' = response$headers$Date))
     expect_equal(app$header('X-Powered-By'), 'fiery')
 })
 
@@ -514,7 +514,7 @@ test_that("Logging can be configured", {
     expect_snapshot(res <- app$trigger('test'))
 
     app$access_log_format <- old_format
-    expect_snapshot(app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')))
+    expect_snapshot(res <- app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')))
 })
 
 test_that('is_running works', {
