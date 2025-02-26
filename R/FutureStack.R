@@ -29,16 +29,10 @@ FutureStack <- R6Class('FutureStack',
     },
     eval = function(...) {
       if (!self$empty()) {
-        evalIds <- private$ids[sapply(private$ids, private$do_eval)]
+        evalIds <- private$ids[vapply(private$ids, private$do_eval, logical(1))]
         for (i in evalIds) {
-          res <- tri(value(private$futures[[i]]$expr))
-          if (is.error_cond(res)) {
-            private$server$log('error', conditionMessage(res))
-          }
-          res <- tri(private$futures[[i]]$then(res = res, ...))
-          if (is.error_cond(res)) {
-            private$server$log('error', conditionMessage(res))
-          }
+          res <- private$server$safe_call(value(private$futures[[i]]$expr))
+          private$server$safe_call(private$futures[[i]]$then(res = res, ...))
         }
         if (length(evalIds) != 0) private$clear(evalIds)
       }

@@ -111,7 +111,7 @@ Fire <- R6Class('Fire',
       private$DELAY <- DelayStack$new(self)
       private$TIME <- TimeStack$new(self)
       private$ASYNC <- AsyncStack$new(self)
-      private$LOG_QUEUE <- DelayStack$new(self)
+      private$LOG_QUEUE <- DelayStack$new(list(safe_call = function(x, ...) force(x)))
     },
     #' @description Human readable description of the app
     #' @param ... ignored
@@ -410,19 +410,56 @@ Fire <- R6Class('Fire',
     #' @param message The message to log
     #' @param request The `Request` object associated with the message, if any.
     #' @param ... Additional arguments passed on to the logger.
-    log = function(event, message, request = NULL, ...) {
+    #' @param .logcall The call that send the log request
+    #' @param .topcall The call in which `.logcall` is called from
+    #' @param .topenv The environment associated with `.topcall`
+    log = function(event, message, request = NULL, ..., .logcall = caller_call(), .topcall = caller_call(n = 2), .topenv = env_parent(n = 2)) {
       time <- Sys.time()
       force(message)
       if (private$running) {
-        private$LOG_QUEUE$add(NULL, function(...) private$logger[[1]](event, message, request, time, ...))
+        private$LOG_QUEUE$add(NULL, function(...) private$logger[[1]](event, message, request, time, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv, ...))
       } else {
-        private$logger[[1]](event, message, request, time, ...)
+        private$logger[[1]](event, message, request, time, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv, ...)
       }
       invisible(NULL)
     },
     #' @description Test if an app is running
     is_running = function() {
       private$running
+    },
+    #' @description Evaluate an expression safely, logging any errors, warnings,
+    #' or messages that bubbles up
+    #' @param expr An expression to evaluate
+    #' @param request The request under evaluation, if any. Used in logging
+    #'
+    #' @return The value of the expression. If an error is caught, the condition
+    #' object is returned instead
+    #'
+    safe_call = function(expr, request = NULL) {
+      try_fetch(
+        expr,
+        error = function(e) {
+          bt <- e$trace %||% cheap_trace_back()
+          topcall <- e$call
+          topcall_pos <- which(bt$call == topcall)
+          self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+          e
+        },
+        warning = function(w) {
+          bt <- cheap_trace_back()
+          topcall <- w$call
+          topcall_pos <- which(bt$call == topcall)
+          self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+          cnd_muffle(w)
+        },
+        message = function(m) {
+          bt <- cheap_trace_back()
+          topcall <- m$call
+          topcall_pos <- which(bt$call == topcall)
+          self$log('message', m, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+          cnd_muffle(m)
+        }
+      )
     },
     #' @description Send a request directly to the request logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
@@ -608,10 +645,10 @@ Fire <- R6Class('Fire',
         private$p_trigger('cycle-start', server = self)
         service()
         private$external_triggers()
-        private$safe_call(private$DELAY$eval(server = self))
-        private$safe_call(private$TIME$eval(server = self))
-        private$safe_call(private$ASYNC$eval(server = self))
-        tri(private$LOG_QUEUE$eval(server = self))
+        private$DELAY$eval(server = self)
+        private$TIME$eval(server = self)
+        private$ASYNC$eval(server = self)
+        private$LOG_QUEUE$eval(server = self)
         private$p_trigger('cycle-end', server = self)
         if (private$quitting) {
           private$quitting <- FALSE
@@ -645,10 +682,10 @@ Fire <- R6Class('Fire',
       if (private$running) {
         private$p_trigger('cycle-start', server = self)
         private$external_triggers()
-        private$safe_call(private$DELAY$eval(server = self))
-        private$safe_call(private$TIME$eval(server = self))
-        private$safe_call(private$ASYNC$eval(server = self))
-        tri(private$LOG_QUEUE$eval(server = self))
+        private$DELAY$eval(server = self)
+        private$TIME$eval(server = self)
+        private$ASYNC$eval(server = self)
+        private$LOG_QUEUE$eval(server = self)
         private$p_trigger('cycle-end', server = self)
         later(function() {
           private$allowing_cycle()
@@ -665,33 +702,40 @@ Fire <- R6Class('Fire',
     },
     request_logic = function(req) {
       start_time <- Sys.time()
-      request <- tri(private$mount_request(req))
-      if (is.error_cond(request)) {
+      request <- self$safe_call(private$mount_request(req), Request$new(req))
+      if (is_condition(request)) {
         req <- Request$new(req)
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
-        self$log('error', conditionMessage(request), req)
       } else {
         req <- Request$new(request)
         id <- private$client_id(req)
         args <- unlist(
-          unname(private$p_trigger('before-request', server = self, id = id, request = req)),
+          unname(private$p_trigger('before-request', server = self, id = id, request = req, .request = req)),
           recursive = FALSE
         )
-        private$p_trigger('request', server = self, id = id, request = req, arg_list = args)
+        res <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args, .request = req)
+        problems <- vapply(res, reqres::is_reqres_problem, logical(1))
+        errors <- vapply(res, is_condition, logical(1))
         response <- req$respond()
+        if (any(problems)) {
+          reqres::handle_problem(response, res[[which(problems)[1]]])
+        } else if (any(vapply(res, is_condition, logical(1)))) {
+          response$status_with_text(500L)
+        }
         for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
-        response <- tri(response$as_list())
+        response <- self$safe_call(response$as_list(), req)
         # On the off-chance that reqres throws an error during conversion of response
-        if (is.error_cond(response)) {
+        if (is_condition(response)) {
+          response$status_with_text(500L) # Update the real response first so it gets logged correctly
           response <- list(
             status = 500L,
             headers = list("Content-Type" = "text/plain"),
             body = "Internal Server Error"
           )
         }
-        private$p_trigger('after-request', server = self, id = id, request = req)
+        private$p_trigger('after-request', server = self, id = id, request = req, response = req$response, .request = req)
       }
       end_time <- Sys.time()
       self$log('request', glue_log(
@@ -702,17 +746,20 @@ Fire <- R6Class('Fire',
     },
     header_logic = function(req) {
       start_time <- Sys.time()
-      request <- tri(private$mount_request(req))
-      if (is.error_cond(request)) {
+      request <- self$safe_call(private$mount_request(req), Request$new(req))
+      if (is_condition(request)) {
         req <- Request$new(req)
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
-        self$log('error', conditionMessage(request), req)
       } else {
         req <- Request$new(request)
         id <- private$client_id(req)
-        response <- private$p_trigger('header', server = self, id = id, request = req)
+        response <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
+        problems <- vapply(response, reqres::is_reqres_problem, logical(1))
+        if (any(problems)) {
+          reqres::handle_problem(req$respond(), res[[which(problems)[1]]])
+        }
         if (length(response) == 0) {
           response <- NULL
         } else {
@@ -722,8 +769,9 @@ Fire <- R6Class('Fire',
             response <- NULL
           } else {
             self$log('request', 'denied after header', req)
-            response <- tri(req$respond()$as_list())
-            if (is.error_cond(response)) {
+            response <- self$safe_call(req$respond()$as_list(), req)
+            if (is_condition(response)) {
+              req$response$status_with_text(500L)
               response <- list(
                 status = 500L,
                 headers = list("Content-Type" = "text/plain"),
@@ -743,9 +791,8 @@ Fire <- R6Class('Fire',
       response
     },
     websocket_logic = function(ws) {
-      request <- tri(private$mount_request(ws$request))
-      if (is.error_cond(request)) {
-        self$log('error', conditionMessage(request))
+      request <- self$safe_call(private$mount_request(ws$request), Request$new(ws$request))
+      if (is_condition(request)) {
         ws$close()
         return()
       } else {
@@ -765,7 +812,8 @@ Fire <- R6Class('Fire',
           unname(
             private$p_trigger('before-message', server = self,
                               id = id, binary = binary,
-                              message = msg, request = request)
+                              message = msg, request = request,
+                              .request = request)
           ),
           recursive = FALSE
         )
@@ -774,22 +822,22 @@ Fire <- R6Class('Fire',
         if ('message' %in% names(args)) msg <- args$message
         args <- modifyList(args, list(binary = NULL, message = NULL))
 
-        private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args)
+        private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args, .request = request)
 
-        private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request)
+        private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request, .request = request)
 
         self$log('websocket', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, message = msg)
       }
     },
     close_ws_logic = function(id, request) {
       function() {
-        private$p_trigger('websocket-closed', server = self, id = id, request = request)
+        private$p_trigger('websocket-closed', server = self, id = id, request = request, .request = request)
         self$log('websocket', paste0('connection to ', id, ' closed from the client'), request)
       }
     },
     add_handler = function(event, handler, pos, id) {
       if (is.null(private$handlers[[event]])) {
-        private$handlers[[event]] <- HandlerStack$new()
+        private$handlers[[event]] <- HandlerStack$new(server = self)
       }
       private$handlers[[event]]$add(handler, id, pos)
     },
@@ -800,10 +848,9 @@ Fire <- R6Class('Fire',
     add_plugin = function(plugin, name) {
       private$pluginList[[name]] <- plugin
     },
-    p_trigger = function(event, ...) {
+    p_trigger = function(event, ..., .request = NULL) {
       if (!is.null(private$handlers[[event]])) {
-        res <- private$safe_call(private$handlers[[event]]$dispatch(...))
-        for (val in res) if (is.error_cond(val)) self$log('error', paste0(conditionMessage(val), ' from ', deparse(conditionCall(val), nlines = 1)))
+        res <- private$handlers[[event]]$dispatch(..., .request = .request)
       } else {
         res <- set_names(list())
       }
@@ -827,22 +874,6 @@ Fire <- R6Class('Fire',
         }
         triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
       }
-    },
-    safe_call = function(expr) {
-      try_fetch(
-        expr,
-        error = function(e) {
-          self$log('error', paste0(cnd_message(e), ' from ', deparse(conditionCall(e), nlines = 1)))
-        },
-        warning = function(w) {
-          self$log('warning', paste0(cnd_message(w), ' from ', deparse(conditionCall(w), nlines = 1)))
-          cnd_muffle(w)
-        },
-        message = function(m) {
-          self$log('message', paste0(cnd_message(m), ' from ', deparse(conditionCall(m), nlines = 1)))
-          cnd_muffle(m)
-        }
-      )
     },
     send_ws = function(message, id) {
       if (!is.raw(message)) {

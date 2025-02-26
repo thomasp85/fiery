@@ -5,12 +5,16 @@ NULL
 HandlerStack <- R6Class('HandlerStack',
   public = list(
     # Methods
-    initialize = function() {
+    initialize = function(server = NULL) {
       private$handleEnv <- new.env(parent = emptyenv())
+      private$server <- server
     },
     add = function(handler, id, pos = NULL) {
       check_string(id)
       check_function(handler)
+      if (!rlang::is_primitive(handler) && ".request" %in% fn_fmls_names(handler)) {
+        cli::cli_abort("{.arg request} is a reserved argument name and cannot be used in event handlers")
+      }
       if (is.null(pos)) {
         pos <- length(private$handleOrder) + 1
       } else {
@@ -30,9 +34,9 @@ HandlerStack <- R6Class('HandlerStack',
         invisible(handler)
       }
     },
-    dispatch = function(...) {
+    dispatch = function(..., .request = NULL) {
       res <- lapply(private$handleOrder, function(id) {
-        tri(private$handleEnv[[id]](...))
+        private$server$safe_call(private$handleEnv[[id]](...), request = .request)
       })
       names(res) <- private$handleOrder
       res
@@ -52,6 +56,7 @@ HandlerStack <- R6Class('HandlerStack',
   private = list(
     # Data
     handleEnv = NULL,
-    handleOrder = character()
+    handleOrder = character(),
+    server = NULL
   )
 )

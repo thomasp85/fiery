@@ -171,15 +171,19 @@ test_that('life cycle events get fired', {
     })
     app$ignite(silent = TRUE)
     igniteRes <- app$get_data('events')
+    app$extinguish()
     app$remove_data('events')
     app$start(silent = TRUE)
     startRes <- app$get_data('events')
+    app$extinguish()
     app$remove_data('events')
     app$reignite(silent = TRUE)
     reigniteRes <- app$get_data('events')
+    app$extinguish()
     app$remove_data('events')
     app$resume(silent = TRUE)
     resumeRes <- app$get_data('events')
+    app$extinguish()
     app$remove_data('events')
 
     expect_equal(igniteRes, startRes)
@@ -197,7 +201,7 @@ test_that('life cycle events get fired', {
 #        Sys.sleep(.1)
 #        later::run_now()
 #    }) #, 'Cannot stop server from within a non-blocking event cycle')
-    app$stop()
+    app$extinguish()
     igniteResNoBlock <- app$get_data('events')
     app$remove_data('events')
     expect_equal(unique(igniteResNoBlock), c('start', 'cycle-start', 'cycle-end', 'end'))
@@ -538,8 +542,8 @@ test_that('is_running works', {
 
 test_that('safe_call catches conditions', {
   app <- standard_app()
-  private <- environment(app$clone)$private
-  expect_snapshot(private$safe_call(stop('error test')))
-  expect_snapshot(private$safe_call(warning('warning test')))
-  expect_snapshot(private$safe_call(message('message test')))
+  self <- environment(app$clone)$self
+  expect_snapshot(cnd <- self$safe_call(stop('error test')))
+  expect_snapshot(cnd <- self$safe_call(warning('warning test')))
+  expect_snapshot(cnd <- self$safe_call(message('message test')))
 })

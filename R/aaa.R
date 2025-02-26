@@ -39,27 +39,13 @@ client_to_id <- function(request) {
   paste0('ID_', request$ip)
 }
 
-#' Predefined responses
-#'
-#' This is a convenience for not having to type out a typical response every time
-#' they are needed
-#'
-#' @noRd
-#'
-notFound <- list(
-  status = 404L,
-  headers = list('Content-Type' = 'text/plain'),
-  body = ''
-)
-serverError <- list(
-  status = 500L,
-  headers = list('Content-Type' = 'text/plain'),
-  body = ''
-)
-
-# better try
-tri <- function(expr) {
-  try_fetch(expr, error = function(e) e)
+cheap_trace_back <- function() {
+  frames <- sys.frames()
+  idx <- seq_len(sys.parent(2L))
+  frames <- frames[idx]
+  parents <- sys.parents()[idx]
+  calls <- as.list(sys.calls()[idx])
+  recursive <- parents == seq_along(parents)
+  parents[recursive] <- 0L
+  list(calls, parents)
 }
-is.condition <- function(x) inherits(x, 'condition')
-is.error_cond <- function(x) is.condition(x) && inherits(x, 'error')

@@ -123,38 +123,60 @@ NULL
 logger_null <- function() {
   function(event, message, request = NULL, time = Sys.time(), ...) {
     if (event %in% c('error', 'warning', 'message')) {
-      cli::cli_inform("{.strong {event}}: {trimws(message)}")
+      if (is_condition(message)) {
+        print(upgrade_condition(message))
+      } else {
+        for (m in message) {
+          cli::cli_inform("{.strong {event}}: {m}")
+        }
+      }
     }
   }
 }
+
 #' @rdname loggers
 #'
-#' @importFrom crayon red yellow blue green cyan magenta bold make_style
 #' @export
 logger_console <- function(format = '{time} - {event}: {message}') {
-  orange <- make_style('orange')
+  col_orange <- cli::make_ansi_style('orange')
   function(event, message, request = NULL, time = Sys.time(), ...) {
-    msg <- glue_log(list(
-      time = time,
-      event = event,
-      message = trimws(message)
-    ), format)
-    msg <- switch(event, error = red(msg), warning = yellow(msg), message = blue(msg), msg)
-    if (event == 'request') {
-      status_group <- as.integer(cut(request$respond()$status, breaks = c(100, 200, 300, 400, 500, 600), right = FALSE))
-      msg <- switch(
-        status_group,
-        blue$bold(msg),
-        green$bold(msg),
-        cyan$bold(msg),
-        orange$bold(msg),
-        red$bold(msg)
-      )
+    msg <- as_log_message(message)
+    time <- style_log(time, event, request)
+    event <- style_log(event, event, request)
+    for (m in msg) {
+      m <- glue_log(list(
+        time = time,
+        event = event,
+        message = m
+      ), format)
+      cat(m, file = stdout(), append = TRUE)
+      cat('\n', file = stdout(), append = TRUE)
     }
-    cat(msg, file = stdout(), append = TRUE)
-    cat('\n', file = stdout(), append = TRUE)
   }
 }
+
+col_orange <- cli::make_ansi_style('orange')
+style_log <- function(x, event, request = NULL, default = identity) {
+  switch(
+    event,
+    error = cli::col_red(x),
+    warning = cli::col_yellow(x),
+    message = cli::col_blue(x),
+    request = {
+      status_group <- as.integer(cut(request$respond()$status, breaks = c(100, 200, 300, 400, 500, 600), right = FALSE))
+      cli::style_bold(switch(
+        status_group,
+        cli::col_blue(x),
+        cli::col_green(x),
+        cli::col_cyan(x),
+        col_orange(x),
+        cli::col_red(x)
+      ))
+    },
+    default(x)
+  )
+}
+
 #' @rdname loggers
 #'
 #' @param file A file or connection to write to
@@ -164,13 +186,16 @@ logger_console <- function(format = '{time} - {event}: {message}') {
 logger_file <- function(file, format = '{time} - {event}: {message}') {
   format <- sub('\n$', '', format)
   function(event, message, request = NULL, time = Sys.time(), ...) {
-    msg <- glue_log(list(
-      time = time,
-      event = event,
-      message = trimws(message)
-    ), format)
-    cat(msg, file = file, append = TRUE)
-    cat('\n', file = file, append = TRUE)
+    msg <- cli::ansi_strip(as_log_message(message))
+    for (m in msg) {
+      m <- glue_log(list(
+        time = time,
+        event = event,
+        message = m
+      ), format)
+      cat(m, file = file, append = TRUE)
+      cat('\n', file = file, append = TRUE)
+    }
   }
 }
 #' @rdname loggers
@@ -198,13 +223,45 @@ logger_switch <- function(..., default = logger_null()) {
     inject(switch(!!!loc_args))(event = event, message = message, request = request, time = time, ...)
   }
 }
+
+#' @rdname loggers
+#'
+#' @param default_level The log level to use for events that are not `request`,
+#' `websocket`, `message`, `warning`, or `error`
+#'
+#' @export
+logger_logger <- function(default_level = "INFO") {
+  check_installed("logger")
+  default_level <- logger::as.loglevel(default_level)
+  function(event, message, request = NULL, time = Sys.time(), .logcall, .topcall, .topenv, ...) {
+    if (is_string(event)) {
+      level <- switch(
+        request = logger::SUCCESS,
+        websocket = logger::SUCCESS,
+        message = logger::INFO,
+        warning = logger::WARN,
+        error = logger::ERROR,
+        default_level
+      )
+    } else if (inherits(event, "loglevel")) {
+      level <- event
+      event <- attr(event, "level")
+    } else {
+      level <- logger::INFO
+    }
+    msg <- as_log_message(message)
+    for (m in msg) {
+      logger::log_level(event, m, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv)
+    }
+  }
+}
+
 #' @rdname loggers
 #' @export
 common_log_format <- '{request$ip} - {id} [{format(end_time, "%d/%b/%Y:%T %z")}] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
 #' @rdname loggers
 #' @export
 combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer") %||% ""}" "{paste(request$get_header("User-Agent"), collapse = ", ") %||% ""}"')
-
 
 # Helpers -----------------------------------------------------------------
 
@@ -219,3 +276,24 @@ glue_log <- function(.data, ..., .envir = parent.frame()) {
   glue_data(.data, ..., .envir = .envir)
   #glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
 }
+
+as_log_message <- function(message) {
+  if (is_condition(message)) {
+    message <- cnd_message(message)
+  } else if (length(message) > 1) {
+    message <- format_error_bullets(x)
+  }
+  unlist(stringi::stri_split_fixed(message, "\n"))
+}
+
+upgrade_condition <- function(cnd) {
+  UseMethod("upgrade_condition")
+}
+#' @export
+upgrade_condition.default <- function(cnd) cnd
+#' @export
+upgrade_condition.simpleError <- function(cnd) error_cnd(message = cnd$message, call = cnd$call)
+#' @export
+upgrade_condition.simpleWarning <- function(cnd) warning_cnd(message = cnd$message, call = cnd$call)
+#' @export
+upgrade_condition.simpleMessage <- function(cnd) message_cnd(message = cnd$message, call = cnd$call)

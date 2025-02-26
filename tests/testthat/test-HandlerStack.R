@@ -70,7 +70,7 @@ test_that('Assertions throw errors', {
 })
 
 test_that('Dispatch works', {
-    stack <- HandlerStack$new()
+    stack <- HandlerStack$new(list(safe_call = function(x, ...) force(x)))
     args <- 1:10
     expect_type(stack$dispatch(args), 'list')
     expect_length(stack$dispatch(args), 0)

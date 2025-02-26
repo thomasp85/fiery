@@ -2,55 +2,71 @@
 
     Code
       delay$eval()
-    Message
+    Output
+      <message/rlang_message>
+      Message in `message()`:
       test
 
 ---
 
     Code
       delay$eval()
-    Message
+    Output
+      <message/rlang_message>
+      Message in `message()`:
       test2
 
 ---
 
     Code
       delay$eval()
-    Message
-      error: error test
+    Output
+      <error/rlang_error>
+      Error:
+      ! error test
 
 ---
 
     Code
       delay$eval()
-    Message
-      error: error test
+    Output
+      <error/rlang_error>
+      Error in `private$futures[[i]]$then()`:
+      ! error test
 
 # TimeStack works
 
     Code
       time$eval()
-    Message
+    Output
+      <message/rlang_message>
+      Message in `message()`:
       test
 
 ---
 
     Code
       time$eval()
-    Message
+    Output
+      <message/rlang_message>
+      Message in `message()`:
       test
 
 ---
 
     Code
       time$eval()
-    Message
+    Output
+      <message/rlang_message>
+      Message in `message()`:
       test
 
 ---
 
     Code
       time$eval()
-    Message
+    Output
+      <message/rlang_message>
+      Message in `message()`:
       test
 

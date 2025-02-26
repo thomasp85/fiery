@@ -139,6 +139,7 @@ app$ignite(showcase = TRUE)
 \item \href{#method-Fire-set_logger}{\code{Fire$set_logger()}}
 \item \href{#method-Fire-log}{\code{Fire$log()}}
 \item \href{#method-Fire-is_running}{\code{Fire$is_running()}}
+\item \href{#method-Fire-safe_call}{\code{Fire$safe_call()}}
 \item \href{#method-Fire-test_request}{\code{Fire$test_request()}}
 \item \href{#method-Fire-test_header}{\code{Fire$test_header()}}
 \item \href{#method-Fire-test_message}{\code{Fire$test_message()}}
@@ -714,7 +715,15 @@ Sets the logging function to use
 \subsection{Method \code{log()}}{
 Log a message with the logger attached to the app. See \link{loggers} for build in functionality
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Fire$log(event, message, request = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Fire$log(
+  event,
+  message,
+  request = NULL,
+  ...,
+  .logcall = caller_call(),
+  .topcall = caller_call(n = 2),
+  .topenv = env_parent(n = 2)
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -727,6 +736,12 @@ Log a message with the logger attached to the app. See \link{loggers} for build 
 \item{\code{request}}{The \code{Request} object associated with the message, if any.}
 
 \item{\code{...}}{Additional arguments passed on to the logger.}
+
+\item{\code{.logcall}}{The call that send the log request}
+
+\item{\code{.topcall}}{The call in which \code{.logcall} is called from}
+
+\item{\code{.topenv}}{The environment associated with \code{.topcall}}
 }
 \if{html}{\out{</div>}}
 }
@@ -740,6 +755,30 @@ Test if an app is running
 \if{html}{\out{<div class="r">}}\preformatted{Fire$is_running()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Fire-safe_call"></a>}}
+\if{latex}{\out{\hypertarget{method-Fire-safe_call}{}}}
+\subsection{Method \code{safe_call()}}{
+Evaluate an expression safely, logging any errors, warnings,
+or messages that bubbles up
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Fire$safe_call(expr, request = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{expr}}{An expression to evaluate}
+
+\item{\code{request}}{The request under evaluation, if any. Used in logging}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The value of the expression. If an error is caught, the condition
+object is returned instead
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Fire-test_request"></a>}}
