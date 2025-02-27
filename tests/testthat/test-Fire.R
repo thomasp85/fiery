@@ -493,6 +493,10 @@ test_that('app can be mounted at path', {
     expect_equal(req$PATH_INFO, '/testing')
     req <- fake_request('http://example.com/test/testing')
     app$test_header(req)
+    expect_equal(req$PATH_INFO, '/test/testing')
+    app$on("header", function(...) TRUE)
+    req <- fake_request('http://example.com/testing')
+    app$test_header(req)
     expect_equal(req$PATH_INFO, '/testing')
     req <- fake_request('http://example.com/test/testing')
     app$set_logger(logger_null())
@@ -507,6 +511,7 @@ test_that('app can be mounted at path', {
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
     expect_snapshot(app$test_websocket(req, 'test'))
+    options(old_opt)
 })
 
 test_that("Logging can be configured", {

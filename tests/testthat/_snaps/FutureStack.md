@@ -3,7 +3,6 @@
     Code
       delay$eval()
     Output
-      <message/rlang_message>
       Message in `message()`:
       test
 
@@ -12,7 +11,6 @@
     Code
       delay$eval()
     Output
-      <message/rlang_message>
       Message in `message()`:
       test2
 
@@ -39,7 +37,6 @@
     Code
       time$eval()
     Output
-      <message/rlang_message>
       Message in `message()`:
       test
 
@@ -48,7 +45,6 @@
     Code
       time$eval()
     Output
-      <message/rlang_message>
       Message in `message()`:
       test
 
@@ -57,7 +53,6 @@
     Code
       time$eval()
     Output
-      <message/rlang_message>
       Message in `message()`:
       test
 
@@ -66,7 +61,6 @@
     Code
       time$eval()
     Output
-      <message/rlang_message>
       Message in `message()`:
       test
 

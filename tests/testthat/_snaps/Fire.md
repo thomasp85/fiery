@@ -156,7 +156,7 @@
       app$attach(plugin, 15)
     Condition
       Error in `app$attach()`:
-      ! `plugin$name` must be a single string, not `NULL`.
+      ! `name` must be a single string, not `NULL`.
 
 ---
 
@@ -325,7 +325,6 @@
     Code
       app$ignite(silent = TRUE)
     Output
-      <message/rlang_message>
       Message in `message()`:
       10
 
@@ -334,7 +333,6 @@
     Code
       app$ignite(silent = TRUE)
     Output
-      <message/rlang_message>
       Message in `message()`:
       10
 
@@ -345,7 +343,6 @@
     Message
       Fire started at <127.0.0.1:49925>
     Output
-      <message/rlang_message>
       Message in `message()`:
       10
 
@@ -447,15 +444,15 @@
       Backtrace:
            x
         1. \-app$test_request(req)
-        2.   \-private$request_logic(request) at fiery/R/Fire.R:467:7
-        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:705:7
-        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:439:7
+        2.   \-private$request_logic(request) at fiery/R/Fire.R:488:7
+        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:739:7
+        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
         7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
         8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
         9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(req) at fiery/R/Fire.R:439:7
+       10.     \-private$mount_request(req) at fiery/R/Fire.R:460:7
 
 ---
 
@@ -469,15 +466,15 @@
       Backtrace:
            x
         1. \-app$test_header(req)
-        2.   \-private$header_logic(request) at fiery/R/Fire.R:472:7
-        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:749:7
-        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:439:7
+        2.   \-private$header_logic(request) at fiery/R/Fire.R:493:7
+        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:787:7
+        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
         7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
         8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
         9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(req) at fiery/R/Fire.R:439:7
+       10.     \-private$mount_request(req) at fiery/R/Fire.R:787:7
 
 ---
 
@@ -491,15 +488,15 @@
       Backtrace:
            x
         1. \-app$test_websocket(req, "test")
-        2.   \-private$websocket_logic(ws) at fiery/R/Fire.R:500:7
-        3.     +-self$safe_call(private$mount_request(ws$request), Request$new(ws$request)) at fiery/R/Fire.R:794:7
-        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:439:7
+        2.   \-private$websocket_logic(ws) at fiery/R/Fire.R:521:7
+        3.     +-self$safe_call(private$mount_request(ws$request), Request$new(ws$request)) at fiery/R/Fire.R:832:7
+        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
         7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
         8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
         9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(ws$request) at fiery/R/Fire.R:439:7
+       10.     \-private$mount_request(ws$request) at fiery/R/Fire.R:460:7
     Message
       closing
 
@@ -537,17 +534,12 @@
 
     Code
       cnd <- self$safe_call(warning("warning test"))
-    Output
-      <warning/rlang_warning>
-      Warning in `withCallingHandlers()`:
-      warning test
 
 ---
 
     Code
       cnd <- self$safe_call(message("message test"))
     Output
-      <message/rlang_message>
       Message in `message()`:
       message test
 
