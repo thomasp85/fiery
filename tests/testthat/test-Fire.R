@@ -7,6 +7,8 @@ standard_app <- function(silent = TRUE) {
     app
 }
 
+old_opt <- options(rlang_backtrace_on_error = "none")
+
 test_that('handlers can be added, triggered and removed', {
     app <- standard_app()
 
@@ -547,3 +549,5 @@ test_that('safe_call catches conditions', {
   expect_snapshot(cnd <- self$safe_call(warning('warning test')))
   expect_snapshot(cnd <- self$safe_call(message('message test')))
 })
+
+options(old_opt)
