@@ -290,7 +290,7 @@ Fire <- R6Class('Fire',
     #' @param name Optional name for the plugin. If omitted `plugin$name` will be used instead
     #' @param ... Arguments to pass into the plugins `on_attach()` method
     #' @param force If the plugin has already been attached an error is thrown, unless `force = TRUE` which tells the app to reattach it
-    attach = function(plugin, name = NULL, ..., force = FALSE) {
+    attach = function(plugin, ..., name = NULL, force = FALSE) {
       name <- name %||% plugin$name
       check_string(name)
 

@@ -448,7 +448,7 @@ Exclude a url path from serving static content. Only meaningful to exclude sub p
 \subsection{Method \code{attach()}}{
 Attach a plugin to the app. See the \href{https://fiery.data-imaginist.com/articles/plugins.html}{\emph{Creating and using fiery plugins} vignette} for more information
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Fire$attach(plugin, name = NULL, ..., force = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Fire$attach(plugin, ..., name = NULL, force = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -456,9 +456,9 @@ Attach a plugin to the app. See the \href{https://fiery.data-imaginist.com/artic
 \describe{
 \item{\code{plugin}}{The plugin to attach}
 
-\item{\code{name}}{Optional name for the plugin. If omitted \code{plugin$name} will be used instead}
-
 \item{\code{...}}{Arguments to pass into the plugins \code{on_attach()} method}
+
+\item{\code{name}}{Optional name for the plugin. If omitted \code{plugin$name} will be used instead}
 
 \item{\code{force}}{If the plugin has already been attached an error is thrown, unless \code{force = TRUE} which tells the app to reattach it}
 }
