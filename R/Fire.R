@@ -724,12 +724,15 @@ Fire <- R6Class('Fire',
       }
     },
     mount_request = function(req) {
-      if (req$SCRIPT_NAME != self$root && !grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) {
+      if (req$SCRIPT_NAME == self$root) {
+        req
+      } else if (grepl(paste0('^', self$root, '(/|$)'), req$PATH_INFO)) {
+        req$SCRIPT_NAME <- self$root
+        req$PATH_INFO <- sub(paste0('^', self$root, ''), '', req$PATH_INFO)
+        req
+      } else {
         cli::cli_abort('URL ({req$PATH_INFO}) not matching mount point ({self$root})')
       }
-      req$SCRIPT_NAME <- self$root
-      req$PATH_INFO <- sub(paste0('^', self$root, ''), '', req$PATH_INFO)
-      req
     },
     request_logic = function(req) {
       start_time <- Sys.time()
