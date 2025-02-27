@@ -529,7 +529,7 @@ string is used as a path to add to the root before opening</p></dd>
 <h3 id="method-attach-">Method <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code><a class="anchor" aria-label="anchor" href="#method-attach-"></a></h3>
 <p>Attach a plugin to the app. See the <a href="https://fiery.data-imaginist.com/articles/plugins.html"><em>Creating and using fiery plugins</em> vignette</a> for more information</p><div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span>, <span class="va">...</span>, name <span class="op">=</span> <span class="cn">NULL</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -538,12 +538,12 @@ string is used as a path to add to the root before opening</p></dd>
 <dd><p>The plugin to attach</p></dd>
 
 
-<dt><code>name</code></dt>
-<dd><p>Optional name for the plugin. If omitted <code>plugin$name</code> will be used instead</p></dd>
-
-
 <dt><code>...</code></dt>
 <dd><p>Arguments to pass into the plugins <code>on_attach()</code> method</p></dd>
+
+
+<dt><code>name</code></dt>
+<dd><p>Optional name for the plugin. If omitted <code>plugin$name</code> will be used instead</p></dd>
 
 
 <dt><code>force</code></dt>
