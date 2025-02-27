@@ -141,7 +141,9 @@ Fire <- R6Class('Fire',
     },
     #' @description Begin running the server. Will trigger the `start` event
     #' @param block Should the console be blocked while running (alternative is to run in the background)
-    #' @param showcase Should the default browser open up at the server address
+    #' @param showcase Should the default browser open up at the server address.
+    #' If `TRUE` then a browser opens at the root of the app. If a string the
+    #' string is used as a path to add to the root before opening
     #' @param ... Arguments passed on to the `start` handler
     #' @param silent Should startup messaging by silenced
     ignite = function(block = TRUE, showcase = FALSE, ..., silent = FALSE) {
@@ -618,7 +620,9 @@ Fire <- R6Class('Fire',
     run = function(block = TRUE, resume = FALSE, showcase = FALSE, ..., silent = FALSE) {
       check_bool(block)
       check_bool(resume)
-      check_bool(showcase)
+      if (!is_bool(showcase)) {
+        check_string(showcase, what = "`TRUE` or `FALSE` or a single string")
+      }
       check_bool(silent)
       if (!private$running) {
         private$running <- TRUE
@@ -664,8 +668,8 @@ Fire <- R6Class('Fire',
 
       on.exit(stopServer(server))
 
-      if (showcase) {
-        private$open_browser()
+      if (!isFALSE(showcase)) {
+        private$open_browser(if (is.character(showcase)) showcase else "")
       }
 
       while (TRUE) {
@@ -699,8 +703,8 @@ Fire <- R6Class('Fire',
         )
       )
 
-      if (showcase) {
-        private$open_browser()
+      if (!isFALSE(showcase)) {
+        private$open_browser(if (is.character(showcase)) showcase else "")
       }
 
       private$allowing_cycle()
@@ -929,8 +933,8 @@ Fire <- R6Class('Fire',
         self$log('websocket', paste0('connection to ', id, ' closed from the server'))
       }
     },
-    open_browser = function() {
-      url <- paste0('http://', private$HOST, ':', private$PORT, '/')
+    open_browser = function(path = "") {
+      url <- paste0('http://', private$HOST, ':', private$PORT, '/', sub("^/", "", path))
       browseURL(url)
     }
   )

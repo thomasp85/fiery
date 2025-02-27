@@ -205,7 +205,9 @@ Begin running the server. Will trigger the \code{start} event
 \describe{
 \item{\code{block}}{Should the console be blocked while running (alternative is to run in the background)}
 
-\item{\code{showcase}}{Should the default browser open up at the server address}
+\item{\code{showcase}}{Should the default browser open up at the server address.
+If \code{TRUE} then a browser opens at the root of the app. If a string the
+string is used as a path to add to the root before opening}
 
 \item{\code{...}}{Arguments passed on to the \code{start} handler}
 
