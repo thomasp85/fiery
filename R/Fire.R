@@ -414,13 +414,31 @@ Fire <- R6Class('Fire',
     #' @param .logcall The call that send the log request
     #' @param .topcall The call in which `.logcall` is called from
     #' @param .topenv The environment associated with `.topcall`
-    log = function(event, message, request = NULL, ..., .logcall = caller_call(), .topcall = caller_call(n = 2), .topenv = env_parent(n = 2)) {
+    log = function(event, message, request = NULL, ..., .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
       time <- Sys.time()
       force(message)
+      log_fun <- function(...) {
+        if (!is_condition(message)) {
+          message <- vapply(message, cli::format_inline, character(1), .envir = .topenv)
+        }
+        private$logger[[1]](
+          event,
+          message,
+          request,
+          time,
+          .logcall = .logcall,
+          .topcall = .topcall,
+          .topenv = .topenv,
+          ...
+        )
+      }
       if (private$running) {
-        private$LOG_QUEUE$add(NULL, function(...) private$logger[[1]](event, message, request, time, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv, ...))
+        private$LOG_QUEUE$add(
+          NULL,
+          log_fun
+        )
       } else {
-        private$logger[[1]](event, message, request, time, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv, ...)
+        log_fun()
       }
       invisible(NULL)
     },

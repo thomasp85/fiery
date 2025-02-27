@@ -724,9 +724,9 @@ Log a message with the logger attached to the app. See \link{loggers} for build 
   message,
   request = NULL,
   ...,
-  .logcall = caller_call(),
-  .topcall = caller_call(n = 2),
-  .topenv = env_parent(n = 2)
+  .logcall = sys.call(),
+  .topcall = sys.call(-1),
+  .topenv = parent.frame()
 )}\if{html}{\out{</div>}}
 }
 
