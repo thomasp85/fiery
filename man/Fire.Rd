@@ -99,6 +99,8 @@ app$ignite(showcase = TRUE)
 
 \item{\code{plugins}}{A named list of the already attached plugins. \strong{Read Only} - can only be modified using the \code{attach()} method.}
 
+\item{\code{data_store}}{Access the environment that holds the global data store}
+
 \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \verb{/demo/test} to \verb{/test} if \code{root == '/demo'}}
 
 \item{\code{access_log_format}}{A \link[glue:glue]{glue} string defining how requests will be logged. For standard formats see \link{common_log_format} and \link{combined_log_format}. Defaults to the \emph{Common Log Format}}

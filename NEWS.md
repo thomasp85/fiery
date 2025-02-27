@@ -3,6 +3,13 @@
 * Added `serve_static()` method to `Fire` to serve a directory of static files
   directly outside the request loop
 * Move code over to rlang style programming
+* Full rewrite of condition handling.
+* Added `logger_logger()` to use the logger package for logging
+* `Fire$log()` now supports cli syntax in the message
+* Support for the `reqres_problem` conditions
+* `Fire$log()` now supports passing in a condition as message
+* Added `Fire$data_store` field to suppleant `Fire$get_data()` and friends. It
+  provides direct acces to the global data store
 
 # fiery 1.2.1
 

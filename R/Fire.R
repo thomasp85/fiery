@@ -540,6 +540,14 @@ Fire <- R6Class('Fire',
       }
       private$pluginList
     },
+    #' @field data_store Access the environment that holds the global data store
+    data_store = function(value) {
+      if (missing(value)) return(private$data)
+      if (!identical(private$data, value)) {
+        cli::cli_abort("It is not allowed to replace the data store")
+      }
+      private$data <- value
+    },
     #' @field root The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`
     root = function(path) {
       if (missing(path)) return(private$ROOT)
