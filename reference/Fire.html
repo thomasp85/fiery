@@ -158,6 +158,10 @@ object is desired, use the <code>clone()</code> method.</p>
 <dd><p>A named list of the already attached plugins. <strong>Read Only</strong> - can only be modified using the <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code> method.</p></dd>
 
 
+<dt><code>data_store</code></dt>
+<dd><p>Access the environment that holds the global data store</p></dd>
+
+
 <dt><code>root</code></dt>
 <dd><p>The location of the app. Setting this will remove the root value from requests (or decline them with <code>400</code> if the request does not match the root). E.g. the path of a request will be changed from <code>/demo/test</code> to <code>/test</code> if <code>root == '/demo'</code></p></dd>
 
@@ -205,6 +209,7 @@ object is desired, use the <code>clone()</code> method.</p>
 <li><p><a href="#method-Fire-set_logger"><code>Fire$set_logger()</code></a></p></li>
 <li><p><a href="#method-Fire-log"><code>Fire$log()</code></a></p></li>
 <li><p><a href="#method-Fire-is_running"><code>Fire$is_running()</code></a></p></li>
+<li><p><a href="#method-Fire-safe_call"><code>Fire$safe_call()</code></a></p></li>
 <li><p><a href="#method-Fire-test_request"><code>Fire$test_request()</code></a></p></li>
 <li><p><a href="#method-Fire-test_header"><code>Fire$test_header()</code></a></p></li>
 <li><p><a href="#method-Fire-test_message"><code>Fire$test_message()</code></a></p></li>
@@ -268,7 +273,9 @@ object is desired, use the <code>clone()</code> method.</p>
 
 
 <dt><code>showcase</code></dt>
-<dd><p>Should the default browser open up at the server address</p></dd>
+<dd><p>Should the default browser open up at the server address.
+If <code>TRUE</code> then a browser opens at the root of the app. If a string the
+string is used as a path to add to the root before opening</p></dd>
 
 
 <dt><code>...</code></dt>
@@ -522,13 +529,17 @@ object is desired, use the <code>clone()</code> method.</p>
 <h3 id="method-attach-">Method <code><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach()</a></code><a class="anchor" aria-label="anchor" href="#method-attach-"></a></h3>
 <p>Attach a plugin to the app. See the <a href="https://fiery.data-imaginist.com/articles/plugins.html"><em>Creating and using fiery plugins</em> vignette</a> for more information</p><div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span>, <span class="va">...</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="kw">attach</span><span class="op">(</span><span class="va">plugin</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, force <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>plugin</code></dt>
 <dd><p>The plugin to attach</p></dd>
+
+
+<dt><code>name</code></dt>
+<dd><p>Optional name for the plugin. If omitted <code>plugin$name</code> will be used instead</p></dd>
 
 
 <dt><code>...</code></dt>
@@ -802,7 +813,15 @@ object is desired, use the <code>clone()</code> method.</p>
 <h3 id="method-log-">Method <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code><a class="anchor" aria-label="anchor" href="#method-log-"></a></h3>
 <p>Log a message with the logger attached to the app. See <a href="loggers.html">loggers</a> for build in functionality</p><div class="section">
 <h4 id="usage-29">Usage<a class="anchor" aria-label="anchor" href="#usage-29"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">log</span><span class="op">(</span><span class="va">event</span>, <span class="va">message</span>, request <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">log</span><span class="op">(</span></span>
+<span>  <span class="va">event</span>,</span>
+<span>  <span class="va">message</span>,</span>
+<span>  request <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  .logcall <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.call</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  .topcall <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">sys.call</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>  .topenv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -823,6 +842,18 @@ object is desired, use the <code>clone()</code> method.</p>
 <dd><p>Additional arguments passed on to the logger.</p></dd>
 
 
+<dt><code>.logcall</code></dt>
+<dd><p>The call that send the log request</p></dd>
+
+
+<dt><code>.topcall</code></dt>
+<dd><p>The call in which <code>.logcall</code> is called from</p></dd>
+
+
+<dt><code>.topenv</code></dt>
+<dd><p>The environment associated with <code>.topcall</code></p></dd>
+
+
 </dl><p></p></div>
 </div>
 
@@ -834,27 +865,37 @@ object is desired, use the <code>clone()</code> method.</p>
 </div>
 
 
-</div><p></p><hr><a id="method-Fire-test_request"></a><div class="section">
-<h3 id="method-test-request-">Method <code>test_request()</code><a class="anchor" aria-label="anchor" href="#method-test-request-"></a></h3>
-<p>Send a request directly to the request logic of a non-running app. Only intended for testing the request logic</p><div class="section">
+</div><p></p><hr><a id="method-Fire-safe_call"></a><div class="section">
+<h3 id="method-safe-call-">Method <code>safe_call()</code><a class="anchor" aria-label="anchor" href="#method-safe-call-"></a></h3>
+<p>Evaluate an expression safely, logging any errors, warnings,
+or messages that bubbles up</p><div class="section">
 <h4 id="usage-31">Usage<a class="anchor" aria-label="anchor" href="#usage-31"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_request</span><span class="op">(</span><span class="va">request</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">safe_call</span><span class="op">(</span><span class="va">expr</span>, request <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-28">Arguments<a class="anchor" aria-label="anchor" href="#arguments-28"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>request</code></dt>
-<dd><p>The request to send</p></dd>
+<p></p><div class="arguments"><dl><dt><code>expr</code></dt>
+<dd><p>An expression to evaluate</p></dd>
+
+
+<dt><code>request</code></dt>
+<dd><p>The request under evaluation, if any. Used in logging</p></dd>
 
 
 </dl><p></p></div>
 </div>
+<div class="section">
+<h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
+<p>The value of the expression. If an error is caught, the condition
+object is returned instead</p>
+</div>
 
-</div><p></p><hr><a id="method-Fire-test_header"></a><div class="section">
-<h3 id="method-test-header-">Method <code>test_header()</code><a class="anchor" aria-label="anchor" href="#method-test-header-"></a></h3>
-<p>Send a request directly to the header logic of a non-running app. Only intended for testing the request logic</p><div class="section">
+</div><p></p><hr><a id="method-Fire-test_request"></a><div class="section">
+<h3 id="method-test-request-">Method <code>test_request()</code><a class="anchor" aria-label="anchor" href="#method-test-request-"></a></h3>
+<p>Send a request directly to the request logic of a non-running app. Only intended for testing the request logic</p><div class="section">
 <h4 id="usage-32">Usage<a class="anchor" aria-label="anchor" href="#usage-32"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_header</span><span class="op">(</span><span class="va">request</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_request</span><span class="op">(</span><span class="va">request</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -866,15 +907,31 @@ object is desired, use the <code>clone()</code> method.</p>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Fire-test_message"></a><div class="section">
-<h3 id="method-test-message-">Method <code>test_message()</code><a class="anchor" aria-label="anchor" href="#method-test-message-"></a></h3>
-<p>Send a message directly <strong>to</strong> the message logic of a non-running app. Only intended for testing the websocket logic</p><div class="section">
+</div><p></p><hr><a id="method-Fire-test_header"></a><div class="section">
+<h3 id="method-test-header-">Method <code>test_header()</code><a class="anchor" aria-label="anchor" href="#method-test-header-"></a></h3>
+<p>Send a request directly to the header logic of a non-running app. Only intended for testing the request logic</p><div class="section">
 <h4 id="usage-33">Usage<a class="anchor" aria-label="anchor" href="#usage-33"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_message</span><span class="op">(</span><span class="va">request</span>, <span class="va">binary</span>, <span class="va">message</span>, withClose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_header</span><span class="op">(</span><span class="va">request</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-30">Arguments<a class="anchor" aria-label="anchor" href="#arguments-30"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>request</code></dt>
+<dd><p>The request to send</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Fire-test_message"></a><div class="section">
+<h3 id="method-test-message-">Method <code>test_message()</code><a class="anchor" aria-label="anchor" href="#method-test-message-"></a></h3>
+<p>Send a message directly <strong>to</strong> the message logic of a non-running app. Only intended for testing the websocket logic</p><div class="section">
+<h4 id="usage-34">Usage<a class="anchor" aria-label="anchor" href="#usage-34"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_message</span><span class="op">(</span><span class="va">request</span>, <span class="va">binary</span>, <span class="va">message</span>, withClose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-31">Arguments<a class="anchor" aria-label="anchor" href="#arguments-31"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>request</code></dt>
 <dd><p>The request to use to establish the connection</p></dd>
 
@@ -897,12 +954,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-test_websocket"></a><div class="section">
 <h3 id="method-test-websocket-">Method <code>test_websocket()</code><a class="anchor" aria-label="anchor" href="#method-test-websocket-"></a></h3>
 <p>Send a message directly <strong>from</strong> a non-running app. Only intended for testing the websocket logic</p><div class="section">
-<h4 id="usage-34">Usage<a class="anchor" aria-label="anchor" href="#usage-34"></a></h4>
+<h4 id="usage-35">Usage<a class="anchor" aria-label="anchor" href="#usage-35"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">test_websocket</span><span class="op">(</span><span class="va">request</span>, <span class="va">message</span>, close <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-31">Arguments<a class="anchor" aria-label="anchor" href="#arguments-31"></a></h4>
+<h4 id="arguments-32">Arguments<a class="anchor" aria-label="anchor" href="#arguments-32"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>request</code></dt>
 <dd><p>The request to use to establish the connection</p></dd>
 
@@ -921,12 +978,12 @@ object is desired, use the <code>clone()</code> method.</p>
 </div><p></p><hr><a id="method-Fire-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-35">Usage<a class="anchor" aria-label="anchor" href="#usage-35"></a></h4>
+<h4 id="usage-36">Usage<a class="anchor" aria-label="anchor" href="#usage-36"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Fire</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-32">Arguments<a class="anchor" aria-label="anchor" href="#arguments-32"></a></h4>
+<h4 id="arguments-33">Arguments<a class="anchor" aria-label="anchor" href="#arguments-33"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
