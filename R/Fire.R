@@ -772,6 +772,10 @@ Fire <- R6Class('Fire',
       response
     },
     header_logic = function(req) {
+      # Short-circuit if no header handlers exist
+      if (is.null(private$handlers[["header"]])) {
+        return(NULL)
+      }
       start_time <- Sys.time()
       request <- self$safe_call(private$mount_request(req), Request$new(req))
       if (is_condition(request)) {
