@@ -124,7 +124,11 @@ logger_null <- function() {
   function(event, message, request = NULL, time = Sys.time(), ...) {
     if (event %in% c('error', 'warning', 'message')) {
       if (is_condition(message)) {
-        print(upgrade_condition(message))
+        message <- upgrade_condition(message)
+        cat(
+          if (is_error(message)) format(message) else cnd_message(message, prefix = TRUE),
+          file = if (is_warning(message)) stderr() else stdout()
+        )
       } else {
         for (m in message) {
           cli::cli_inform("{.strong {event}}: {m}")
@@ -233,9 +237,10 @@ logger_switch <- function(..., default = logger_null()) {
 logger_logger <- function(default_level = "INFO") {
   check_installed("logger")
   default_level <- logger::as.loglevel(default_level)
-  function(event, message, request = NULL, time = Sys.time(), .logcall, .topcall, .topenv, ...) {
+  function(event, message, request = NULL, time = Sys.time(), .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame(), ...) {
     if (is_string(event)) {
       level <- switch(
+        event,
         request = logger::SUCCESS,
         websocket = logger::SUCCESS,
         message = logger::INFO,
@@ -251,7 +256,7 @@ logger_logger <- function(default_level = "INFO") {
     }
     msg <- as_log_message(message)
     for (m in msg) {
-      logger::log_level(event, m, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv)
+      logger::log_level(level, m, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv)
     }
   }
 }
@@ -279,11 +284,21 @@ glue_log <- function(.data, ..., .envir = parent.frame()) {
 
 as_log_message <- function(message) {
   if (is_condition(message)) {
-    message <- cnd_message(message)
-  } else if (length(message) > 1) {
-    message <- format_error_bullets(x)
+    msg <- cnd_message(message)
+    msg <- unlist(stringi::stri_split_fixed(msg, "\n"))
+    if (!is.null(message$instance)) {
+      msg <- c(
+        paste0(" <instance ", message$instance, ">"),
+        msg,
+        "</instance>"
+      )
+    }
+    msg
+  } else {
+    unlist(
+      stringi::stri_split_fixed(format_error_bullets(message), "\n")
+    )
   }
-  unlist(stringi::stri_split_fixed(message, "\n"))
 }
 
 upgrade_condition <- function(cnd) {
