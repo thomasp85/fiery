@@ -41,7 +41,16 @@ test_that("switch logger works", {
     expect_match(logs[1], "error: error test")
 })
 
-test_that("%||% works", {
-    expect_equal(NULL %||% 10, 10)
-    expect_equal(20 %||% 10, 20)
+test_that("logger logger works", {
+    skip_on_cran()
+    skip_if_not_installed("logger")
+    logger <- logger_logger()
+    logger::log_layout(logger::layout_glue_generator(
+        '{level} [2025-02-26 08:18:18] {msg}}'
+    ))
+    req <- reqres::Request$new(fake_request('www.example.com'))
+    expect_snapshot(logger('error', 'error test'))
+    expect_snapshot(logger('warning', 'warning test'))
+    expect_snapshot(logger('info', 'info test'))
+    expect_snapshot(logger('request', 'request test', req))
 })
