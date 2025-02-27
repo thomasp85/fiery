@@ -10,6 +10,7 @@
 * `Fire$log()` now supports passing in a condition as message
 * Added `Fire$data_store` field to suppleant `Fire$get_data()` and friends. It
   provides direct acces to the global data store
+* Allow naming plugins when they are attached
 
 # fiery 1.2.1
 

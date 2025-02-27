@@ -285,11 +285,12 @@ Fire <- R6Class('Fire',
     },
     #' @description Attach a plugin to the app. See the [*Creating and using fiery plugins* vignette](https://fiery.data-imaginist.com/articles/plugins.html) for more information
     #' @param plugin The plugin to attach
+    #' @param name Optional name for the plugin. If omitted `plugin$name` will be used instead
     #' @param ... Arguments to pass into the plugins `on_attach()` method
     #' @param force If the plugin has already been attached an error is thrown, unless `force = TRUE` which tells the app to reattach it
-    attach = function(plugin, ..., force = FALSE) {
-      name <- plugin$name
-      check_string(name, arg = 'plugin$name')
+    attach = function(plugin, name = NULL, ..., force = FALSE) {
+      name <- name %||% plugin$name
+      check_string(name)
 
       if (!force && self$has_plugin(name)) {
         cli::cli_abort(c(
