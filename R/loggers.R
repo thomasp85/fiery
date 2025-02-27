@@ -296,7 +296,7 @@ as_log_message <- function(message) {
     msg
   } else {
     unlist(
-      stringi::stri_split_fixed(format_error_bullets(message), "\n")
+      stringi::stri_split_fixed(cli::format_bullets_raw(message), "\n")
     )
   }
 }
