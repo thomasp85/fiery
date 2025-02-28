@@ -95,7 +95,7 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #'
 #' @param method The request type (get, post, put, etc). Defaults to `"get"`
 #'
-#' @param appLocation A string giving the first part of the url path that should
+#' @param app_location A string giving the first part of the url path that should
 #' be stripped from the path
 #'
 #' @param content The content of the request, either a raw vector or a string
@@ -103,6 +103,8 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #' @param headers A list of name-value pairs that defines the request headers
 #'
 #' @param ... Additional name-value pairs that should be added to the request
+#'
+#' @param remote_address The IP address of the presumed sender
 #'
 #' @return A Rook-compliant environment
 #'
@@ -129,7 +131,7 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #' rm(req)
 #' gc()
 #'
-fake_request <- function(url, method = 'get', appLocation = '', content = '', headers = list(), ..., REMOTE_ADDR = "123.123.123.123") {
+fake_request <- function(url, method = 'get', app_location = '', content = '', headers = list(), ..., remote_address = "123.123.123.123") {
   rook <- new.env(parent = emptyenv())
   rook$REQUEST_METHOD <- toupper(method)
 
@@ -138,16 +140,16 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
   rook$rook.url_scheme <- url$scheme
   rook$SERVER_NAME <- url$domain
   rook$SERVER_PORT <- url$port
-  if (appLocation != '') {
-    appLocation <- sub('/$', '', appLocation)
-    appLocReg <- paste0('^', appLocation)
+  if (app_location != '') {
+    app_location <- sub('/$', '', app_location)
+    appLocReg <- paste0('^', app_location)
     if (!grepl(appLocReg, url$path)) {
-      cli::cli_abort('{.arg appLocation} must correspond to the beginning of the path')
+      cli::cli_abort('{.arg app_location} must correspond to the beginning of the path')
     }
-    rook$SCRIPT_NAME <- appLocation
+    rook$SCRIPT_NAME <- app_location
     url$path <- sub(appLocReg, '', url$path)
   } else {
-    rook$SCRIPT_NAME <- appLocation
+    rook$SCRIPT_NAME <- app_location
   }
   rook$PATH_INFO <- url$path
   rook$QUERY_STRING <- url$query
@@ -156,7 +158,7 @@ fake_request <- function(url, method = 'get', appLocation = '', content = '', he
   rook$httpuv.version <- packageVersion('httpuv')
   rook$rook.version <- "1.1-0"
   rook$REMOTE_PORT <- paste(sample(0:9, 5, TRUE), collapse = '')
-  rook$REMOTE_ADDR <- REMOTE_ADDR
+  rook$REMOTE_ADDR <- remote_address
 
   # Headers
   if (length(headers) > 0) {

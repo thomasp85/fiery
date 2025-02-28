@@ -7,10 +7,11 @@
 fake_request(
   url,
   method = "get",
-  appLocation = "",
+  app_location = "",
   content = "",
   headers = list(),
-  ...
+  ...,
+  remote_address = "123.123.123.123"
 )
 }
 \arguments{
@@ -18,7 +19,7 @@ fake_request(
 
 \item{method}{The request type (get, post, put, etc). Defaults to \code{"get"}}
 
-\item{appLocation}{A string giving the first part of the url path that should
+\item{app_location}{A string giving the first part of the url path that should
 be stripped from the path}
 
 \item{content}{The content of the request, either a raw vector or a string}
@@ -26,6 +27,8 @@ be stripped from the path}
 \item{headers}{A list of name-value pairs that defines the request headers}
 
 \item{...}{Additional name-value pairs that should be added to the request}
+
+\item{remote_address}{The IP address of the presumed sender}
 }
 \value{
 A Rook-compliant environment
