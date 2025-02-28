@@ -445,7 +445,7 @@
            x
         1. \-app$test_request(req)
         2.   \-private$request_logic(request) at fiery/R/Fire.R:488:7
-        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:740:7
+        3.     +-self$safe_call(private$mount_request(req), private$new_req(req)) at fiery/R/Fire.R:784:7
         4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
@@ -467,14 +467,14 @@
            x
         1. \-app$test_header(req)
         2.   \-private$header_logic(request) at fiery/R/Fire.R:493:7
-        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:788:7
+        3.     +-self$safe_call(private$mount_request(req), private$new_req(req)) at fiery/R/Fire.R:832:7
         4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
         7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
         8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
         9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(req) at fiery/R/Fire.R:788:7
+       10.     \-private$mount_request(req) at fiery/R/Fire.R:832:7
 
 ---
 
@@ -489,7 +489,7 @@
            x
         1. \-app$test_websocket(req, "test")
         2.   \-private$websocket_logic(ws) at fiery/R/Fire.R:522:7
-        3.     +-self$safe_call(private$mount_request(ws$request), Request$new(ws$request)) at fiery/R/Fire.R:833:7
+        3.     +-self$safe_call(private$mount_request(ws$request), private$new_req(ws$request)) at fiery/R/Fire.R:877:7
         4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)

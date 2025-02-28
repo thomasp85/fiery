@@ -498,7 +498,7 @@ Fire <- R6Class('Fire',
     #' @param message The message to send. If `binary = FALSE` a character vector, if `binary = TRUE` a raw vector
     #' @param withClose Should the websocket connection be closed at the end by the client
     test_message = function(request, binary, message, withClose = TRUE) {
-      req <- Request$new(request)
+      req <- private$new_req(request)
       id <- private$client_id(req)
       message_fun <- private$message_logic(id, req)
       message_fun(binary, message)
@@ -520,8 +520,8 @@ Fire <- R6Class('Fire',
         close = function() {message('closing')}
       )
       private$websocket_logic(ws)
-      self$send(message, private$client_id(Request$new(request)))
-      if (close) private$close_ws(private$client_id(Request$new(request)))
+      self$send(message, private$client_id(private$new_req(request)))
+      if (close) private$close_ws(private$client_id(private$new_req(request)))
     }
   ),
   active = list(
@@ -583,6 +583,47 @@ Fire <- R6Class('Fire',
       if (missing(format)) return(private$ACCESS_LOG_FORMAT)
       check_string(format)
       private$ACCESS_LOG_FORMAT <- format
+    },
+    #' @field key The encryption key to use for request/response encryption
+    #'
+    key = function(value) {
+      if (missing(value)) {
+        cli::cli_abort("{.arg key} can only be set, not retrieved")
+      }
+      if (!is.null(key)) {
+        if (is_string(value)) {
+          value <- sodium::hex2bin(value)
+          if (length(value) == 0) {
+            cli::cli_abort("Malformed key. If given as a string it must be hexadecimal encoded")
+          }
+        }
+        if (!is.raw(value)) {
+          cli::cli_abort("Malformed key. It must be provided as either a string, a raw vector or NULL")
+        }
+        if (length(value) != 32) {
+          cli::cli_abort("Malformed key. The key must be 32 bit")
+        }
+      }
+      private$KEY <- value
+    },
+    #' @field session_cookie_settings Get or set the session cookie settings
+    #'
+    session_cookie_settings = function(value) {
+      if (missing(value)) return(private$SESSION_COOKIE)
+      if (!reqres::is_session_cookie_settings(value)) {
+        cli::cli_abort(c(
+          "{.arg session_cookie_settings} can only be set to a valid settings object",
+          "i" = "Construct one using {.fun reqres::session_cookie}"
+        ))
+      }
+      private$SESSION_COOKIE <- value
+    },
+    #' @field trust A logical indicating whether incoming requests are trusted.
+    #'
+    trust = function(value) {
+      if (missing(value)) return(private$TRUST)
+      check_bool(value)
+      private$TRUST <- value
     }
   ),
   private = list(
@@ -594,6 +635,9 @@ Fire <- R6Class('Fire',
     TRIGGERDIR = NULL,
     ROOT = '',
     ACCESS_LOG_FORMAT = common_log_format,
+    KEY = NULL,
+    SESSION_COOKIE = NULL,
+    TRUST = FALSE,
 
     running = FALSE,
     quitting = FALSE,
@@ -737,14 +781,14 @@ Fire <- R6Class('Fire',
     },
     request_logic = function(req) {
       start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), Request$new(req))
+      request <- self$safe_call(private$mount_request(req), private$new_req(req))
       if (is_condition(request)) {
-        req <- Request$new(req)
+        req <- private$new_req(req)
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
       } else {
-        req <- Request$new(request)
+        req <- private$new_req(request)
         id <- private$client_id(req)
         args <- unlist(
           unname(private$p_trigger('before-request', server = self, id = id, request = req, .request = req)),
@@ -785,14 +829,14 @@ Fire <- R6Class('Fire',
         return(NULL)
       }
       start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), Request$new(req))
+      request <- self$safe_call(private$mount_request(req), private$new_req(req))
       if (is_condition(request)) {
-        req <- Request$new(req)
+        req <- private$new_req(req)
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
       } else {
-        req <- Request$new(request)
+        req <- private$new_req(request)
         id <- private$client_id(req)
         response <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
         problems <- vapply(response, reqres::is_reqres_problem, logical(1))
@@ -830,12 +874,12 @@ Fire <- R6Class('Fire',
       response
     },
     websocket_logic = function(ws) {
-      request <- self$safe_call(private$mount_request(ws$request), Request$new(ws$request))
+      request <- self$safe_call(private$mount_request(ws$request), private$new_req(ws$request))
       if (is_condition(request)) {
         ws$close()
         return()
       } else {
-        req <- Request$new(request)
+        req <- private$new_req(request)
       }
       id <- private$client_id(req)
       assign(id, ws, envir = private$websockets)
@@ -944,6 +988,9 @@ Fire <- R6Class('Fire',
     open_browser = function(path = "") {
       url <- paste0('http://', private$HOST, ':', private$PORT, '/', sub("^/", "", path))
       browseURL(url)
+    },
+    new_req = function(request) {
+      Request$new(request, trust = private$TRUST, key = private$KEY, session_cookie = private$SESSION_COOKIE)
     }
   )
 )
