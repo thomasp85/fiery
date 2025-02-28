@@ -2,7 +2,6 @@
 NULL
 
 #' @importFrom R6 R6Class
-#' @importFrom uuid UUIDgenerate
 #' @importFrom future future resolved value
 #'
 FutureStack <- R6Class('FutureStack',
@@ -16,7 +15,7 @@ FutureStack <- R6Class('FutureStack',
       if (!substituted) {
         expr <- substitute(expr)
       }
-      id <- UUIDgenerate()
+      id <- reqres::random_key()
       private$futures[[id]] <- private$make_future(expr, then, ...)
       private$ids <- append(private$ids, id)
       invisible(id)

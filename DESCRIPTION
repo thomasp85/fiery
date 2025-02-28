@@ -29,8 +29,7 @@ Imports:
     rlang (>= 1.1.0),
     stats,
     stringi,
-    utils,
-    uuid
+    utils
 Suggests:
     covr,
     knitr,

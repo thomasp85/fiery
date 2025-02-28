@@ -31,7 +31,6 @@ NULL
 #'
 #' @importFrom R6 R6Class
 #' @importFrom httpuv startServer service startDaemonizedServer stopDaemonizedServer stopServer
-#' @importFrom uuid UUIDgenerate
 #' @importFrom utils browseURL
 #' @importFrom later later
 #' @importFrom stats setNames
@@ -198,7 +197,7 @@ Fire <- R6Class('Fire',
       if (!is.null(id) && id %in% names(private$handlerMap)) {
         cli::cli_abort("{.arg id} must be unique. A handler with this id has already been added")
       }
-      handlerId <- id %||% UUIDgenerate()
+      handlerId <- id %||% reqres::random_key()
       private$handlerMap[[handlerId]] <- event
       private$add_handler(event, handler, pos, handlerId)
 
