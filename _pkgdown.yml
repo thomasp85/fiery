@@ -69,5 +69,13 @@ reference:
       A central part of many servers is the router that takes care of recieving
       requests and directing them at the right handlers for further processing.
       Being the minimal server framework that it is, fiery doesn't include
-      router functionality itself, but the
-      [routr](https://github.com/thomasp85/routr) package.
+      routing functionality itself. An option is the
+      [routr](https://github.com/thomasp85/routr) package which is build to work
+      together with fiery as a plugin.
+  - title: Helpers
+    desc: >
+      Most functionality is available to the user through the Fire object or
+      loggers. Any additional helper functions provided by fiery is documented
+      here.
+    contents:
+      - session_id_cookie

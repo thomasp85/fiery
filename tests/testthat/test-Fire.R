@@ -108,9 +108,11 @@ test_that('id converter can be set and gets called', {
     app$on('request', function(server, id, ...) {
         server$set_data('id', id)
     })
-    request <- fake_request('http://www.example.com', REMOTE_ADDR = '127.0.0.1')
+    request <- fake_request('http://www.example.com', headers = list(
+        Cookie = "fiery_id=abcd"
+    ))
     app$test_request(request)
-    expect_equal(app$get_data('id'), client_to_id(reqres::Request$new(request)))
+    expect_equal(app$get_data('id'), session_id_cookie()(reqres::Request$new(request)))
 
     app$set_client_id_converter(function(request) {
         10
@@ -445,11 +447,11 @@ test_that('websockets are attached, and removed', {
     expect_null(app$get_data('send'))
     expect_snapshot(app$test_websocket(req, 'test', FALSE))
     expect_true(app$get_data('send'))
-    expect_snapshot(app$send('keep testing', client_to_id(req)))
+    expect_snapshot(app$send('keep testing', session_id_cookie()(reqres::Request$new(req))))
     expect_snapshot(app$send('keep testing again'))
-    expect_snapshot(app$close_ws_con(client_to_id(req)))
-    expect_silent(app$close_ws_con(client_to_id(req)))
-    expect_silent(app$send('keep testing', client_to_id(req)))
+    expect_snapshot(app$close_ws_con(session_id_cookie()(reqres::Request$new(req))))
+    expect_silent(app$close_ws_con(session_id_cookie()(reqres::Request$new(req))))
+    expect_silent(app$send('keep testing', session_id_cookie()(reqres::Request$new(req))))
     expect_silent(app$send('keep testing again'))
 })
 
@@ -467,6 +469,7 @@ test_that('showcase opens a browser', {
 
 test_that('global headers are assigned and used', {
     app <- standard_app()
+    app$set_client_id_converter(function(request) NULL)
     app$header('X-Powered-By', 'fiery')
     app$header('X-XSS-Protection', '1; mode=block')
     app$on('request', function(request, ...) {
@@ -511,7 +514,6 @@ test_that('app can be mounted at path', {
     expect_equal(res$status, 400L)
     req <- fake_request('http://example.com/testing')
     expect_snapshot(app$test_websocket(req, 'test'))
-    options(old_opt)
 })
 
 test_that("Logging can be configured", {
@@ -525,7 +527,7 @@ test_that("Logging can be configured", {
     expect_snapshot(res <- app$trigger('test'))
 
     app$access_log_format <- old_format
-    expect_snapshot(res <- app$test_request(fake_request('www.example.com/path', REMOTE_ADDR = 'test')))
+    expect_snapshot(res <- app$test_request(fake_request('www.example.com/path', headers = list(Cookie = "fiery_id=ID_test"))))
 })
 
 test_that('is_running works', {

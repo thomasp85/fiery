@@ -12,7 +12,9 @@
   provides direct acces to the global data store
 * Allow naming plugins when they are attached
 * `showcase` in `Fire$ignite()`/`Fire$run()` can now take a string giving the
-  path to open the browser at
+  path to open the browser at.
+* Improve the default session id handling and added `session_id_cookie()` helper
+  function for constructing session ID extractor
 
 # fiery 1.2.1
 

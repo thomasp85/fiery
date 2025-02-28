@@ -374,7 +374,7 @@
 ---
 
     Code
-      app$send("keep testing", client_to_id(req))
+      app$send("keep testing", session_id_cookie()(reqres::Request$new(req)))
     Message
       keep testing
 
@@ -388,7 +388,7 @@
 ---
 
     Code
-      app$close_ws_con(client_to_id(req))
+      app$close_ws_con(session_id_cookie()(reqres::Request$new(req)))
     Message
       closing
 
@@ -445,7 +445,7 @@
            x
         1. \-app$test_request(req)
         2.   \-private$request_logic(request) at fiery/R/Fire.R:488:7
-        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:739:7
+        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:740:7
         4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
@@ -467,14 +467,14 @@
            x
         1. \-app$test_header(req)
         2.   \-private$header_logic(request) at fiery/R/Fire.R:493:7
-        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:787:7
+        3.     +-self$safe_call(private$mount_request(req), Request$new(req)) at fiery/R/Fire.R:788:7
         4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
         7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
         8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
         9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(req) at fiery/R/Fire.R:787:7
+       10.     \-private$mount_request(req) at fiery/R/Fire.R:788:7
 
 ---
 
@@ -488,8 +488,8 @@
       Backtrace:
            x
         1. \-app$test_websocket(req, "test")
-        2.   \-private$websocket_logic(ws) at fiery/R/Fire.R:521:7
-        3.     +-self$safe_call(private$mount_request(ws$request), Request$new(ws$request)) at fiery/R/Fire.R:832:7
+        2.   \-private$websocket_logic(ws) at fiery/R/Fire.R:522:7
+        3.     +-self$safe_call(private$mount_request(ws$request), Request$new(ws$request)) at fiery/R/Fire.R:833:7
         4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
         5.     |   +-base::tryCatch(...)
         6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
@@ -510,9 +510,11 @@
 ---
 
     Code
-      res <- app$test_request(fake_request("www.example.com/path", REMOTE_ADDR = "test"))
+      res <- app$test_request(fake_request("www.example.com/path", headers = list(
+        Cookie = "fiery_id=ID_test")))
     Output
-      request: test - ID_test [29/Jan/2025:08:17:44 +0100] "GET /path HTTP/1.1" 404 0
+      request: 123.123.123.123 - ID_test [29/Jan/2025:08:17:44 +0100] "GET /path HTTP/1.1" 404
+      request: 0
 
 # is_running works
 

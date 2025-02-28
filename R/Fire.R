@@ -107,7 +107,7 @@ Fire <- R6Class('Fire',
       private$data <- new.env(parent = emptyenv())
       private$handlers <- new.env(parent = emptyenv())
       private$websockets <- new.env(parent = emptyenv())
-      private$client_id <- client_to_id
+      private$client_id <- session_id_cookie()
       private$DELAY <- DelayStack$new(self)
       private$TIME <- TimeStack$new(self)
       private$ASYNC <- AsyncStack$new(self)
@@ -498,11 +498,12 @@ Fire <- R6Class('Fire',
     #' @param message The message to send. If `binary = FALSE` a character vector, if `binary = TRUE` a raw vector
     #' @param withClose Should the websocket connection be closed at the end by the client
     test_message = function(request, binary, message, withClose = TRUE) {
-      id <- private$client_id(request)
-      message_fun <- private$message_logic(id, request)
+      req <- Request$new(request)
+      id <- private$client_id(req)
+      message_fun <- private$message_logic(id, req)
       message_fun(binary, message)
       if (withClose) {
-        close_fun <- private$close_ws_logic(id, request)
+        close_fun <- private$close_ws_logic(id, req)
         close_fun()
       }
     },
@@ -519,8 +520,8 @@ Fire <- R6Class('Fire',
         close = function() {message('closing')}
       )
       private$websocket_logic(ws)
-      self$send(message, private$client_id(request))
-      if (close) private$close_ws(private$client_id(request))
+      self$send(message, private$client_id(Request$new(request)))
+      if (close) private$close_ws(private$client_id(Request$new(request)))
     }
   ),
   active = list(
@@ -844,6 +845,8 @@ Fire <- R6Class('Fire',
       ws$onClose(private$close_ws_logic(id, req))
     },
     message_logic = function(id, request) {
+      force(id)
+      force(request)
       function(binary, msg) {
         start <- Sys.time()
         args <- unlist(
@@ -868,6 +871,8 @@ Fire <- R6Class('Fire',
       }
     },
     close_ws_logic = function(id, request) {
+      force(id)
+      force(request)
       function() {
         private$p_trigger('websocket-closed', server = self, id = id, request = request, .request = request)
         self$log('websocket', paste0('connection to ', id, ' closed from the client'), request)
