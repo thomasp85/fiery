@@ -27,6 +27,7 @@ Imports:
     R6,
     reqres (>= 0.2.5.9000),
     rlang (>= 1.1.0),
+    sodium,
     stats,
     stringi,
     utils

@@ -104,6 +104,12 @@ app$ignite(showcase = TRUE)
 \item{\code{root}}{The location of the app. Setting this will remove the root value from requests (or decline them with \code{400} if the request does not match the root). E.g. the path of a request will be changed from \verb{/demo/test} to \verb{/test} if \code{root == '/demo'}}
 
 \item{\code{access_log_format}}{A \link[glue:glue]{glue} string defining how requests will be logged. For standard formats see \link{common_log_format} and \link{combined_log_format}. Defaults to the \emph{Common Log Format}}
+
+\item{\code{key}}{The encryption key to use for request/response encryption}
+
+\item{\code{session_cookie_settings}}{Get or set the session cookie settings}
+
+\item{\code{trust}}{A logical indicating whether incoming requests are trusted.}
 }
 \if{html}{\out{</div>}}
 }
