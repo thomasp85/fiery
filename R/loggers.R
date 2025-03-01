@@ -286,6 +286,7 @@ as_log_message <- function(message) {
   if (is_condition(message)) {
     msg <- cnd_message(message)
     msg <- unlist(stringi::stri_split_fixed(msg, "\n"))
+    if (msg[length(msg)] == "") msg <- msg[-length(msg)]
     if (!is.null(message$instance)) {
       msg <- c(
         paste0(" <instance ", message$instance, ">"),
