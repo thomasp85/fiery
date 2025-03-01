@@ -36,6 +36,7 @@ NULL
 #' @importFrom stats setNames
 #' @importFrom reqres Request
 #' @importFrom stringi stri_pad_left
+#' @importFrom sodium hex2bin
 #'
 #' @export
 #'
@@ -591,7 +592,7 @@ Fire <- R6Class('Fire',
       }
       if (!is.null(value)) {
         if (is_string(value)) {
-          value <- sodium::hex2bin(value)
+          value <- hex2bin(value)
           if (length(value) == 0) {
             cli::cli_abort("Malformed key. If given as a string it must be hexadecimal encoded")
           }

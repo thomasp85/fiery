@@ -18,7 +18,6 @@ URL: https://fiery.data-imaginist.com, https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues
 Imports:
     cli,
-    crayon,
     future,
     glue,
     httpuv,
@@ -55,5 +54,5 @@ Collate:
     'import-standalone-types-check.R'
     'zzz.R'
 Config/testthat/edition: 3
-Remotes: 
+Remotes:
     thomasp85/reqres

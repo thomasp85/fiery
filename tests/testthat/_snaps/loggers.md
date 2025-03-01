@@ -19,38 +19,6 @@
     Message
       message: message test
 
----
-
-    Code
-      logger("error", catch_cnd(stop("error test")))
-    Output
-      <error/rlang_error>
-      Error in `force()`:
-      ! error test
-
----
-
-    Code
-      logger("warning", catch_cnd(warning("warning test")))
-
----
-
-    Code
-      logger("message", catch_cnd(message("message test")))
-    Output
-      Message in `message()`:
-      message test
-
----
-
-    Code
-      logger("info", catch_cnd(cnd("info", message = "info test")))
-
----
-
-    Code
-      logger("error", catch_cnd(reqres::abort_bad_request("http problem", instance = "test")))
-
 # console logger works
 
     Code
@@ -78,6 +46,41 @@
       logger("request", "request test", req)
     Output
       request: request test
+
+---
+
+    Code
+      logger("error", catch_cnd(stop("error test")))
+    Output
+      error: error test
+
+---
+
+    Code
+      logger("warning", catch_cnd(warning("warning test")))
+    Output
+      warning: warning test
+
+---
+
+    Code
+      logger("message", catch_cnd(message("message test")))
+    Output
+      message: message test
+
+---
+
+    Code
+      logger("info", catch_cnd(cnd("info", message = "info test")))
+
+---
+
+    Code
+      logger("error", catch_cnd(reqres::abort_bad_request("http problem", instance = "test")))
+    Output
+      error:  <instance test>
+      error: http problem
+      error: </instance>
 
 # switch logger works
 

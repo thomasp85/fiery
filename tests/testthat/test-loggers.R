@@ -4,11 +4,6 @@ test_that("null logger works", {
     expect_snapshot(logger('warning', 'warning test'))
     expect_snapshot(logger('message', 'message test'))
     expect_silent(logger('info', 'info test'))
-    expect_snapshot(logger('error', catch_cnd(stop("error test"))))
-    expect_snapshot(logger('warning', catch_cnd(warning("warning test"))))
-    expect_snapshot(logger('message', catch_cnd(message("message test"))))
-    expect_snapshot(logger('info', catch_cnd(cnd("info", message = "info test"))))
-    expect_snapshot(logger('error', catch_cnd(reqres::abort_bad_request("http problem", instance = "test"))))
 })
 
 test_that("console logger works", {
@@ -19,6 +14,11 @@ test_that("console logger works", {
     expect_snapshot(logger('warning', 'warning test'))
     expect_snapshot(logger('info', 'info test'))
     expect_snapshot(logger('request', 'request test', req))
+    expect_snapshot(logger('error', catch_cnd(stop("error test"))))
+    expect_snapshot(logger('warning', catch_cnd(warning("warning test"))))
+    expect_snapshot(logger('message', catch_cnd(message("message test"))))
+    expect_snapshot(logger('info', catch_cnd(cnd("info", message = "info test"))))
+    expect_snapshot(logger('error', catch_cnd(reqres::abort_bad_request("http problem", instance = "test"))))
 })
 
 test_that("file logger works", {
