@@ -569,4 +569,106 @@ test_that('safe_call catches conditions', {
   expect_snapshot(cnd <- self$safe_call(message('message test')))
 })
 
+test_that("requests are created with the correct settings", {
+    app <- standard_app()
+    req <- fake_request('www.example.com')
+
+    expect_snapshot(app$key, error = TRUE)
+    expect_snapshot(app$key <- 500, error = TRUE)
+    expect_snapshot(app$key <- "xyz", error = TRUE)
+    expect_snapshot(app$key <- "1234", error = TRUE)
+
+    expect_silent(app$key <- reqres::random_key())
+    expect_silent(app$key <- sodium::hex2bin(reqres::random_key()))
+
+    request <- app$.__enclos_env__$private$new_req(req)
+    expect_true(request$has_key)
+
+    expect_silent(app$key <- NULL)
+    request <- app$.__enclos_env__$private$new_req(req)
+    expect_false(request$has_key)
+
+    expect_false(request$trust)
+    app$trust <- TRUE
+    request <- app$.__enclos_env__$private$new_req(req)
+    expect_true(request$trust)
+
+    expect_snapshot(app$session_cookie_settings <- "reqres", error = TRUE)
+    session <- reqres::session_cookie()
+    app$session_cookie_settings <- session
+    expect_equal(app$session_cookie_settings, session)
+    expect_snapshot(request <- app$.__enclos_env__$private$new_req(req))
+    expect_null(request$session_cookie_settings)
+    app$key <- reqres::random_key()
+    expect_silent(request <- app$.__enclos_env__$private$new_req(req))
+    expect_equal(request$session_cookie_settings, session)
+})
+
+test_that("request handlers handle conditions", {
+    req <- fake_request('www.example.com')
+
+    app <- standard_app()
+    app$on("request", function(request, ...) {
+        reqres::abort_bad_request("test")
+    })
+    expect_snapshot(res <- app$test_request(req))
+    expect_equal(res$status, 400L)
+
+    app <- standard_app()
+    app$on("request", function(request, ...) {
+        stop("test")
+    })
+    expect_snapshot(res <- app$test_request(req))
+    expect_equal(res$status, 500L)
+
+    app <- standard_app()
+    app$on("request", function(request, ...) {
+        request$respond()$set_formatter("text/plain" = function(...) stop("test"))
+    })
+    expect_snapshot(res <- app$test_request(req))
+    expect_equal(res$status, 500L)
+})
+
+test_that("header handlers handle conditions", {
+    req <- fake_request('www.example.com')
+
+    app <- standard_app()
+    app$on("header", function(request, ...) {
+        reqres::abort_bad_request("test")
+    })
+    expect_snapshot(res <- app$test_header(req))
+    expect_equal(res$status, 400L)
+
+    app <- standard_app()
+    app$on("header", function(request, ...) {
+        stop("test")
+    })
+    expect_snapshot(res <- app$test_header(req))
+    expect_equal(res$status, 500L)
+
+    app <- standard_app()
+    app$on("header", function(request, ...) {
+        request$respond()$set_formatter("text/plain" = function(...) stop("test"))
+        FALSE
+    })
+    expect_snapshot(res <- app$test_header(req))
+    expect_equal(res$status, 500L)
+})
+
+test_that("static file serving works", {
+    app <- standard_app()
+
+    expect_snapshot(app$serve_static("/static", "test"), error = TRUE)
+    expect_snapshot(app$serve_static("/static", getwd(), headers = 3), error = TRUE)
+    expect_snapshot(app$serve_static("/static", getwd(), headers = list("a" = 4)), error = TRUE)
+
+    app$serve_static("/static", getwd())
+    expect_snapshot(app$serve_static("/static", getwd()))
+
+    expect_snapshot(app$exclude_static(4), error = TRUE)
+    app$exclude_static("/static/test")
+
+    expect_equal(names(app$.__enclos_env__$private$staticList), c("/static", "/static/test"))
+})
+
 options(old_opt)

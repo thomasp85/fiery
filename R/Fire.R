@@ -261,7 +261,7 @@ Fire <- R6Class('Fire',
         stop_input_type(headers, "a named list")
       }
       for (i in names(headers)) {
-        check_string(headers[[i]])
+        check_string(headers[[i]], arg = paste0("headers$", i))
       }
       check_string(validation, allow_null = TRUE)
       if (at %in% names(private$staticList)) {
@@ -589,7 +589,7 @@ Fire <- R6Class('Fire',
       if (missing(value)) {
         cli::cli_abort("{.arg key} can only be set, not retrieved")
       }
-      if (!is.null(key)) {
+      if (!is.null(value)) {
         if (is_string(value)) {
           value <- sodium::hex2bin(value)
           if (length(value) == 0) {
@@ -795,7 +795,6 @@ Fire <- R6Class('Fire',
         )
         res <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args, .request = req)
         problems <- vapply(res, reqres::is_reqres_problem, logical(1))
-        errors <- vapply(res, is_condition, logical(1))
         response <- req$respond()
         if (any(problems)) {
           reqres::handle_problem(response, res[[which(problems)[1]]])
@@ -806,7 +805,7 @@ Fire <- R6Class('Fire',
         response <- self$safe_call(response$as_list(), req)
         # On the off-chance that reqres throws an error during conversion of response
         if (is_condition(response)) {
-          response$status_with_text(500L) # Update the real response first so it gets logged correctly
+          req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
           response <- list(
             status = 500L,
             headers = list("Content-Type" = "text/plain"),
@@ -837,15 +836,20 @@ Fire <- R6Class('Fire',
       } else {
         req <- private$new_req(request)
         id <- private$client_id(req)
-        response <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
-        problems <- vapply(response, reqres::is_reqres_problem, logical(1))
+        res <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
+        problems <- vapply(res, reqres::is_reqres_problem, logical(1))
+        response <- req$respond()
         if (any(problems)) {
           reqres::handle_problem(req$respond(), res[[which(problems)[1]]])
+          res <- FALSE
+        } else if (any(vapply(res, is_condition, logical(1)))) {
+          response$status_with_text(500L)
+          res <- FALSE
         }
-        if (length(response) == 0) {
-          response <- NULL
+        if (length(res) == 0) {
+          res <- NULL
         } else {
-          continue <- tail(response, 1)[[1]]
+          continue <- tail(res, 1)[[1]]
           check_bool(continue)
           if (continue) {
             response <- NULL

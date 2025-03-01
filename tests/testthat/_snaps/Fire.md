@@ -508,3 +508,137 @@
     Output
       message: message test
 
+# requests are created with the correct settings
+
+    Code
+      app$key
+    Condition
+      Error:
+      ! `key` can only be set, not retrieved
+
+---
+
+    Code
+      app$key <- 500
+    Condition
+      Error:
+      ! Malformed key. It must be provided as either a string, a raw vector or NULL
+
+---
+
+    Code
+      app$key <- "xyz"
+    Condition
+      Error:
+      ! Malformed key. If given as a string it must be hexadecimal encoded
+
+---
+
+    Code
+      app$key <- "1234"
+    Condition
+      Error:
+      ! Malformed key. The key must be 32 bit
+
+---
+
+    Code
+      app$session_cookie_settings <- "reqres"
+    Condition
+      Error:
+      ! `session_cookie_settings` can only be set to a valid settings object
+      i Construct one using `reqres::session_cookie()`
+
+---
+
+    Code
+      request <- app$.__enclos_env__$private$new_req(req)
+    Condition
+      Warning:
+      Ignoring `session_cookie` argument when `key` is NULL
+
+# request handlers handle conditions
+
+    Code
+      res <- app$test_request(req)
+    Output
+      error: test
+
+---
+
+    Code
+      res <- app$test_request(req)
+    Output
+      error: test
+
+---
+
+    Code
+      res <- app$test_request(req)
+    Output
+      error: Error formatting the response body
+      error: Caused by error in `self$formatter()`:
+      error: ! test
+
+# header handlers handle conditions
+
+    Code
+      res <- app$test_header(req)
+    Output
+      error: test
+
+---
+
+    Code
+      res <- app$test_header(req)
+    Output
+      error: test
+
+---
+
+    Code
+      res <- app$test_header(req)
+    Output
+      error: Error formatting the response body
+      error: Caused by error in `self$formatter()`:
+      error: ! test
+
+# static file serving works
+
+    Code
+      app$serve_static("/static", "test")
+    Condition
+      Error in `app$serve_static()`:
+      ! `test` does not point to an existing file or directory
+
+---
+
+    Code
+      app$serve_static("/static", getwd(), headers = 3)
+    Condition
+      Error in `app$serve_static()`:
+      ! `headers` must be a named list, not the number 3.
+
+---
+
+    Code
+      app$serve_static("/static", getwd(), headers = list(a = 4))
+    Condition
+      Error in `app$serve_static()`:
+      ! `headers$a` must be a single string, not the number 4.
+
+---
+
+    Code
+      app$serve_static("/static", getwd())
+    Message
+      Overwriting static url path /static
+
+---
+
+    Code
+      app$exclude_static(4)
+    Condition
+      Error in `app$exclude_static()`:
+      ! `at` must be a single string, not the number 4.
+
