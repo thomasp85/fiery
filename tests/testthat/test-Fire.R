@@ -1,7 +1,10 @@
 standard_app <- function(silent = TRUE) {
     app <- Fire$new(port = 49925)
+    logger <- logger_console("{event}: {message}")
     if (!silent) {
-        app$set_logger(logger_console("{event}: {message}"))
+        app$set_logger(logger)
+    } else {
+        app$set_logger(function(event, message, request, ...) if (event %in% c("message", "error", "warning")) logger(event, message,request, ...))
     }
     app$access_log_format <- '{request$ip} - {id} [29/Jan/2025:08:17:44 +0100] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
     app
@@ -502,7 +505,6 @@ test_that('app can be mounted at path', {
     app$test_header(req)
     expect_equal(req$PATH_INFO, '/testing')
     req <- fake_request('http://example.com/test/testing')
-    app$set_logger(logger_null())
     expect_snapshot(app$test_websocket(req, 'test'))
     expect_equal(req$PATH_INFO, '/testing')
 

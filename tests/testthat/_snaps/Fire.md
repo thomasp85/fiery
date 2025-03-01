@@ -303,9 +303,7 @@
     Code
       app$ignite(silent = TRUE, block = FALSE)
     Output
-      <error/rlang_error>
-      Error in `private$handleEnv[[id]]()`:
-      ! Testing an error
+      error: Testing an error
     Code
       later::run_now()
 
@@ -314,9 +312,7 @@
     Code
       app$reignite(silent = TRUE, block = FALSE)
     Output
-      <error/rlang_error>
-      Error in `private$handleEnv[[id]]()`:
-      ! Testing an error
+      error: Testing an error
     Code
       later::run_now()
 
@@ -325,16 +321,14 @@
     Code
       app$ignite(silent = TRUE)
     Output
-      Message in `message()`:
-      10
+      message: 10
 
 ---
 
     Code
       app$ignite(silent = TRUE)
     Output
-      Message in `message()`:
-      10
+      message: 10
 
 ---
 
@@ -343,22 +337,21 @@
     Message
       Fire started at <127.0.0.1:49925>
     Output
-      Message in `message()`:
-      10
+      message: 10
 
 # ignite is blocked during run
 
     Code
       app$ignite()
       later::run_now()
-    Message
+    Output
       warning: Server is already running and cannot be started
 
 # external triggers are fired
 
     Code
       app$ignite(silent = TRUE, block = FALSE)
-    Message
+    Output
       warning: External triggers must be an rds file containing a list
     Code
       later::run_now()
@@ -437,66 +430,21 @@
     Code
       res <- app$test_request(req)
     Output
-      <error/rlang_error>
-      Error in `private$mount_request()`:
-      ! URL (/testing) not matching mount point (/test)
-      ---
-      Backtrace:
-           x
-        1. \-app$test_request(req)
-        2.   \-private$request_logic(request) at fiery/R/Fire.R:488:7
-        3.     +-self$safe_call(private$mount_request(req), private$new_req(req)) at fiery/R/Fire.R:784:7
-        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
-        5.     |   +-base::tryCatch(...)
-        6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
-        7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
-        9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(req) at fiery/R/Fire.R:460:7
+      error: URL (/testing) not matching mount point (/test)
 
 ---
 
     Code
       res <- app$test_header(req)
     Output
-      <error/rlang_error>
-      Error in `private$mount_request()`:
-      ! URL (/testing) not matching mount point (/test)
-      ---
-      Backtrace:
-           x
-        1. \-app$test_header(req)
-        2.   \-private$header_logic(request) at fiery/R/Fire.R:493:7
-        3.     +-self$safe_call(private$mount_request(req), private$new_req(req)) at fiery/R/Fire.R:832:7
-        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
-        5.     |   +-base::tryCatch(...)
-        6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
-        7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
-        9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(req) at fiery/R/Fire.R:832:7
+      error: URL (/testing) not matching mount point (/test)
 
 ---
 
     Code
       app$test_websocket(req, "test")
     Output
-      <error/rlang_error>
-      Error in `private$mount_request()`:
-      ! URL (/testing) not matching mount point (/test)
-      ---
-      Backtrace:
-           x
-        1. \-app$test_websocket(req, "test")
-        2.   \-private$websocket_logic(ws) at fiery/R/Fire.R:522:7
-        3.     +-self$safe_call(private$mount_request(ws$request), private$new_req(ws$request)) at fiery/R/Fire.R:877:7
-        4.     | \-rlang::try_fetch(...) at fiery/R/Fire.R:460:7
-        5.     |   +-base::tryCatch(...)
-        6.     |   | \-base (local) tryCatchList(expr, classes, parentenv, handlers)
-        7.     |   |   \-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
-        8.     |   |     \-base (local) doTryCatch(return(expr), name, parentenv, handler)
-        9.     |   \-base::withCallingHandlers(...)
-       10.     \-private$mount_request(ws$request) at fiery/R/Fire.R:460:7
+      error: URL (/testing) not matching mount point (/test)
     Message
       closing
 
@@ -520,7 +468,7 @@
 
     Code
       app$ignite(silent = TRUE)
-    Message
+    Output
       message: TRUE
 
 # safe_call catches conditions
@@ -528,20 +476,19 @@
     Code
       cnd <- self$safe_call(stop("error test"))
     Output
-      <error/rlang_error>
-      Error in `withCallingHandlers()`:
-      ! error test
+      error: error test
 
 ---
 
     Code
       cnd <- self$safe_call(warning("warning test"))
+    Output
+      warning: warning test
 
 ---
 
     Code
       cnd <- self$safe_call(message("message test"))
     Output
-      Message in `message()`:
-      message test
+      message: message test
 

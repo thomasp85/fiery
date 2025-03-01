@@ -1,10 +1,10 @@
 # URL parsing works
 
     Code
-      fake_request("http://www.example.com/a/mount/", appLocation = "/wrong/mount/")
+      fake_request("http://www.example.com/a/mount/", app_location = "/wrong/mount/")
     Condition
       Error in `fake_request()`:
-      ! `appLocation` must correspond to the beginning of the path
+      ! `app_location` must correspond to the beginning of the path
 
 # Headers are assigned
 
