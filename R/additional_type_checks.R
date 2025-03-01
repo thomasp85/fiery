@@ -1,3 +1,4 @@
+# nocov start
 check_args <- function(x, arguments, ..., arg = caller_arg(x), call = caller_env()) {
   check_function(x, ..., arg = arg, call = call)
   if (!all(arguments %in% names(formals(x)))) {
@@ -23,3 +24,4 @@ check_scalar <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call =
     cli::cli_abort("{.arg {arg}} must be a scalar object, not {obj_type_friendly(letters)}", call = call)
   }
 }
+# nocov end

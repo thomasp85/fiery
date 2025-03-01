@@ -32,6 +32,10 @@ test_that('handlers can be added, triggered and removed', {
     expect_type(triggerRes, 'list')
     expect_length(triggerRes, 0)
     expect_named(triggerRes, character())
+
+    id1 <- app$on('test', function(...) 10, id = "testid")
+    expect_equal(id1, "testid")
+    expect_snapshot(app$on('test', function(...) 10, id = "testid"), error = TRUE)
 })
 
 test_that('Fire objects are printed', {
@@ -74,6 +78,10 @@ test_that('data can be set, get and removed', {
     expect_snapshot(app$get_data(c('test', 'test2')), error = TRUE)
     app$remove_data('test')
     expect_null(app$get_data('test'))
+
+    expect_null(app$data_store$test)
+    app$data_store$test <- testdata
+    expect_equal(app$data_store$test$a, testdata$a)
 })
 
 test_that('plugins are being attached', {
@@ -190,7 +198,7 @@ test_that('life cycle events get fired', {
     app$remove_data('events')
     app$resume(silent = TRUE)
     resumeRes <- app$get_data('events')
-    app$extinguish()
+    app$stop()
     app$remove_data('events')
 
     expect_equal(igniteRes, startRes)
@@ -459,13 +467,15 @@ test_that('websockets are attached, and removed', {
 })
 
 test_that('showcase opens a browser', {
-    oldopt <- options(browser = function(url) message('Open browser'))
+    oldopt <- options(browser = function(url) message('Open browser at ', url))
 
     app <- standard_app()
     app$on('cycle-end', function(server, ...) server$extinguish())
 
     expect_snapshot(app$ignite(showcase = TRUE))
+    expect_snapshot(app$ignite(showcase = "/test"))
     expect_snapshot(app$ignite(showcase = TRUE, block = FALSE))
+
     app$extinguish()
     options(oldopt)
 })

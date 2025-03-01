@@ -1,3 +1,11 @@
+# handlers can be added, triggered and removed
+
+    Code
+      app$on("test", function(...) 10, id = "testid")
+    Condition
+      Error:
+      ! `id` must be unique. A handler with this id has already been added
+
 # Fire objects are printed
 
     Code
@@ -391,7 +399,15 @@
       app$ignite(showcase = TRUE)
     Message
       Fire started at <127.0.0.1:49925>
-      Open browser
+      Open browser at http://127.0.0.1:49925/
+
+---
+
+    Code
+      app$ignite(showcase = "/test")
+    Message
+      Fire started at <127.0.0.1:49925>
+      Open browser at http://127.0.0.1:49925/test
 
 ---
 
@@ -399,7 +415,7 @@
       app$ignite(showcase = TRUE, block = FALSE)
     Message
       Fire started at <127.0.0.1:49925>
-      Open browser
+      Open browser at http://127.0.0.1:49925/
 
 # app can be mounted at path
 

@@ -19,6 +19,38 @@
     Message
       message: message test
 
+---
+
+    Code
+      logger("error", catch_cnd(stop("error test")))
+    Output
+      <error/rlang_error>
+      Error in `force()`:
+      ! error test
+
+---
+
+    Code
+      logger("warning", catch_cnd(warning("warning test")))
+
+---
+
+    Code
+      logger("message", catch_cnd(message("message test")))
+    Output
+      Message in `message()`:
+      message test
+
+---
+
+    Code
+      logger("info", catch_cnd(cnd("info", message = "info test")))
+
+---
+
+    Code
+      logger("error", catch_cnd(reqres::abort_bad_request("http problem", instance = "test")))
+
 # console logger works
 
     Code
@@ -95,4 +127,18 @@
       logger("request", "request test", req)
     Output
       SUCCESS [2025-02-26 08:18:18] request test}
+
+---
+
+    Code
+      logger(logger::INFO, "info test")
+    Output
+      INFO [2025-02-26 08:18:18] info test}
+
+---
+
+    Code
+      logger(1, "info test")
+    Output
+      INFO [2025-02-26 08:18:18] info test}
 
