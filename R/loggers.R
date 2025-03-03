@@ -212,19 +212,21 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
 #'
 #' @export
 logger_switch <- function(..., default = logger_null()) {
-  enclos <- parent.frame()
-  args <- eval(substitute(alist(...)))
-  args <- lapply(args, function(e) {
-    if (!identical(e, quote(expr = ))) {
-      eval(e, envir = enclos)
-    } else {
-      e
-    }
-  })
-  args <- c(args, list(default))
+  loggers <- enquos(...)
+  expect_named(loggers)
+  is_missing <- vapply(loggers, quo_is_missing, logical(1))
+  if (any(is_missing)) {
+    fallthrough <- rle(is_missing)
+    fallthrough <- rep(cumsum(fallthrough$lengths)[which(fallthrough$values)] + 1, fallthrough$lengths[which(fallthrough$values)])
+    loggers[is_missing] <- loggers[fallthrough]
+  }
+  loggers <- lapply(loggers, eval_tidy)
+
+  force(default)
+
   function(event, message, request = NULL, time = Sys.time(), ...) {
-    loc_args <- c(list(event), args)
-    inject(switch(!!!loc_args))(event = event, message = message, request = request, time = time, ...)
+    logger <- loggers[[event]] %||% default
+    logger(event = event, message = message, request = request, time = time, ...)
   }
 }
 
