@@ -2,10 +2,9 @@ pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
-  delayed: delayed.html
   events: events.html
   plugins: plugins.html
-last_built: 2025-03-01T16:18Z
+last_built: 2025-03-03T12:07Z
 urls:
   reference: https://fiery.data-imaginist.com/reference
   article: https://fiery.data-imaginist.com/articles
