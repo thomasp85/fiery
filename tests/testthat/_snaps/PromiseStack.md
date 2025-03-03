@@ -1,7 +1,7 @@
 # DelayStack works
 
     Code
-      delay$eval()
+      rs(delay$eval())
     Output
       Message in `message()`:
       test
@@ -9,7 +9,7 @@
 ---
 
     Code
-      delay$eval()
+      rs(delay$eval())
     Output
       Message in `message()`:
       test2
@@ -17,7 +17,7 @@
 ---
 
     Code
-      delay$eval()
+      rs(delay$eval())
     Output
       <error/rlang_error>
       Error:
@@ -26,7 +26,7 @@
 ---
 
     Code
-      delay$eval()
+      rs(delay$eval())
     Output
       <error/rlang_error>
       Error in `private$calls[[i]]$then()`:
@@ -35,7 +35,7 @@
 # TimeStack works
 
     Code
-      time$eval()
+      rs(time$eval())
     Output
       Message in `message()`:
       test
@@ -43,7 +43,7 @@
 ---
 
     Code
-      time$eval()
+      rs(time$eval())
     Output
       Message in `message()`:
       test
@@ -51,7 +51,7 @@
 ---
 
     Code
-      time$eval()
+      rs(time$eval())
     Output
       Message in `message()`:
       test
@@ -59,7 +59,7 @@
 ---
 
     Code
-      time$eval()
+      rs(time$eval())
     Output
       Message in `message()`:
       test
