@@ -47,7 +47,7 @@ Collate:
     'aaa.R'
     'HandlerStack.R'
     'Fire.R'
-    'FutureStack.R'
+    'PromiseStack.R'
     'additional_type_checks.R'
     'fake_request.R'
     'fiery-package.R'
