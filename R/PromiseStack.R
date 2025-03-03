@@ -66,6 +66,9 @@ DelayStack <- R6Class('DelayStack',
     },
     null_fun = function(...) {
       NULL
+    },
+    finalize = function() {
+      try(rm(list = ls(private$calls), envir = private$calls), silent = TRUE)
     }
   )
 )

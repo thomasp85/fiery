@@ -20,9 +20,6 @@ InputStreamFake <- R6Class('InputStreamFake',
       private$length <- length(content)
       seek(private$content, 0)
     },
-    finalize = function() {
-      try(close(private$content), silent = TRUE)
-    },
     read_lines = function(n = -1L) {
       readLines(private$content, n, warn = FALSE)
     },
@@ -45,7 +42,11 @@ InputStreamFake <- R6Class('InputStreamFake',
   ),
   private = list(
     content = NULL,
-    length = NULL
+    length = NULL,
+
+    finalize = function() {
+      try(close(private$content), silent = TRUE)
+    }
   )
 )
 #' A Class mimicking NullInputStream from httpuv
