@@ -2,21 +2,18 @@
 NULL
 
 #' @importFrom R6 R6Class
-#' @importFrom future future resolved value
 #'
-FutureStack <- R6Class('FutureStack',
+DelayStack <- R6Class('DelayStack',
   public = list(
     # Methods
     initialize = function(server) {
       private$server <- server
-      private$futures <- new.env(parent = emptyenv())
+      private$calls <- new.env(parent = emptyenv())
     },
-    add = function(expr, then, ..., substituted = FALSE) {
-      if (!substituted) {
-        expr <- substitute(expr)
-      }
+    add = function(expr, then, ...) {
+      expr <- enquo(expr)
       id <- reqres::random_key()
-      private$futures[[id]] <- private$make_future(expr, then, ...)
+      private$calls[[id]] <- private$make_promise(expr, then, ...)
       private$ids <- append(private$ids, id)
       invisible(id)
     },
@@ -28,43 +25,43 @@ FutureStack <- R6Class('FutureStack',
     },
     eval = function(...) {
       if (!self$empty()) {
-        evalIds <- private$ids[vapply(private$ids, private$do_eval, logical(1))]
+        evalIds <- private$do_eval()
         for (i in evalIds) {
-          res <- private$server$safe_call(value(private$futures[[i]]$expr))
-          private$server$safe_call(private$futures[[i]]$then(res = res, ...))
+          res <- private$server$safe_call(eval_tidy(private$calls[[i]]$expr))
+          private$server$safe_call(private$calls[[i]]$then(res = res, ...))
+          private$calls[[i]]$evaled <- TRUE
         }
-        if (length(evalIds) != 0) private$clear(evalIds)
+        private$clear(evalIds)
       }
     }
   ),
   private = list(
     # Data
     ids = character(),
-    futures = NULL,
-    catcher = 'future',
-    lazy = FALSE,
+    calls = NULL,
     server = NULL,
 
     # Methods
-    make_future = function(expr, then, ...) {
+    make_promise = function(expr, then, ...) {
       if (missing(then)) {
         then <- private$null_fun
       } else {
         check_function(then)
       }
       list(
-        expr = eval_bare(call2(private$catcher, expr = expr, lazy = private$lazy)),
+        expr = expr,
         then = then,
+        evaled = FALSE,
         ...
       )
     },
-    do_eval = function(id) {
-      resolved(private$futures[[id]]$expr, timeout = 0.05)
+    do_eval = function() {
+      private$ids
     },
     clear = function(ids, ...) {
       if (length(ids) > 0) {
         private$ids <- private$ids[!private$ids %in% ids]
-        rm(list = ids, envir = private$futures)
+        rm(list = ids, envir = private$calls)
       }
     },
     null_fun = function(...) {
@@ -74,13 +71,43 @@ FutureStack <- R6Class('FutureStack',
 )
 
 #' @importFrom R6 R6Class
-#' @importFrom future sequential
 #'
-DelayStack <- R6Class('DelayStack',
-  inherit = FutureStack,
+TimeStack <- R6Class('TimeStack',
+  inherit = DelayStack,
+  public = list(
+    remove = function(id) {
+      private$clear(id, force = TRUE)
+    },
+    reset = function() {
+      for (id in private$ids) {
+        private$calls[[id]]$at <- Sys.time() + private$calls[[id]]$after
+      }
+    }
+  ),
   private = list(
-    catcher = 'sequential',
-    lazy = TRUE
+    make_promise = function(expr, then, after, loop = FALSE) {
+      check_number_decimal(after)
+      check_bool(loop)
+      super$make_promise(expr = expr, then = then, after = after,
+                        loop = loop, at = Sys.time() + after)
+    },
+    do_eval = function() {
+      private$ids[vapply(private$calls, function(x) x$at, numeric(1)) < Sys.time()]
+    },
+    clear = function(ids, force = FALSE) {
+      if (!force) {
+        remove <- vapply(ids, function(id) {
+          if (private$calls[[id]]$loop && private$calls[[id]]$evaled) {
+            private$calls[[id]]$at <- private$calls[[id]]$at + private$calls[[id]]$after
+            FALSE
+          } else {
+            TRUE
+          }
+        }, logical(1))
+        ids <- ids[remove]
+      }
+      super$clear(ids)
+    }
   )
 )
 
@@ -95,61 +122,45 @@ multiprocess <- function(...) {
 }
 
 #' @importFrom R6 R6Class
+#' @importFrom future future resolved value
 #'
 AsyncStack <- R6Class('AsyncStack',
-  inherit = FutureStack,
-  private = list(
-    catcher = multiprocess
-  )
-)
-
-#' @importFrom R6 R6Class
-#'
-TimeStack <- R6Class('TimeStack',
   inherit = DelayStack,
   public = list(
-    remove = function(id) {
-      private$clear(id, force = TRUE)
+    # Methods
+    add = function(expr, then, ...) {
+      id <- reqres::random_key()
+      private$calls[[id]] <- private$make_promise(expr, then, ...)
+      private$ids <- append(private$ids, id)
+      invisible(id)
     },
-    reset = function() {
-      for (id in private$ids) {
-        private$futures[[id]]$at <- Sys.time() + private$futures[[id]]$after
+    eval = function(...) {
+      if (!self$empty()) {
+        evalIds <- private$do_eval()
+        for (i in evalIds) {
+          res <- private$server$safe_call(value(private$calls[[i]]$expr))
+          private$server$safe_call(private$calls[[i]]$then(res = res, ...))
+        }
+        if (length(evalIds) != 0) private$clear(evalIds)
       }
     }
   ),
   private = list(
-    make_future = function(expr, then, after, loop = FALSE) {
-      check_number_decimal(after)
-      check_bool(loop)
-      super$make_future(expr = expr, then = then, after = after,
-                        loop = loop, at = Sys.time() + after)
-    },
-    do_eval = function(id) {
-      Sys.time() > private$futures[[id]]$at
-    },
-    clear = function(ids, force = FALSE) {
-      if (!force) {
-        remove <- sapply(ids, function(id) {
-          if (private$futures[[id]]$loop) {
-            private$restore(private$futures[[id]]$expr)
-            private$futures[[id]]$at <- private$futures[[id]]$at +
-              private$futures[[id]]$after
-            FALSE
-          } else {
-            TRUE
-          }
-        })
-        ids <- ids[remove]
+    # Methods
+    make_promise = function(expr, then, ...) {
+      if (missing(then)) {
+        then <- private$null_fun
+      } else {
+        check_function(then)
       }
-      super$clear(ids)
+      list(
+        expr = eval_bare(call2(multiprocess, expr = expr, lazy = FALSE)),
+        then = then,
+        ...
+      )
     },
-    restore = function(future) {
-      if (future$state == 'finished') {
-        future$state <- 'created'
-        if (exists('value', envir = future)) {
-          rm('value', envir = future)
-        }
-      }
+    do_eval = function() {
+      private$ids[vapply(private$calls, function(x) resolved(x$expr, timeout = 0.05), logical(1))]
     }
   )
 )

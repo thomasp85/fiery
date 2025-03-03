@@ -570,7 +570,7 @@ Remove data from the global data store
 \if{html}{\out{<a id="method-Fire-time"></a>}}
 \if{latex}{\out{\hypertarget{method-Fire-time}{}}}
 \subsection{Method \code{time()}}{
-Add a timed evaluation that will be evaluated after the given number of seconds. See the \href{https://fiery.data-imaginist.com/articles/delayed.html}{\emph{Delaying code execution in Fiery} vignette} for more information
+Add a timed evaluation that will be evaluated after the given number of seconds.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Fire$time(expr, then, after, loop = FALSE)}\if{html}{\out{</div>}}
 }
@@ -613,7 +613,7 @@ Remove a timed evaluation
 \if{html}{\out{<a id="method-Fire-delay"></a>}}
 \if{latex}{\out{\hypertarget{method-Fire-delay}{}}}
 \subsection{Method \code{delay()}}{
-Add a delayed evaluation to be evaluated immediately at the end of the loop cycle. See the \href{https://fiery.data-imaginist.com/articles/delayed.html}{\emph{Delaying code execution in Fiery} vignette} for more information
+Add a delayed evaluation to be evaluated immediately at the end of the loop cycle.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Fire$delay(expr, then)}\if{html}{\out{</div>}}
 }
@@ -652,7 +652,7 @@ Remove a delayed evaluation
 \if{html}{\out{<a id="method-Fire-async"></a>}}
 \if{latex}{\out{\hypertarget{method-Fire-async}{}}}
 \subsection{Method \code{async()}}{
-Add an asynchronous evaluation to be evaluated in another process without blocking the server. See the \href{https://fiery.data-imaginist.com/articles/delayed.html}{\emph{Delaying code execution in Fiery} vignette} for more information
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Add an asynchronous evaluation to be evaluated in another process without blocking the server. This function has been deprecated in favor of using your own async framework of choice, e.g. \href{https://shikokuchuo.net/mirai/}{mirai} or \href{https://rstudio.github.io/promises/}{promises}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Fire$async(expr, then)}\if{html}{\out{</div>}}
 }

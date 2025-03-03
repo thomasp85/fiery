@@ -19,8 +19,6 @@ navbar:
       menu:
       - text: The event cycle
         href: articles/events.html
-      - text: Delaying code execution
-        href: articles/delayed.html
       - text: Creating and using plugins
         href: articles/plugins.html
       - text: "------------------"

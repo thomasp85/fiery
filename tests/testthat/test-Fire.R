@@ -386,12 +386,14 @@ test_that('futures can be added and called', {
 
     skip_on_os('windows') # The async stuff fail on windows builders though it works fine locally
     app <- standard_app()
-    id <- app$async({
-        10
-    }, function(res, server, ...) {
-        message(res)
-        server$extinguish()
-    })
+    lifecycle::expect_deprecated(
+        id <- app$async({
+            10
+        }, function(res, server, ...) {
+            message(res)
+            server$extinguish()
+        })
+    )
     app$remove_async(id)
     app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {

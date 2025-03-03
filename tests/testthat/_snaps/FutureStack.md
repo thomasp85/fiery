@@ -29,7 +29,7 @@
       delay$eval()
     Output
       <error/rlang_error>
-      Error in `private$futures[[i]]$then()`:
+      Error in `private$calls[[i]]$then()`:
       ! error test
 
 # TimeStack works

@@ -355,38 +355,39 @@ Fire <- R6Class('Fire',
       rm(list = name, envir = private$data)
       invisible(NULL)
     },
-    #' @description Add a timed evaluation that will be evaluated after the given number of seconds. See the [*Delaying code execution in Fiery* vignette](https://fiery.data-imaginist.com/articles/delayed.html) for more information
+    #' @description Add a timed evaluation that will be evaluated after the given number of seconds.
     #' @param expr The expression to evaluate when the time has passed
     #' @param then A handler to call once `expr` has been evaluated
     #' @param after The time in second to wait before evaluating `expr`
     #' @param loop Should `expr` be called repeatedly with the interval given by `after`
     #' @return A unique id identifying the handler
     time = function(expr, then, after, loop = FALSE) {
-      private$TIME$add(substitute(expr), then, after, loop, substituted = TRUE)
+      private$TIME$add({{expr}}, then, after, loop)
     },
     #' @description Remove a timed evaluation
     #' @param id The unique id identifying the handler
     remove_time = function(id) {
       private$TIME$remove(id)
     },
-    #' @description Add a delayed evaluation to be evaluated immediately at the end of the loop cycle. See the [*Delaying code execution in Fiery* vignette](https://fiery.data-imaginist.com/articles/delayed.html) for more information
+    #' @description Add a delayed evaluation to be evaluated immediately at the end of the loop cycle.
     #' @param expr The expression to evaluate at the end of the cycle
     #' @param then A handler to call once `expr` has been evaluated
     #' @return A unique id identifying the handler
     delay = function(expr, then) {
-      private$DELAY$add(substitute(expr), then, substituted = TRUE)
+      private$DELAY$add({{expr}}, then)
     },
     #' @description Remove a delayed evaluation
     #' @param id The unique id identifying the handler
     remove_delay = function(id) {
       private$DELAY$remove(id)
     },
-    #' @description Add an asynchronous evaluation to be evaluated in another process without blocking the server. See the [*Delaying code execution in Fiery* vignette](https://fiery.data-imaginist.com/articles/delayed.html) for more information
+    #' @description `r lifecycle::badge('deprecated')` Add an asynchronous evaluation to be evaluated in another process without blocking the server. This function has been deprecated in favor of using your own async framework of choice, e.g. [mirai](https://shikokuchuo.net/mirai/) or [promises](https://rstudio.github.io/promises/)
     #' @param expr The expression to evaluate at the end of the cycle
     #' @param then A handler to call once `expr` has been evaluated
     #' @return A unique id identifying the handler
     async = function(expr, then) {
-      private$ASYNC$add(substitute(expr), then, substituted = TRUE)
+      lifecycle::deprecate_soft("2.0.0", what = "Fire$async()", details = "Use an async evaluation framework of your own choice, such as promises or mirai")
+      private$ASYNC$add(substitute(expr), then)
     },
     #' @description Remove an async evaluation
     #' @param id The unique id identifying the handler

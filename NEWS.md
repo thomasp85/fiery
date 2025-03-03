@@ -15,6 +15,9 @@
   path to open the browser at.
 * Improve the default session id handling and added `session_id_cookie()` helper
   function for constructing session ID extractor
+* Deprecate use of future. `Fire$delay()` and `Fire$time()` now uses quosures
+  and `Fire$async()` has been soft deprecated in favor of letting the user use
+  whatever async framework they like
 
 # fiery 1.2.1
 

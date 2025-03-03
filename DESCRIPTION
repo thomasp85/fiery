@@ -22,6 +22,7 @@ Imports:
     glue,
     httpuv,
     later,
+    lifecycle,
     parallelly,
     R6,
     reqres (>= 0.2.5.9000),
