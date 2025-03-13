@@ -213,7 +213,9 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
 #' @export
 logger_switch <- function(..., default = logger_null()) {
   loggers <- enquos(...)
-  expect_named(loggers)
+  if (!is_named2(loggers)) {
+    cli::cli_abort("{.arg ...} must be named")
+  }
   is_missing <- vapply(loggers, quo_is_missing, logical(1))
   if (any(is_missing)) {
     fallthrough <- rle(is_missing)
@@ -250,6 +252,7 @@ logger_logger <- function(default_level = "INFO") {
         error = logger::ERROR,
         default_level
       )
+      message <- paste0(event, ": ", message)
     } else if (inherits(event, "loglevel")) {
       level <- event
       event <- attr(event, "level")

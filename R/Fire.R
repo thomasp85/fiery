@@ -420,6 +420,9 @@ Fire <- R6Class('Fire',
     log = function(event, message, request = NULL, ..., .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
       time <- Sys.time()
       force(message)
+      force(.logcall)
+      force(.topcall)
+      force(.topenv)
       log_fun <- function(...) {
         if (!is_condition(message)) {
           message <- vapply(message, cli::format_inline, character(1), .envir = .topenv)
@@ -461,24 +464,48 @@ Fire <- R6Class('Fire',
       try_fetch(
         expr,
         error = function(e) {
-          bt <- e$trace %||% cheap_trace_back()
           topcall <- e$call
-          topcall_pos <- which(bt$call == topcall)
-          self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+          if (!is.null(topcall)) {
+            bt <- e$trace %||% cheap_trace_back()
+            topcall_pos <- which(bt$call == topcall)
+            if (length(topcall_pos) != 1) {
+              self$log('error', e)
+            } else {
+              self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+            }
+          } else {
+            self$log('error', e)
+          }
           e
         },
         warning = function(w) {
-          bt <- cheap_trace_back()
           topcall <- w$call
-          topcall_pos <- which(bt$call == topcall)
-          self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+          if (!is.null(topcall)) {
+            bt <- cheap_trace_back()
+            topcall_pos <- which(bt$call == topcall)
+            if (length(topcall_pos) != 1) {
+              self$log('warning', w)
+            } else {
+              self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+            }
+          } else {
+            self$log("warning", w)
+          }
           cnd_muffle(w)
         },
         message = function(m) {
-          bt <- cheap_trace_back()
           topcall <- m$call
-          topcall_pos <- which(bt$call == topcall)
-          self$log('message', m, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+          if (!is.null(topcall)) {
+            bt <- cheap_trace_back()
+            topcall_pos <- which(bt$call == topcall)
+            if (length(topcall_pos) != 1) {
+              self$log('message', m)
+            } else {
+              self$log('message', m, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+            }
+          } else {
+            self$log("message", m)
+          }
           cnd_muffle(m)
         }
       )

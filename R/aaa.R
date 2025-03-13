@@ -82,5 +82,5 @@ cheap_trace_back <- function() {
   calls <- as.list(sys.calls()[idx])
   recursive <- parents == seq_along(parents)
   parents[recursive] <- 0L
-  list(calls, parents)
+  list(call = calls, parent = parents)
 }
