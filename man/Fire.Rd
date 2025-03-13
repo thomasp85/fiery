@@ -110,6 +110,9 @@ app$ignite(showcase = TRUE)
 \item{\code{session_cookie_settings}}{Get or set the session cookie settings}
 
 \item{\code{trust}}{A logical indicating whether incoming requests are trusted.}
+
+\item{\code{compression_limit}}{The size threshold in bytes for trying to
+compress the response body (it is still dependant on content negotiation)}
 }
 \if{html}{\out{</div>}}
 }

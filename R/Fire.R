@@ -652,6 +652,13 @@ Fire <- R6Class('Fire',
       if (missing(value)) return(private$TRUST)
       check_bool(value)
       private$TRUST <- value
+    },
+    #' @field compression_limit The size threshold in bytes for trying to
+    #' compress the response body (it is still dependant on content negotiation)
+    compression_limit = function(value) {
+      if (missing(value)) return(private$COMPRESSION_LIMIT)
+      check_number_decimal(value, min = 0, allow_infinite = TRUE)
+      private$COMPRESSION_LIMIT <- value
     }
   ),
   private = list(
@@ -666,6 +673,7 @@ Fire <- R6Class('Fire',
     KEY = NULL,
     SESSION_COOKIE = NULL,
     TRUST = FALSE,
+    COMPRESSION_LIMIT = 0,
 
     running = FALSE,
     quitting = FALSE,
