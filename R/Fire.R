@@ -1030,7 +1030,17 @@ Fire <- R6Class('Fire',
       browseURL(url)
     },
     new_req = function(request) {
-      Request$new(request, trust = private$TRUST, key = private$KEY, session_cookie = private$SESSION_COOKIE)
+      req <- get_request(
+        rook = request,
+        trust = private$TRUST,
+        key = private$KEY,
+        session_cookie = private$SESSION_COOKIE,
+        compression_limit = private$COMPRESSION_LIMIT
+      )
+      f <- as.call(list(function() put_request(req)))
+      envir <- parent.frame()
+      do.call(on.exit, list(f, TRUE, TRUE), envir = envir)
+      req
     }
   )
 )

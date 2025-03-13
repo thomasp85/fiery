@@ -54,6 +54,7 @@ Collate:
     'fiery-package.R'
     'import-standalone-obj-type.R'
     'import-standalone-types-check.R'
+    'request_store.R'
     'zzz.R'
 Config/testthat/edition: 3
 Remotes:
