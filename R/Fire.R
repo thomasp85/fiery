@@ -468,7 +468,7 @@ Fire <- R6Class('Fire',
           if (!is.null(topcall)) {
             bt <- e$trace %||% cheap_trace_back()
             topcall_pos <- which(bt$call == topcall)
-            if (length(topcall_pos) != 1) {
+            if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
               self$log('error', e)
             } else {
               self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
@@ -483,7 +483,7 @@ Fire <- R6Class('Fire',
           if (!is.null(topcall)) {
             bt <- cheap_trace_back()
             topcall_pos <- which(bt$call == topcall)
-            if (length(topcall_pos) != 1) {
+            if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
               self$log('warning', w)
             } else {
               self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
@@ -494,14 +494,15 @@ Fire <- R6Class('Fire',
           cnd_muffle(w)
         },
         message = function(m) {
-          topcall <- m$call
-          if (!is.null(topcall)) {
+          logcall <- m$call
+          if (!is.null(logcall)) {
             bt <- cheap_trace_back()
-            topcall_pos <- which(bt$call == topcall)
-            if (length(topcall_pos) != 1) {
-              self$log('message', m)
+            logcall_pos <- which(bt$call == logcall)
+            topcall_pos <- bt$parent[logcall_pos]
+            if (length(topcall_pos) != 1 || topcall_pos == 0) {
+              self$log('message', m, .logcall = logcall)
             } else {
-              self$log('message', m, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+              self$log('message', m, request = request, .logcall = logcall, .topcall = bt$call[[topcall_pos]], .topenv = sys.frame(topcall_pos))
             }
           } else {
             self$log("message", m)
