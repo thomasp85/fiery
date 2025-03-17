@@ -1,62 +1,48 @@
-standard_app <- function(silent = TRUE) {
-    app <- Fire$new(port = 49925)
-    logger <- logger_console("{event}: {message}")
-    if (!silent) {
-        app$set_logger(logger)
-    } else {
-        app$set_logger(function(event, message, request, ...) if (event %in% c("message", "error", "warning")) logger(event, message,request, ...))
-    }
-    app$access_log_format <- '{request$ip} - {id} [29/Jan/2025:08:17:44 +0100] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
-    app
-}
-
-old_opt <- options(rlang_backtrace_on_error = "none")
-
 test_that('handlers can be added, triggered and removed', {
-    app <- standard_app()
+    rs <- r_session()
 
-    triggerRes <- app$trigger('test')
-    expect_type(triggerRes, 'list')
-    expect_length(triggerRes, 0)
-    expect_named(triggerRes, character())
+    rs(triggerRes <- app$trigger('test'))
+    expect_type(rs(triggerRes), 'list')
+    expect_length(rs(triggerRes), 0)
+    expect_named(rs(triggerRes), character())
 
-    id1 <- app$on('test', function(...) 10)
-    triggerRes <- app$trigger('test')
-    expect_type(triggerRes, 'list')
-    expect_length(triggerRes, 1)
-    expect_named(triggerRes, id1)
-    expect_equal(triggerRes[[1]], 10)
+    rs(id1 <- app$on('test', function(...) 10))
+    rs(triggerRes <- app$trigger('test'))
+    expect_type(rs(triggerRes), 'list')
+    expect_length(rs(triggerRes), 1)
+    expect_named(rs(triggerRes), rs(id1))
+    expect_equal(rs(triggerRes[[1]]), 10)
 
-    app$off(id1)
-    triggerRes <- app$trigger('test')
-    expect_type(triggerRes, 'list')
-    expect_length(triggerRes, 0)
-    expect_named(triggerRes, character())
+    rs(app$off(id1))
+    rs(triggerRes <- app$trigger('test'))
+    expect_type(rs(triggerRes), 'list')
+    expect_length(rs(triggerRes), 0)
+    expect_named(rs(triggerRes), character())
 
-    id1 <- app$on('test', function(...) 10, id = "testid")
-    expect_equal(id1, "testid")
-    expect_snapshot(app$on('test', function(...) 10, id = "testid"), error = TRUE)
+    rs(id1 <- app$on('test', function(...) 10, id = "testid"))
+    expect_equal(rs(id1), "testid")
+    expect_snapshot(rs(app$on('test', function(...) 10, id = "testid")), error = TRUE)
 })
 
 test_that('Fire objects are printed', {
     skip_on_os("windows") # Windows not a fan of unicode
 
-    app <- standard_app()
-    expect_snapshot(app$format())
+    rs <- r_session()
+    expect_snapshot(print(rs(app$format())))
 
-    app$attach(list(
+    rs({app$attach(list(
         name = 'test',
         on_attach = function(...) {}
-    ))
-    app$on('start', function(...){})
-    app$on('request', function(...){})
-    app$on('request', function(...){})
+    ))})
+    rs(app$on('start', function(...){}))
+    rs(app$on('request', function(...){}))
+    rs(app$on('request', function(...){}))
 
-    expect_snapshot(app$format())
+    expect_snapshot(print(rs(app$format())))
 })
 
 test_that('protected events cannot be triggered', {
-    app <- standard_app()
+    rs <- r_session()
 
     protected <- c('start', 'resume', 'end', 'cycle-start',
                    'cycle-end', 'header', 'before-request', 'request',
@@ -64,24 +50,24 @@ test_that('protected events cannot be triggered', {
                    'after-message', 'websocket-closed', 'send')
 
     for (i in protected) {
-        expect_snapshot(app$trigger(i), error = TRUE)
+        expect_snapshot(rs(app$trigger(!!i)), error = TRUE)
     }
 })
 
 test_that('data can be set, get and removed', {
-    app <- standard_app()
-    expect_null(app$get_data('test'))
-    testdata <- list(a = 1, b = 1:10, c = letters[6:10])
-    app$set_data('test', testdata)
-    expect_equal(app$get_data('test'), testdata)
-    expect_snapshot(app$get_data(1), error = TRUE)
-    expect_snapshot(app$get_data(c('test', 'test2')), error = TRUE)
-    app$remove_data('test')
-    expect_null(app$get_data('test'))
+    rs <- r_session()
+    expect_null(rs(app$get_data('test')))
+    rs(testdata <- list(a = 1, b = 1:10, c = letters[6:10]))
+    rs(app$set_data('test', testdata))
+    expect_equal(rs(app$get_data('test')), rs(testdata))
+    expect_snapshot(rs(app$get_data(1)), error = TRUE)
+    expect_snapshot(rs(app$get_data(c('test', 'test2'))), error = TRUE)
+    rs(app$remove_data('test'))
+    expect_null(rs(app$get_data('test')))
 
-    expect_null(app$data_store$test)
-    app$data_store$test <- testdata
-    expect_equal(app$data_store$test$a, testdata$a)
+    expect_null(rs(app$data_store$test))
+    rs(app$data_store$test <- testdata)
+    expect_equal(rs(app$data_store$test$a), rs(testdata$a))
 })
 
 test_that('plugins are being attached', {
@@ -672,5 +658,3 @@ test_that("static file serving works", {
 
     expect_equal(names(app$.__enclos_env__$private$staticList), c("/static", "/static/test"))
 })
-
-options(old_opt)

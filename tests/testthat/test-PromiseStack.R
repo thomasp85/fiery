@@ -1,8 +1,7 @@
 test_that('DelayStack works', {
     rs <- r_session()
-    rs(app <- Fire$new())
     rs(catcher <- new.env())
-    rs(delay <- DelayStack$new(app))
+    rs(delay <- fiery:::DelayStack$new(app))
     expect_true(rs(delay$empty()))
     rs({delay$add({
         message('test')
@@ -39,9 +38,8 @@ test_that('DelayStack works', {
 
 test_that('TimeStack works', {
     rs <- r_session()
-    rs(app <- Fire$new())
     rs(catcher <- new.env())
-    rs(time <- TimeStack$new(app))
+    rs(time <- fiery:::TimeStack$new(app))
     expect_true(rs(time$empty()))
     rs({time$add({
         message('test')

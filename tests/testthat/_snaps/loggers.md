@@ -109,28 +109,28 @@
     Code
       rs(logger("error", "error test"))
     Output
-      ERROR [2025-02-26 08:18:18] error test}
+      ERROR [2025-02-26 08:18:18] error: error test}
 
 ---
 
     Code
       rs(logger("warning", "warning test"))
     Output
-      WARN [2025-02-26 08:18:18] warning test}
+      WARN [2025-02-26 08:18:18] warning: warning test}
 
 ---
 
     Code
       rs(logger("info", "info test"))
     Output
-      INFO [2025-02-26 08:18:18] info test}
+      INFO [2025-02-26 08:18:18] info: info test}
 
 ---
 
     Code
       rs(logger("request", "request test", req))
     Output
-      SUCCESS [2025-02-26 08:18:18] request test}
+      SUCCESS [2025-02-26 08:18:18] request: request test}
 
 ---
 

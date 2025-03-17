@@ -1,88 +1,110 @@
 # Assertions throw errors
 
     Code
-      stack$add("string", "id")
+      rs(stack$add("string", "id"))
     Condition
-      Error in `stack$add()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `handler` must be a function, not the string "string".
 
 ---
 
     Code
-      stack$add(c(min, max), "id")
+      rs(stack$add(c(min, max), "id"))
     Condition
-      Error in `stack$add()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `handler` must be a function, not a list.
 
 ---
 
     Code
-      stack$add(min, 3)
+      rs(stack$add(min, 3))
     Condition
-      Error in `stack$add()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `id` must be a single string, not the number 3.
 
 ---
 
     Code
-      stack$add(min, 3:5)
+      rs(stack$add(min, 3:5))
     Condition
-      Error in `stack$add()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `id` must be a single string, not an integer vector.
 
 ---
 
     Code
-      stack$add(min, "min", "position")
+      rs(stack$add(min, "min", "position"))
     Condition
-      Error in `stack$add()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `pos` must be a whole number, not the string "position".
 
 ---
 
     Code
-      stack$add(min, "min", 1:4)
+      rs(stack$add(min, "min", 1:4))
     Condition
-      Error in `stack$add()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `pos` must be a whole number, not an integer vector.
 
 ---
 
     Code
-      stack(add(min, "min", 1.5))
+      rs(stack$add(min, "min", 1.5))
     Condition
-      Error in `add()`:
-      ! could not find function "add"
+      Error:
+      ! in callr subprocess.
+      Caused by error:
+      ! `pos` must be a whole number, not the number 1.5.
 
 ---
 
     Code
-      stack$remove(1)
+      rs(stack$remove(1))
     Condition
-      Error in `stack$remove()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `id` must be a single string, not the number 1.
 
 ---
 
     Code
-      stack$remove(c("1", "2"))
+      rs(stack$remove(c("1", "2")))
     Condition
-      Error in `stack$remove()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `id` must be a single string, not a character vector.
 
 ---
 
     Code
-      stack$position(1)
+      rs(stack$position(1))
     Condition
-      Error in `stack$position()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `id` must be a character vector, not the number 1.
 
 ---
 
     Code
-      stack$contains(1)
+      rs(stack$contains(1))
     Condition
-      Error in `stack$contains()`:
+      Error:
+      ! in callr subprocess.
+      Caused by error:
       ! `id` must be a character vector, not the number 1.
 
