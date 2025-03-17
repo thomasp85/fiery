@@ -1041,6 +1041,11 @@ Fire <- R6Class('Fire',
       envir <- parent.frame()
       do.call(on.exit, list(f, TRUE, TRUE), envir = envir)
       req
+    },
+    finalize = function() {
+      if (private$running) {
+        self$extinguish()
+      }
     }
   )
 )
