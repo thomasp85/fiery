@@ -824,6 +824,16 @@ Fire <- R6Class('Fire',
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
+        response <- self$safe_call(response$as_list(), req)
+        # On the off-chance that reqres throws an error during conversion of response
+        if (is_condition(response)) {
+          req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
+          response <- list(
+            status = 500L,
+            headers = list("Content-Type" = "text/plain"),
+            body = "Internal Server Error"
+          )
+        }
       } else {
         req <- private$new_req(request)
         id <- private$client_id(req)
@@ -871,6 +881,16 @@ Fire <- R6Class('Fire',
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
+        response <- self$safe_call(response$as_list(), req)
+        # On the off-chance that reqres throws an error during conversion of response
+        if (is_condition(response)) {
+          req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
+          response <- list(
+            status = 500L,
+            headers = list("Content-Type" = "text/plain"),
+            body = "Internal Server Error"
+          )
+        }
       } else {
         req <- private$new_req(request)
         id <- private$client_id(req)
