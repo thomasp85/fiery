@@ -194,6 +194,10 @@ Fire <- R6Class('Fire',
     on = function(event, handler, pos = NULL, id = NULL) {
       check_string(event)
       check_function(handler)
+      # We do this to ensure that any set of arguments is valid to the handler
+      if (!"..." %in% fn_fmls_names(handler)) {
+        fn_fmls(handler) <- c(fn_fmls(handler), "..." = missing_arg())
+      }
       check_string(id, allow_null = TRUE)
       if (!is.null(id) && id %in% names(private$handlerMap)) {
         cli::cli_abort("{.arg id} must be unique. A handler with this id has already been added")
