@@ -838,6 +838,7 @@ Fire <- R6Class('Fire',
             body = "Internal Server Error"
           )
         }
+        private$log_request(start_time, req, id)
       } else {
         req <- private$new_req(request)
         id <- private$client_id(req)
@@ -846,32 +847,45 @@ Fire <- R6Class('Fire',
           recursive = FALSE
         )
         res <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args, .request = req)
-        problems <- vapply(res, reqres::is_reqres_problem, logical(1))
-        response <- req$respond()
-        if (any(problems)) {
-          reqres::handle_problem(response, res[[which(problems)[1]]])
-        } else if (any(vapply(res, is_condition, logical(1)))) {
-          response$status_with_text(500L)
+        any_promising <- any(vapply(res, promises::is.promising, logical(1)))
+        if (any_promising) {
+          promises::then(promises::promise_map(res, identity), function(res) {
+            private$finish_request(res, req, start_time, id)
+          })
+        } else {
+          private$finish_request(res, req, start_time, id)
         }
-        for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
-        response <- self$safe_call(response$as_list(), req)
-        # On the off-chance that reqres throws an error during conversion of response
-        if (is_condition(response)) {
-          req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
-          response <- list(
-            status = 500L,
-            headers = list("Content-Type" = "text/plain"),
-            body = "Internal Server Error"
-          )
-        }
-        private$p_trigger('after-request', server = self, id = id, request = req, response = req$response, .request = req)
       }
+    },
+    finish_request = function(res, request, start_time, id) {
+      response <- request$respond()
+      problems <- vapply(res, reqres::is_reqres_problem, logical(1))
+      if (any(problems)) {
+        reqres::handle_problem(response, res[[which(problems)[1]]])
+      } else if (any(vapply(res, is_condition, logical(1)))) {
+        response$status_with_text(500L)
+      }
+      for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
+      response <- self$safe_call(response$as_list(), req)
+      # On the off-chance that reqres throws an error during conversion of response
+      if (is_condition(response)) {
+        req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
+        response <- list(
+          status = 500L,
+          headers = list("Content-Type" = "text/plain"),
+          body = "Internal Server Error"
+        )
+      }
+      private$p_trigger('after-request', server = self, id = id, request = req, response = req$response, .request = req)
+      private$log_request(start_time, request, id)
+      response
+    },
+    log_request = function(start_time, req, id) {
       end_time <- Sys.time()
       self$log('request', glue_log(
         list(start_time = start_time, end_time = end_time, request = req, response = req$response, id = id),
         self$access_log_format
       ), req)
-      response
     },
     header_logic = function(req) {
       # Short-circuit if no header handlers exist
@@ -930,11 +944,7 @@ Fire <- R6Class('Fire',
         }
       }
       if (!is.null(response)) {
-        end_time <- Sys.time()
-        self$log('request', glue_log(
-          list(start_time = start_time, end_time = end_time, request = req, response = req$response, id = id),
-          self$access_log_format
-        ), req)
+        private$log_request(start_time, req, id)
       }
       response
     },
@@ -1003,6 +1013,15 @@ Fire <- R6Class('Fire',
     p_trigger = function(event, ..., .request = NULL) {
       if (!is.null(private$handlers[[event]])) {
         res <- private$handlers[[event]]$dispatch(..., .request = .request)
+        res <- lapply(res, function(r) {
+          if (promises::is.promising(r)) {
+            promises::catch(r, function(r) {
+              self$safe_call(cnd_signal(r), .request)
+            })
+          } else {
+            r
+          }
+        })
       } else {
         res <- set_names(list())
       }

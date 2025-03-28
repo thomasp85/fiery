@@ -18,6 +18,8 @@
 * Deprecate use of future. `Fire$delay()` and `Fire$time()` now uses quosures
   and `Fire$async()` has been soft deprecated in favor of letting the user use
   whatever async framework they like
+* Support returning promises in `request` events, and automated error logging
+  from promises in all events
 
 # fiery 1.2.1
 
