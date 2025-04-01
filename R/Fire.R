@@ -850,6 +850,10 @@ Fire <- R6Class('Fire',
         any_promising <- any(vapply(res, promises::is.promising, logical(1)))
         if (any_promising) {
           promises::then(promises::promise_map(res, identity), function(res) {
+            on.exit({
+              req$locked <- FALSE
+              put_request(req)
+            })
             private$finish_request(res, req, start_time, id)
           })
         } else {
@@ -1015,6 +1019,7 @@ Fire <- R6Class('Fire',
         res <- private$handlers[[event]]$dispatch(..., .request = .request)
         res <- lapply(res, function(r) {
           if (promises::is.promising(r)) {
+            if (!is.null(.request)) .request$locked <- TRUE
             promises::catch(r, function(r) {
               self$safe_call(cnd_signal(r), .request)
             })
