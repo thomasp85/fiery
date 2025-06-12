@@ -332,9 +332,9 @@ Fire <- R6Class('Fire',
     #' @param value The value of the header. Use `NULL` to remove the global header
     header = function(name, value) {
       check_string(name)
-      if (missing(value)) return(private$headers[[name]])
+      if (missing(value)) return(private$headers[[tolower(name)]])
       check_string(value, allow_null = TRUE)
-      private$headers[[name]] <- value
+      private$headers[[tolower(name)]] <- value
       invisible(NULL)
     },
     #' @description Add data to the global data store
