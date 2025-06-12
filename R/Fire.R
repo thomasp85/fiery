@@ -872,17 +872,17 @@ Fire <- R6Class('Fire',
         response$status_with_text(500L)
       }
       for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
-      response <- self$safe_call(response$as_list(), req)
+      response <- self$safe_call(response$as_list(), request)
       # On the off-chance that reqres throws an error during conversion of response
       if (is_condition(response)) {
-        req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
+        request$response$status_with_text(500L) # Update the real response first so it gets logged correctly
         response <- list(
           status = 500L,
           headers = list("Content-Type" = "text/plain"),
           body = "Internal Server Error"
         )
       }
-      private$p_trigger('after-request', server = self, id = id, request = req, response = req$response, .request = req)
+      private$p_trigger('after-request', server = self, id = id, request = request, response = request$response, .request = request)
       private$log_request(start_time, request, id)
       response
     },

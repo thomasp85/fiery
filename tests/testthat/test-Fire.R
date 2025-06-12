@@ -477,11 +477,11 @@ test_that('global headers are assigned and used', {
         request$respond()$status_with_text(200L)
     })
     response <- app$test_request(fake_request('www.example.com'))
-    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery', 'Date' = response$headers$Date, 'X-XSS-Protection' = '1; mode=block'))
+    expect_equal(response$headers, list('x-powered-by' = 'fiery', 'x-xss-protection' = '1; mode=block', 'content-type' = 'text/plain', 'date' = response$headers$date))
     app$header('X-XSS-Protection', NULL)
     response <- app$test_request(fake_request('www.example.com'))
-    expect_equal(response$headers, list('Content-Type' = 'text/plain', 'X-Powered-By' = 'fiery', 'Date' = response$headers$Date))
-    expect_equal(app$header('X-Powered-By'), 'fiery')
+    expect_equal(response$headers, list('x-powered-by' = 'fiery', 'content-type' = 'text/plain', 'date' = response$headers$date))
+    expect_equal(app$header('x-powered-by'), 'fiery')
 })
 
 test_that('app can be mounted at path', {
