@@ -840,6 +840,7 @@ Fire <- R6Class('Fire',
           )
         }
         private$log_request(start_time, req, id)
+        response
       } else {
         req <- private$new_req(request)
         id <- private$client_id(req)
