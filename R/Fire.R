@@ -685,7 +685,8 @@ Fire <- R6Class('Fire',
     privateTriggers = c('start', 'resume', 'cycle-start', 'header',
                         'before-request', 'request', 'after-request',
                         'before-message', 'message', 'after-message',
-                        'websocket-closed', 'send', 'cycle-end', 'end'),
+                        'websocket-opened', 'websocket-closed', 'send',
+                        'cycle-end', 'end'),
     data = NULL,
     headers = list(),
     handlers = NULL,
@@ -963,7 +964,7 @@ Fire <- R6Class('Fire',
       id <- private$client_id(req)
       assign(id, ws, envir = private$websockets)
       self$log('websocket', paste0('connection established to ', id), req)
-
+      private$p_trigger('websocket-opened', server = self, id = id, connection = ws, .request = request)
       ws$onMessage(private$message_logic(id, req))
       ws$onClose(private$close_ws_logic(id, req))
     },
@@ -990,7 +991,7 @@ Fire <- R6Class('Fire',
 
         private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request, .request = request)
 
-        self$log('websocket', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, message = msg)
+        self$log('websocket', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, ws_message = msg)
       }
     },
     close_ws_logic = function(id, request) {

@@ -20,6 +20,8 @@
   whatever async framework they like
 * Support returning promises in `request` events, and automated error logging
   from promises in all events
+* Added `websocket-opened` event that allows the user to add a handler that
+  modifies the WebSocket connection when it is established
 
 # fiery 1.2.1
 
