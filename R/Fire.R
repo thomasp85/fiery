@@ -256,7 +256,7 @@ Fire <- R6Class('Fire',
     serve_static = function(at, path, use_index = TRUE, fallthrough = FALSE, html_charset = "utf-8", headers = list(), validation = NULL) {
       check_string(at)
       check_string(path)
-      if (!file.exists(path)) {
+      if (!file.exists(path) && !dir.exists(path)) {
         cli::cli_abort("{.arg {path}} does not point to an existing file or directory")
       }
       check_bool(use_index)
