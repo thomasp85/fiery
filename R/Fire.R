@@ -475,7 +475,7 @@ Fire <- R6Class('Fire',
             if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
               self$log('error', e)
             } else {
-              self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+              self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
             }
           } else {
             self$log('error', e)
@@ -490,7 +490,7 @@ Fire <- R6Class('Fire',
             if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
               self$log('warning', w)
             } else {
-              self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+              self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
             }
           } else {
             self$log("warning", w)
