@@ -113,6 +113,9 @@ app$ignite(showcase = TRUE)
 
 \item{\code{compression_limit}}{The size threshold in bytes for trying to
 compress the response body (it is still dependant on content negotiation)}
+
+\item{\code{query_delim}}{The delimeter used to split array-type query arguments
+when parsing the query string}
 }
 \if{html}{\out{</div>}}
 }

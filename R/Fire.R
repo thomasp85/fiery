@@ -664,6 +664,13 @@ Fire <- R6Class('Fire',
       if (missing(value)) return(private$COMPRESSION_LIMIT)
       check_number_decimal(value, min = 0, allow_infinite = TRUE)
       private$COMPRESSION_LIMIT <- value
+    },
+    #' @field query_delim The delimeter used to split array-type query arguments
+    #' when parsing the query string
+    query_delim = function(value) {
+      if (missing(value)) return(private$QUERY_DELIM)
+      check_string(value, allow_null = TRUE)
+      private$QUERY_DELIM <- value
     }
   ),
   private = list(
@@ -679,6 +686,7 @@ Fire <- R6Class('Fire',
     SESSION_COOKIE = NULL,
     TRUST = FALSE,
     COMPRESSION_LIMIT = 0,
+    QUERY_DELIM = NULL,
 
     running = FALSE,
     quitting = FALSE,
@@ -1086,7 +1094,8 @@ Fire <- R6Class('Fire',
         trust = private$TRUST,
         key = private$KEY,
         session_cookie = private$SESSION_COOKIE,
-        compression_limit = private$COMPRESSION_LIMIT
+        compression_limit = private$COMPRESSION_LIMIT,
+        query_delim = private$QUERY_DELIM
       )
       f <- as.call(list(function() put_request(req)))
       envir <- parent.frame()
