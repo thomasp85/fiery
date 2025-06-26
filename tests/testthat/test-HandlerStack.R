@@ -75,7 +75,7 @@ test_that('Dispatch works', {
     args <- 1:10
     expect_type(stack$dispatch(args), 'list')
     expect_length(stack$dispatch(args), 0)
-    expect_named(stack$dispatch(args), character())
+    expect_null(names(stack$dispatch(args)))
 
     stack$add(min, 'min')
     stack$add(mean, 'mean')

@@ -6,7 +6,6 @@ HandlerStack <- R6Class('HandlerStack',
   public = list(
     # Methods
     initialize = function(server = NULL) {
-      private$handleEnv <- new.env(parent = emptyenv())
       private$server <- server
     },
     add = function(handler, id, pos = NULL) {
@@ -16,47 +15,39 @@ HandlerStack <- R6Class('HandlerStack',
         cli::cli_abort("{.arg request} is a reserved argument name and cannot be used in event handlers")
       }
       if (is.null(pos)) {
-        pos <- length(private$handleOrder) + 1
+        pos <- length(private$handlers)
       } else {
         check_number_whole(pos, min = 1)
-        pos <- min(c(pos, length(private$handleOrder) + 1))
+        pos <- max(0, min(c(pos - 1, length(private$handlers))))
       }
-      assign(id, handler, envir = private$handleEnv)
-      private$handleOrder <- append(private$handleOrder, id, after = pos - 1)
+      private$handlers <- append(private$handlers, set_names(list(handler), id), pos)
     },
     remove = function(id) {
       check_string(id)
-      ind <- which(private$handleOrder == id)
-      if (length(ind) != 0) {
-        private$handleOrder <- private$handleOrder[-ind]
-        handler <- private$handleEnv[[id]]
-        rm(list = id, envir = private$handleEnv)
-        invisible(handler)
-      }
+      handler <- private$handlers[[id]]
+      private$handlers[[id]] <- NULL
+      invisible(handler)
     },
     dispatch = function(..., .request = NULL) {
-      res <- lapply(private$handleOrder, function(id) {
-        private$server$safe_call(private$handleEnv[[id]](...), request = .request)
+      lapply(private$handlers, function(handler) {
+        private$server$safe_call(handler(...), request = .request)
       })
-      names(res) <- private$handleOrder
-      res
     },
     length = function() {
-      length(private$handleOrder)
+      length(private$handlers)
     },
     contains = function(id) {
       check_character(id)
-      !is.na(self$position(id))
+      !is.null(private$handlers[[id]])
     },
     position = function(id) {
       check_character(id)
-      match(id, private$handleOrder)
+      match(id, names(private$handlers))
     }
   ),
   private = list(
     # Data
-    handleEnv = NULL,
-    handleOrder = character(),
+    handlers = list(),
     server = NULL
   )
 )

@@ -105,8 +105,8 @@ Fire <- R6Class('Fire',
       self$host <- host
       self$port <- port
       private$data <- new.env(parent = emptyenv())
-      private$handlers <- new.env(parent = emptyenv())
-      private$websockets <- new.env(parent = emptyenv())
+      private$handlers <- list()
+      private$websockets <- list()
       private$client_id <- session_id_cookie()
       private$DELAY <- DelayStack$new(self)
       private$TIME <- TimeStack$new(self)
@@ -879,7 +879,6 @@ Fire <- R6Class('Fire',
       } else if (any(vapply(res, is_condition, logical(1)))) {
         response$status_with_text(500L)
       }
-      for (i in names(private$headers)) response$set_header(i, private$headers[[i]])
       response <- self$safe_call(response$as_list(), request)
       # On the off-chance that reqres throws an error during conversion of response
       if (is_condition(response)) {
@@ -971,7 +970,7 @@ Fire <- R6Class('Fire',
         req <- private$new_req(request)
       }
       id <- private$client_id(req)
-      assign(id, ws, envir = private$websockets)
+      private$websockets[[id]] <- ws
       self$log('websocket', paste0('connection established to ', id), req)
       private$p_trigger('websocket-opened', server = self, id = id, connection = ws, .request = request)
       ws$onMessage(private$message_logic(id, req))
@@ -1066,9 +1065,9 @@ Fire <- R6Class('Fire',
         check_string(message)
       }
       if (missing(id) || is.null(id)) {
-        id <- ls(envir = private$websockets)
+        id <- names(private$websockets)
       } else {
-        id <- intersect(id, ls(envir = private$websockets))
+        id <- intersect(id, names(private$websockets))
       }
       if (length(id) == 0) return(NULL)
       for (i in id) {
@@ -1080,7 +1079,7 @@ Fire <- R6Class('Fire',
       ws <- private$websockets[[id]]
       if (!is.null(ws)) {
         try(ws$close(), silent = TRUE)
-        rm(list = id, envir = private$websockets)
+        private$websockets[[id]] <- NULL
         self$log('websocket', paste0('connection to ', id, ' closed from the server'))
       }
     },
@@ -1095,7 +1094,8 @@ Fire <- R6Class('Fire',
         key = private$KEY,
         session_cookie = private$SESSION_COOKIE,
         compression_limit = private$COMPRESSION_LIMIT,
-        query_delim = private$QUERY_DELIM
+        query_delim = private$QUERY_DELIM,
+        response_headers = private$headers
       )
       f <- as.call(list(function() put_request(req)))
       envir <- parent.frame()

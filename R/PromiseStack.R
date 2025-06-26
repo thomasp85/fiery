@@ -8,20 +8,18 @@ DelayStack <- R6Class('DelayStack',
     # Methods
     initialize = function(server) {
       private$server <- server
-      private$calls <- new.env(parent = emptyenv())
     },
     add = function(expr, then, ...) {
       expr <- enquo(expr)
       id <- reqres::random_key()
       private$calls[[id]] <- private$make_promise(expr, then, ...)
-      private$ids <- append(private$ids, id)
       invisible(id)
     },
     remove = function(id) {
       private$clear(id)
     },
     empty = function() {
-      length(private$ids) == 0
+      length(private$calls) == 0
     },
     eval = function(...) {
       if (!self$empty()) {
@@ -37,8 +35,7 @@ DelayStack <- R6Class('DelayStack',
   ),
   private = list(
     # Data
-    ids = character(),
-    calls = NULL,
+    calls = list(),
     server = NULL,
 
     # Methods
@@ -56,19 +53,15 @@ DelayStack <- R6Class('DelayStack',
       )
     },
     do_eval = function() {
-      private$ids
+      names(private$calls)
     },
     clear = function(ids, ...) {
       if (length(ids) > 0) {
-        private$ids <- private$ids[!private$ids %in% ids]
-        rm(list = ids, envir = private$calls)
+        private$calls[ids] <- NULL
       }
     },
     null_fun = function(...) {
       NULL
-    },
-    finalize = function() {
-      try(rm(list = ls(private$calls), envir = private$calls), silent = TRUE)
     }
   )
 )
@@ -95,7 +88,7 @@ TimeStack <- R6Class('TimeStack',
                         loop = loop, at = Sys.time() + after)
     },
     do_eval = function() {
-      private$ids[vapply(private$calls, function(x) x$at, numeric(1)) < Sys.time()]
+      names(private$calls)[vapply(private$calls, function(x) x$at, numeric(1)) < Sys.time()]
     },
     clear = function(ids, force = FALSE) {
       if (!force) {
@@ -134,7 +127,6 @@ AsyncStack <- R6Class('AsyncStack',
     add = function(expr, then, ...) {
       id <- reqres::random_key()
       private$calls[[id]] <- private$make_promise(expr, then, ...)
-      private$ids <- append(private$ids, id)
       invisible(id)
     },
     eval = function(...) {
@@ -163,7 +155,7 @@ AsyncStack <- R6Class('AsyncStack',
       )
     },
     do_eval = function() {
-      private$ids[vapply(private$calls, function(x) resolved(x$expr, timeout = 0.05), logical(1))]
+      names(private$calls)[vapply(private$calls, function(x) resolved(x$expr, timeout = 0.05), logical(1))]
     }
   )
 )
