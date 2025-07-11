@@ -1109,3 +1109,37 @@ Fire <- R6Class('Fire',
     }
   )
 )
+
+# For use by connect etc
+launch_server <- function(settings, host = NULL, port = NULL, ...) {
+  server_yml <- yaml::read_yaml(settings)
+
+  if (!is.null(server_yml$options)) {
+    options(server_yml$options)
+  }
+
+  if (is.null(server_yml$constructor)) {
+    cli::cli_abort("The {.field constructor} field in {.file {settings}} must be present")
+  }
+  constructor <- fs::path(
+    fs::path_dir(settings),
+    server_yml$constructor
+  )
+  if (!fs::file_exists(constructor)) {
+    cli::cli_abort("The {.field constructor} field in {.file {settings}} must point to an existing file")
+  }
+  app <- source(constructor, verbose = FALSE)
+  if (!inherits(app, "Fire")) {
+    cli::cli_abort(
+      "The constructor file in {.file {settings}} did not produce a Fire app"
+    )
+  }
+
+  if (!is.null(host)) {
+    app$host <- host
+  }
+  if (!is.null(port)) {
+    app$port <- port
+  }
+  app$ignite()
+}

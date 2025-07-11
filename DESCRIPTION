@@ -18,6 +18,7 @@ URL: https://fiery.data-imaginist.com, https://github.com/thomasp85/fiery
 BugReports: https://github.com/thomasp85/fiery/issues
 Imports:
     cli,
+    fs,
     future,
     glue,
     httpuv,
@@ -31,7 +32,8 @@ Imports:
     sodium,
     stats,
     stringi,
-    utils
+    utils,
+    yaml
 Suggests:
     callr,
     covr,
