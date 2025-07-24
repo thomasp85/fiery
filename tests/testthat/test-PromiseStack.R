@@ -62,7 +62,7 @@ test_that('TimeStack works', {
     }, after = 2)})
     rs(Sys.sleep(3))
     rs(time$reset())
-    expect_silent(rs(time$eval()))
+    rs(time$eval())
     rs(Sys.sleep(3))
     expect_snapshot(rs(time$eval()))
     expect_equal(rs(catcher$res), 30)

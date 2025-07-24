@@ -75,7 +75,7 @@ TimeStack <- R6Class('TimeStack',
       private$clear(id, force = TRUE)
     },
     reset = function() {
-      for (id in private$ids) {
+      for (id in names(private$calls)) {
         private$calls[[id]]$at <- Sys.time() + private$calls[[id]]$after
       }
     }
@@ -106,16 +106,6 @@ TimeStack <- R6Class('TimeStack',
     }
   )
 )
-
-can_fork <- NULL
-#' @importFrom parallelly availableCores
-on_load({can_fork <- availableCores("multicore") > 1L})
-
-#' @importFrom future multicore multisession
-multiprocess <- function(...) {
-  if (can_fork) multicore(...)
-  else multisession(...)
-}
 
 #' @importFrom R6 R6Class
 #' @importFrom future future resolved value
@@ -149,7 +139,7 @@ AsyncStack <- R6Class('AsyncStack',
         check_function(then)
       }
       list(
-        expr = eval_bare(call2(multiprocess, expr = expr, lazy = FALSE)),
+        expr = eval_bare(call2(future::future, expr = expr, lazy = FALSE)),
         then = then,
         ...
       )
