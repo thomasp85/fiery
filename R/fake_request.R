@@ -163,7 +163,7 @@ fake_request <- function(url, method = 'get', app_location = '', content = '', h
 
   # Headers
   if (length(headers) > 0) {
-    names(headers) <- paste0('HTTP_', sub('^HTTP_', '', toupper(names(headers))))
+    names(headers) <- paste0('HTTP_', sub('^HTTP_', '', toupper(gsub("-", "_", names(headers)))))
     for (i in names(headers)) {
       check_scalar(headers[[i]])
       assign(i, as.character(headers[[i]]), envir = rook)
