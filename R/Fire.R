@@ -469,7 +469,7 @@ Fire <- R6Class('Fire',
         expr,
         error = function(e) {
           topcall <- e$call
-          if (!is.null(topcall)) {
+          if (MAY_TRACEBACK && !is.null(topcall)) {
             bt <- e$trace %||% cheap_trace_back()
             topcall_pos <- which(bt$call == topcall)
             if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
@@ -484,7 +484,7 @@ Fire <- R6Class('Fire',
         },
         warning = function(w) {
           topcall <- w$call
-          if (!is.null(topcall)) {
+          if (MAY_TRACEBACK && !is.null(topcall)) {
             bt <- cheap_trace_back()
             topcall_pos <- which(bt$call == topcall)
             if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
@@ -499,7 +499,7 @@ Fire <- R6Class('Fire',
         },
         message = function(m) {
           logcall <- m$call
-          if (!is.null(logcall)) {
+          if (MAY_TRACEBACK && !is.null(logcall)) {
             bt <- cheap_trace_back()
             logcall_pos <- which(bt$call == logcall)
             topcall_pos <- bt$parent[logcall_pos]
