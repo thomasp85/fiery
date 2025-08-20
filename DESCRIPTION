@@ -5,7 +5,6 @@ Version: 1.2.1.9000
 Authors@R:
     person("Thomas Lin", "Pedersen", , "thomasp85@gmail.com", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-5147-4711"))
-Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
 Description: A very flexible framework for building server side logic in
     R. The framework is unopinionated when it comes to how HTTP requests
     and WebSocket messages are handled and supports all levels of app
@@ -27,7 +26,7 @@ Imports:
     parallelly,
     promises,
     R6,
-    reqres (>= 0.2.5.9000),
+    reqres (>= 1.0.0),
     rlang (>= 1.1.0),
     sodium,
     stats,
@@ -60,5 +59,3 @@ Collate:
     'request_store.R'
     'zzz.R'
 Config/testthat/edition: 3
-Remotes:
-    thomasp85/reqres
