@@ -126,7 +126,7 @@ logger_null <- function() {
       if (is_condition(message)) {
         message <- upgrade_condition(message)
         cat(
-          if (is_error(message)) format(message) else cnd_message(message, prefix = TRUE),
+          if (is_error(message)) format(message) else cnd_message(message, prefix = event == 'warning'),
           file = if (is_warning(message)) stderr() else stdout()
         )
       } else {
