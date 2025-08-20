@@ -391,12 +391,14 @@ test_that('futures can be added and called', {
     expect_silent(app$ignite(silent = TRUE))
 
     app <- standard_app()
-    app$async({
-        10
-    }, function(res, server, ...) {
-        message(res)
-        server$extinguish()
-    })
+    lifecycle::expect_deprecated(
+        app$async({
+            10
+        }, function(res, server, ...) {
+            message(res)
+            server$extinguish()
+        })
+    )
     app$on('start', function(server, ...) server$set_data('time', Sys.time()))
     app$on('cycle-end', function(server, ...) {
         start <- server$get_data('time')
