@@ -385,7 +385,7 @@ Fire <- R6Class('Fire',
     remove_delay = function(id) {
       private$DELAY$remove(id)
     },
-    #' @description `r lifecycle::badge('deprecated')` Add an asynchronous evaluation to be evaluated in another process without blocking the server. This function has been deprecated in favor of using your own async framework of choice, e.g. [mirai](https://shikokuchuo.net/mirai/) or [promises](https://rstudio.github.io/promises/)
+    #' @description `r lifecycle::badge('deprecated')` Add an asynchronous evaluation to be evaluated in another process without blocking the server. This function has been deprecated in favor of using your own async framework of choice, e.g. [mirai](https://mirai.r-lib.org) or [promises](https://rstudio.github.io/promises/)
     #' @param expr The expression to evaluate at the end of the cycle
     #' @param then A handler to call once `expr` has been evaluated
     #' @return A unique id identifying the handler

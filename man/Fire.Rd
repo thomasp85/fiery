@@ -658,7 +658,7 @@ Remove a delayed evaluation
 \if{html}{\out{<a id="method-Fire-async"></a>}}
 \if{latex}{\out{\hypertarget{method-Fire-async}{}}}
 \subsection{Method \code{async()}}{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Add an asynchronous evaluation to be evaluated in another process without blocking the server. This function has been deprecated in favor of using your own async framework of choice, e.g. \href{https://shikokuchuo.net/mirai/}{mirai} or \href{https://rstudio.github.io/promises/}{promises}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Add an asynchronous evaluation to be evaluated in another process without blocking the server. This function has been deprecated in favor of using your own async framework of choice, e.g. \href{https://mirai.r-lib.org}{mirai} or \href{https://rstudio.github.io/promises/}{promises}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Fire$async(expr, then)}\if{html}{\out{</div>}}
 }
