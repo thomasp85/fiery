@@ -1,4 +1,5 @@
 test_that('handlers can be added, triggered and removed', {
+    httpuv::stopAllServers()
     rs <- r_session()
 
     rs(triggerRes <- app$trigger('test'))
@@ -25,6 +26,7 @@ test_that('handlers can be added, triggered and removed', {
 })
 
 test_that('Fire objects are printed', {
+    httpuv::stopAllServers()
     skip_on_os("windows") # Windows not a fan of unicode
 
     rs <- r_session()
@@ -42,6 +44,7 @@ test_that('Fire objects are printed', {
 })
 
 test_that('protected events cannot be triggered', {
+    httpuv::stopAllServers()
     rs <- r_session()
 
     protected <- c('start', 'resume', 'end', 'cycle-start',
@@ -55,6 +58,7 @@ test_that('protected events cannot be triggered', {
 })
 
 test_that('data can be set, get and removed', {
+    httpuv::stopAllServers()
     rs <- r_session()
     expect_null(rs(app$get_data('test')))
     rs(testdata <- list(a = 1, b = 1:10, c = letters[6:10]))
@@ -71,6 +75,7 @@ test_that('data can be set, get and removed', {
 })
 
 test_that('plugins are being attached', {
+    httpuv::stopAllServers()
     app <- standard_app()
     app$set_data('test', 10)
     plugin <- list(
@@ -101,6 +106,7 @@ test_that('plugins are being attached', {
 })
 
 test_that('id converter can be set and gets called', {
+    httpuv::stopAllServers()
     app <- standard_app()
     app$on('request', function(server, id, ...) {
         server$set_data('id', id)
@@ -122,6 +128,7 @@ test_that('id converter can be set and gets called', {
 })
 
 test_that('active bindings work', {
+    httpuv::stopAllServers()
     app <- standard_app()
     expect_snapshot(app$host <- 10, error = TRUE)
     expect_snapshot(app$host <- letters[1:3], error = TRUE)
@@ -151,6 +158,7 @@ test_that('active bindings work', {
 })
 
 test_that('life cycle events get fired', {
+    httpuv::stopAllServers()
     app <- standard_app()
     app$on('start', function(server, ...) {
         server$set_data('events', c(server$get_data('events'), 'start'))
@@ -214,6 +222,7 @@ test_that('life cycle events get fired', {
 })
 
 test_that('request events fire', {
+    httpuv::stopAllServers()
     app <- standard_app()
     request <- fake_request('http://www.example.com')
 
@@ -238,6 +247,7 @@ test_that('request events fire', {
 })
 
 test_that('message events fire', {
+    httpuv::stopAllServers()
     app <- standard_app()
     request <- fake_request('http://www.example.com')
 
@@ -273,6 +283,7 @@ test_that('message events fire', {
 })
 
 test_that('header event fire', {
+    httpuv::stopAllServers()
     app <- standard_app()
     request <- fake_request('http://www.example.com')
     expect_true(is.null(app$test_header(request)))
@@ -291,6 +302,7 @@ test_that('header event fire', {
 })
 
 test_that('errors in start and resume gets caught', {
+    httpuv::stopAllServers()
     app <- standard_app()
     app$on('start', function(...) {
         stop('Testing an error')
@@ -312,6 +324,7 @@ test_that('errors in start and resume gets caught', {
 })
 
 test_that('futures can be added and called', {
+    httpuv::stopAllServers()
     app <- standard_app()
 
     app$delay({
@@ -410,6 +423,7 @@ test_that('futures can be added and called', {
 })
 
 test_that('ignite is blocked during run', {
+    httpuv::stopAllServers()
     skip_on_cran()
     app <- standard_app()
     app$refresh_rate_nb <- 0.001
@@ -423,6 +437,7 @@ test_that('ignite is blocked during run', {
 })
 
 test_that('external triggers are fired', {
+    httpuv::stopAllServers()
     app <- standard_app()
 
     dir <- tempdir()
@@ -442,6 +457,7 @@ test_that('external triggers are fired', {
 })
 
 test_that('websockets are attached, and removed', {
+    httpuv::stopAllServers()
     app <- standard_app()
     req <- fake_request('http://www.example.com')
     app$on('send', function(server, ...) {server$set_data('send', TRUE)})
@@ -457,6 +473,7 @@ test_that('websockets are attached, and removed', {
 })
 
 test_that('showcase opens a browser', {
+    httpuv::stopAllServers()
     oldopt <- options(browser = function(url) message('Open browser at ', url))
 
     app <- standard_app()
@@ -471,6 +488,7 @@ test_that('showcase opens a browser', {
 })
 
 test_that('global headers are assigned and used', {
+    httpuv::stopAllServers()
     app <- standard_app()
     app$set_client_id_converter(function(request) NULL)
     app$header('X-Powered-By', 'fiery')
@@ -487,6 +505,7 @@ test_that('global headers are assigned and used', {
 })
 
 test_that('app can be mounted at path', {
+    httpuv::stopAllServers()
     app <- standard_app()
 
     expect_equal(app$root, '')
@@ -519,6 +538,7 @@ test_that('app can be mounted at path', {
 })
 
 test_that("Logging can be configured", {
+    httpuv::stopAllServers()
     app <- standard_app(FALSE)
     old_format <- app$access_log_format
     app$access_log_format <- combined_log_format
@@ -533,6 +553,7 @@ test_that("Logging can be configured", {
 })
 
 test_that('is_running works', {
+    httpuv::stopAllServers()
     app <- standard_app()
     expect_false(app$is_running())
     app$on('cycle-start', function(server, ...) {
@@ -552,14 +573,16 @@ test_that('is_running works', {
 })
 
 test_that('safe_call catches conditions', {
-  app <- standard_app()
-  self <- environment(app$clone)$self
-  expect_snapshot(cnd <- self$safe_call(stop('error test')))
-  expect_snapshot(cnd <- self$safe_call(warning('warning test')))
-  expect_snapshot(cnd <- self$safe_call(message('message test')))
+    httpuv::stopAllServers()
+    app <- standard_app()
+    self <- environment(app$clone)$self
+    expect_snapshot(cnd <- self$safe_call(stop('error test')))
+    expect_snapshot(cnd <- self$safe_call(warning('warning test')))
+    expect_snapshot(cnd <- self$safe_call(message('message test')))
 })
 
 test_that("requests are created with the correct settings", {
+    httpuv::stopAllServers()
     app <- standard_app()
     req <- fake_request('www.example.com')
 
@@ -595,6 +618,7 @@ test_that("requests are created with the correct settings", {
 })
 
 test_that("request handlers handle conditions", {
+    httpuv::stopAllServers()
     req <- fake_request('www.example.com')
 
     app <- standard_app()
@@ -620,6 +644,7 @@ test_that("request handlers handle conditions", {
 })
 
 test_that("header handlers handle conditions", {
+    httpuv::stopAllServers()
     req <- fake_request('www.example.com')
 
     app <- standard_app()
@@ -646,6 +671,7 @@ test_that("header handlers handle conditions", {
 })
 
 test_that("static file serving works", {
+    httpuv::stopAllServers()
     app <- standard_app()
 
     expect_snapshot(app$serve_static("/static", "test"), error = TRUE)
