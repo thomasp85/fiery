@@ -1,3 +1,5 @@
+# fiery (development version)
+
 # fiery 1.3.0
 
 * Added `serve_static()` method to `Fire` to serve a directory of static files
