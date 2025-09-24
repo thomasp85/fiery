@@ -108,13 +108,13 @@ TimeStack <- R6Class('TimeStack',
 )
 
 #' @importFrom R6 R6Class
-#' @importFrom future future resolved value
 #'
 AsyncStack <- R6Class('AsyncStack',
   inherit = DelayStack,
   public = list(
     # Methods
     add = function(expr, then, ...) {
+      check_installed("future")
       id <- reqres::random_key()
       private$calls[[id]] <- private$make_promise(expr, then, ...)
       invisible(id)
@@ -123,7 +123,7 @@ AsyncStack <- R6Class('AsyncStack',
       if (!self$empty()) {
         evalIds <- private$do_eval()
         for (i in evalIds) {
-          res <- private$server$safe_call(value(private$calls[[i]]$expr))
+          res <- private$server$safe_call(future::value(private$calls[[i]]$expr))
           private$server$safe_call(private$calls[[i]]$then(res = res, ...))
         }
         if (length(evalIds) != 0) private$clear(evalIds)
@@ -145,7 +145,7 @@ AsyncStack <- R6Class('AsyncStack',
       )
     },
     do_eval = function() {
-      names(private$calls)[vapply(private$calls, function(x) resolved(x$expr, timeout = 0.05), logical(1))]
+      names(private$calls)[vapply(private$calls, function(x) future::resolved(x$expr, timeout = 0.05), logical(1))]
     }
   )
 )

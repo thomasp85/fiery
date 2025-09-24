@@ -18,12 +18,10 @@ BugReports: https://github.com/thomasp85/fiery/issues
 Imports:
     cli,
     fs,
-    future,
     glue,
     httpuv,
     later,
     lifecycle,
-    parallelly,
     promises,
     R6,
     reqres (>= 1.0.0),
@@ -36,6 +34,7 @@ Imports:
 Suggests:
     callr,
     covr,
+    future,
     knitr,
     logger,
     rmarkdown,
