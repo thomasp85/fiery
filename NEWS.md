@@ -1,5 +1,7 @@
 # fiery (development version)
 
+* Add support for OpenTelemetry through the otel package
+
 # fiery 1.3.0
 
 * Added `serve_static()` method to `Fire` to serve a directory of static files

@@ -480,7 +480,7 @@ Fire <- R6Class('Fire',
           } else {
             self$log('error', e)
           }
-          e
+          add_otel_exception_event(e)
         },
         warning = function(w) {
           topcall <- w$call
@@ -831,7 +831,7 @@ Fire <- R6Class('Fire',
     },
     request_logic = function(req) {
       start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), private$new_req(req))
+      request <- self$safe_call(private$mount_request(req), private$new_req(req, otel = FALSE))
       if (is_condition(request)) {
         req <- private$new_req(req)
         id <- private$client_id(req)
@@ -906,7 +906,7 @@ Fire <- R6Class('Fire',
         return(NULL)
       }
       start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), private$new_req(req))
+      request <- self$safe_call(private$mount_request(req), private$new_req(req, otel = FALSE))
       if (is_condition(request)) {
         req <- private$new_req(req)
         id <- private$client_id(req)
@@ -923,7 +923,7 @@ Fire <- R6Class('Fire',
           )
         }
       } else {
-        req <- private$new_req(request)
+        req <- private$new_req(request, otel = FALSE)
         id <- private$client_id(req)
         res <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
         problems <- vapply(res, reqres::is_reqres_problem, logical(1))
@@ -962,12 +962,12 @@ Fire <- R6Class('Fire',
       response
     },
     websocket_logic = function(ws) {
-      request <- self$safe_call(private$mount_request(ws$request), private$new_req(ws$request))
+      request <- self$safe_call(private$mount_request(ws$request), private$new_req(ws$request, otel = FALSE))
       if (is_condition(request)) {
         ws$close()
         return()
       } else {
-        req <- private$new_req(request)
+        req <- private$new_req(request, otel = FALSE)
       }
       id <- private$client_id(req)
       private$websockets[[id]] <- ws
@@ -1087,7 +1087,7 @@ Fire <- R6Class('Fire',
       url <- paste0('http://', private$HOST, ':', private$PORT, '/', sub("^/", "", path))
       browseURL(url)
     },
-    new_req = function(request) {
+    new_req = function(request, otel = TRUE) {
       req <- get_request(
         rook = request,
         trust = private$TRUST,
@@ -1095,7 +1095,8 @@ Fire <- R6Class('Fire',
         session_cookie = private$SESSION_COOKIE,
         compression_limit = private$COMPRESSION_LIMIT,
         query_delim = private$QUERY_DELIM,
-        response_headers = private$headers
+        response_headers = private$headers,
+        with_otel = otel
       )
       f <- as.call(list(function() put_request(req)))
       envir <- parent.frame()
