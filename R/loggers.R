@@ -215,13 +215,13 @@ logger_otel <- function(format = '{time} - {event}: {message}') {
       error = "error",
       "info"
     )
-    msg <- paste0(cli::ansi_strip(as_log_message(message)), "\n")
+    msg <- paste0(cli::ansi_strip(as_log_message(message)), collapse = "\n")
     msg <- glue_log(list(
       time = time,
       event = event,
       message = msg
     ), format)
-    otel::log(msg, severity = level, span_context = request$otel)
+    otel::log(as.character(msg), severity = level, span_context = request$otel)
   }
 }
 #' @rdname loggers
