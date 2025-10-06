@@ -830,48 +830,29 @@ Fire <- R6Class('Fire',
       }
     },
     request_logic = function(req) {
-      start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), private$new_req(req, otel = FALSE))
-      if (is_condition(request)) {
-        req <- private$new_req(req)
-        id <- private$client_id(req)
-        response <- req$respond()
-        response$status_with_text(400L)
-        response <- self$safe_call(response$as_list(), req)
-        # On the off-chance that reqres throws an error during conversion of response
-        if (is_condition(response)) {
-          req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
-          response <- list(
-            status = 500L,
-            headers = list("Content-Type" = "text/plain"),
-            body = "Internal Server Error"
-          )
-        }
-        private$log_request(start_time, req, id)
-        response
-      } else {
-        req <- private$new_req(request)
-        id <- private$client_id(req)
-        args <- unlist(
-          unname(private$p_trigger('before-request', server = self, id = id, request = req, .request = req)),
-          recursive = FALSE
-        )
-        res <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args, .request = req)
-        any_promising <- any(vapply(res, promises::is.promising, logical(1)))
-        if (any_promising) {
-          promises::then(promises::promise_map(res, identity), function(res) {
-            on.exit({
-              req$locked <- FALSE
-              put_request(req)
-            })
-            private$finish_request(res, req, start_time, id)
-          })
-        } else {
+      req <- req$._REQRES_OBJ
+      start_time <- req$start_time %||% Sys.time()
+      id <- private$client_id(req)
+      args <- unlist(
+        unname(private$p_trigger('before-request', server = self, id = id, request = req, .request = req)),
+        recursive = FALSE
+      )
+      res <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args, .request = req)
+      any_promising <- any(vapply(res, promises::is.promising, logical(1)))
+      if (any_promising) {
+        promises::then(promises::promise_map(res, identity), function(res) {
           private$finish_request(res, req, start_time, id)
-        }
+        })
+      } else {
+        private$finish_request(res, req, start_time, id)
       }
     },
     finish_request = function(res, request, start_time, id) {
+      on.exit({
+        request$locked <- FALSE
+        put_request(request)
+      })
+
       response <- request$respond()
       problems <- vapply(res, reqres::is_reqres_problem, logical(1))
       if (any(problems)) {
@@ -901,14 +882,11 @@ Fire <- R6Class('Fire',
       ), req)
     },
     header_logic = function(req) {
-      # Short-circuit if no header handlers exist
-      if (is.null(private$handlers[["header"]])) {
-        return(NULL)
-      }
       start_time <- Sys.time()
       request <- self$safe_call(private$mount_request(req), private$new_req(req, otel = FALSE))
+      response <- NULL
       if (is_condition(request)) {
-        req <- private$new_req(req)
+        req <- private$new_req(req, auto_put = FALSE)
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
@@ -923,41 +901,46 @@ Fire <- R6Class('Fire',
           )
         }
       } else {
-        req <- private$new_req(request, otel = FALSE)
-        id <- private$client_id(req)
-        res <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
-        problems <- vapply(res, reqres::is_reqres_problem, logical(1))
-        response <- req$respond()
-        if (any(problems)) {
-          reqres::handle_problem(req$respond(), res[[which(problems)[1]]])
-          res <- FALSE
-        } else if (any(vapply(res, is_condition, logical(1)))) {
-          response$status_with_text(500L)
-          res <- FALSE
-        }
-        if (length(res) == 0) {
-          res <- NULL
-        } else {
-          continue <- tail(res, 1)[[1]]
-          check_bool(continue)
-          if (continue) {
-            response <- NULL
+        req <- private$new_req(request, auto_put = FALSE)
+        request$._REQRES_OBJ <- req
+        # Short-circuit if no header handlers exist
+        if (!is.null(private$handlers[["header"]])) {
+          id <- private$client_id(req)
+          res <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
+          problems <- vapply(res, reqres::is_reqres_problem, logical(1))
+          response <- req$respond()
+          if (any(problems)) {
+            reqres::handle_problem(req$respond(), res[[which(problems)[1]]])
+            res <- FALSE
+          } else if (any(vapply(res, is_condition, logical(1)))) {
+            response$status_with_text(500L)
+            res <- FALSE
+          }
+          if (length(res) == 0) {
+            res <- NULL
           } else {
-            self$log('request', 'denied after header', req)
-            response <- self$safe_call(req$respond()$as_list(), req)
-            if (is_condition(response)) {
-              req$response$status_with_text(500L)
-              response <- list(
-                status = 500L,
-                headers = list("Content-Type" = "text/plain"),
-                body = "Internal Server Error"
-              )
+            continue <- tail(res, 1)[[1]]
+            check_bool(continue)
+            if (continue) {
+              response <- NULL
+            } else {
+              self$log('request', 'denied after header', req)
+              response <- self$safe_call(req$respond()$as_list(), req)
+              if (is_condition(response)) {
+                req$response$status_with_text(500L)
+                response <- list(
+                  status = 500L,
+                  headers = list("Content-Type" = "text/plain"),
+                  body = "Internal Server Error"
+                )
+              }
             }
           }
         }
       }
       if (!is.null(response)) {
-        private$log_request(start_time, req, id)
+        private$log_request(req$start_time %||% start_time, req, id)
+        on.exit(put_request(req))
       }
       response
     },
@@ -1087,7 +1070,7 @@ Fire <- R6Class('Fire',
       url <- paste0('http://', private$HOST, ':', private$PORT, '/', sub("^/", "", path))
       browseURL(url)
     },
-    new_req = function(request, otel = TRUE) {
+    new_req = function(request, otel = TRUE, auto_put = TRUE) {
       req <- get_request(
         rook = request,
         trust = private$TRUST,
@@ -1098,9 +1081,11 @@ Fire <- R6Class('Fire',
         response_headers = private$headers,
         with_otel = otel
       )
-      f <- as.call(list(function() put_request(req)))
-      envir <- parent.frame()
-      do.call(on.exit, list(f, TRUE, TRUE), envir = envir)
+      if (auto_put) {
+        f <- as.call(list(function() put_request(req)))
+        envir <- parent.frame()
+        do.call(on.exit, list(f, TRUE, TRUE), envir = envir)
+      }
       req
     },
     finalize = function() {
