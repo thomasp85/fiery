@@ -203,6 +203,28 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
   }
 }
 #' @rdname loggers
+#' @export
+logger_otel <- function(format = '{time} - {event}: {message}') {
+  function(event, message, request = NULL, time = Sys.time(), ...) {
+    level <- switch(
+      tolower(event),
+      trace = ,
+      debug = ,
+      fatal = tolower(event),
+      warning = "warn",
+      error = "error",
+      "info"
+    )
+    msg <- paste0(cli::ansi_strip(as_log_message(message)), collapse = "\n")
+    msg <- glue_log(list(
+      time = time,
+      event = event,
+      message = msg
+    ), format)
+    otel::log(as.character(msg), severity = level, span_context = request$otel)
+  }
+}
+#' @rdname loggers
 #'
 #' @param ... A named list of loggers to use for different events. The same
 #' semantics as [switch][base::switch] is used so it is possible to let events

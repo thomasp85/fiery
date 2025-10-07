@@ -13,8 +13,8 @@ get_request <- function(...) {
   req
 }
 put_request <- function(req) {
+  req$clear()
   if (requests$counter < 100 && !req$locked) {
-    req$clear()
     requests$counter <- requests$counter + 1L
     requests$stack[[requests$counter]] <- req
   }

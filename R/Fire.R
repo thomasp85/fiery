@@ -37,6 +37,7 @@ NULL
 #' @importFrom reqres Request
 #' @importFrom stringi stri_pad_left
 #' @importFrom sodium hex2bin
+#' @importFrom promises is.promising
 #'
 #' @export
 #'
@@ -480,7 +481,7 @@ Fire <- R6Class('Fire',
           } else {
             self$log('error', e)
           }
-          e
+          add_otel_exception_event(e)
         },
         warning = function(w) {
           topcall <- w$call
@@ -518,11 +519,13 @@ Fire <- R6Class('Fire',
     #' @description Send a request directly to the request logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
     test_request = function(request) {
-      private$request_logic(request)
+      res <- private$header_logic(request)
+      res %||% private$request_logic(request)
     },
     #' @description Send a request directly to the header logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
     test_header = function(request) {
+      on.exit(if (!is.null(request$._REQRES_OBJ)) put_request(request$._REQRES_OBJ))
       private$header_logic(request)
     },
     #' @description Send a message directly **to** the message logic of a non-running app. Only intended for testing the websocket logic
@@ -883,7 +886,7 @@ Fire <- R6Class('Fire',
     },
     header_logic = function(req) {
       start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), private$new_req(req))
+      request <- self$safe_call(private$mount_request(req), private$new_req(req, otel = FALSE))
       response <- NULL
       if (is_condition(request)) {
         req <- private$new_req(req, auto_put = FALSE)
@@ -945,12 +948,12 @@ Fire <- R6Class('Fire',
       response
     },
     websocket_logic = function(ws) {
-      request <- self$safe_call(private$mount_request(ws$request), private$new_req(ws$request))
+      request <- self$safe_call(private$mount_request(ws$request), private$new_req(ws$request, otel = FALSE))
       if (is_condition(request)) {
         ws$close()
         return()
       } else {
-        req <- private$new_req(request)
+        req <- private$new_req(request, otel = FALSE)
       }
       id <- private$client_id(req)
       private$websockets[[id]] <- ws
@@ -1070,7 +1073,7 @@ Fire <- R6Class('Fire',
       url <- paste0('http://', private$HOST, ':', private$PORT, '/', sub("^/", "", path))
       browseURL(url)
     },
-    new_req = function(request, auto_put = TRUE) {
+    new_req = function(request, otel = TRUE, auto_put = TRUE) {
       req <- get_request(
         rook = request,
         trust = private$TRUST,
@@ -1078,7 +1081,8 @@ Fire <- R6Class('Fire',
         session_cookie = private$SESSION_COOKIE,
         compression_limit = private$COMPRESSION_LIMIT,
         query_delim = private$QUERY_DELIM,
-        response_headers = private$headers
+        response_headers = private$headers,
+        with_otel = otel
       )
       if (auto_put) {
         f <- as.call(list(function() put_request(req)))

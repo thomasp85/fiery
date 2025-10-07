@@ -1,5 +1,6 @@
 # fiery (development version)
 
+* Add support for OpenTelemetry through the otel package
 * Request/Response object are now persistent across header and request logic
   (#55)
 
