@@ -37,6 +37,7 @@ NULL
 #' @importFrom reqres Request
 #' @importFrom stringi stri_pad_left
 #' @importFrom sodium hex2bin
+#' @importFrom promises is.promising
 #'
 #' @export
 #'
@@ -518,11 +519,13 @@ Fire <- R6Class('Fire',
     #' @description Send a request directly to the request logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
     test_request = function(request) {
-      private$request_logic(request)
+      res <- private$header_logic(request)
+      res %||% private$request_logic(request)
     },
     #' @description Send a request directly to the header logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
     test_header = function(request) {
+      on.exit(if (!is.null(request$._REQRES_OBJ)) put_request(request$._REQRES_OBJ))
       private$header_logic(request)
     },
     #' @description Send a message directly **to** the message logic of a non-running app. Only intended for testing the websocket logic

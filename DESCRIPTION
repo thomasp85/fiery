@@ -61,4 +61,4 @@ Collate:
     'zzz.R'
 Config/testthat/edition: 3
 Remotes:
-    thomasp85/reqres@otel-integration
+    thomasp85/reqres
