@@ -377,7 +377,7 @@
     Code
       app$ignite()
     Message
-      Fire started at <127.0.0.1:49925>
+      Fire started at <127.0.0.1:49925> (untraditional_lowbred_americancrocodile)
     Output
       message: 10
 
@@ -432,7 +432,7 @@
     Code
       app$ignite(showcase = TRUE)
     Message
-      Fire started at <127.0.0.1:49925>
+      Fire started at <127.0.0.1:49925> (untraditional_lowbred_americancrocodile)
       Open browser at http://127.0.0.1:49925/
 
 ---
@@ -440,7 +440,7 @@
     Code
       app$ignite(showcase = "/test")
     Message
-      Fire started at <127.0.0.1:49925>
+      Fire started at <127.0.0.1:49925> (untraditional_lowbred_americancrocodile)
       Open browser at http://127.0.0.1:49925/test
 
 ---
@@ -448,7 +448,7 @@
     Code
       app$ignite(showcase = TRUE, block = FALSE)
     Message
-      Fire started at <127.0.0.1:49925>
+      Fire started at <127.0.0.1:49925> (untraditional_lowbred_americancrocodile)
       Open browser at http://127.0.0.1:49925/
 
 # app can be mounted at path
