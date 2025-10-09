@@ -113,6 +113,7 @@ Fire <- R6Class('Fire',
       private$TIME <- TimeStack$new(self)
       private$ASYNC <- AsyncStack$new(self)
       private$LOG_QUEUE <- DelayStack$new(list(safe_call = function(x, ...) force(x)))
+      private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
     },
     #' @description Human readable description of the app
     #' @param ... ignored
@@ -440,6 +441,7 @@ Fire <- R6Class('Fire',
           .logcall = .logcall,
           .topcall = .topcall,
           .topenv = .topenv,
+          .session_name = private$SESSION_NAME,
           ...
         )
       }
@@ -690,6 +692,7 @@ Fire <- R6Class('Fire',
     TRUST = FALSE,
     COMPRESSION_LIMIT = 0,
     QUERY_DELIM = NULL,
+    SESSION_NAME = "",
 
     running = FALSE,
     quitting = FALSE,
@@ -728,10 +731,10 @@ Fire <- R6Class('Fire',
         private$p_trigger('start', server = self, ...)
         if (resume) {
           private$p_trigger('resume', server = self, ...)
-          if (!silent) cli::cli_inform('Fire restarted at {.url {self$host}:{self$port}{self$root}}')
+          if (!silent) cli::cli_inform('Fire restarted at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})')
           self$log('resume', paste0(self$host, ':', self$port, self$root))
         } else {
-          if (!silent) cli::cli_inform('Fire started at {.url {self$host}:{self$port}{self$root}}')
+          if (!silent) cli::cli_inform('Fire started at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})')
           self$log('start', paste0(self$host, ':', self$port, self$root))
         }
 
@@ -1084,6 +1087,9 @@ Fire <- R6Class('Fire',
         response_headers = private$headers,
         with_otel = otel
       )
+      if (!is.null(req$otel)) {
+        req$otel$set_attribute("server.id", private$SESSION_NAME)
+      }
       if (auto_put) {
         f <- as.call(list(function() put_request(req)))
         envir <- parent.frame()

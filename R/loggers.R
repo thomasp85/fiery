@@ -205,7 +205,7 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
 #' @rdname loggers
 #' @export
 logger_otel <- function(format = '{time} - {event}: {message}') {
-  function(event, message, request = NULL, time = Sys.time(), ...) {
+  function(event, message, request = NULL, time = Sys.time(), session_name = "", ...) {
     level <- switch(
       tolower(event),
       trace = ,
@@ -221,7 +221,8 @@ logger_otel <- function(format = '{time} - {event}: {message}') {
       event = event,
       message = msg
     ), format)
-    otel::log(as.character(msg), severity = level, span_context = request$otel)
+    otel::log(as.character(msg), severity = level, span_context = request$otel,
+              timestamp = time, attributes = list(server.id = session_name))
   }
 }
 #' @rdname loggers
