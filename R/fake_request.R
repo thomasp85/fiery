@@ -7,7 +7,8 @@ NULL
 #'
 #' @noRd
 #'
-InputStreamFake <- R6Class('InputStreamFake',
+InputStreamFake <- R6Class(
+  'InputStreamFake',
   public = list(
     initialize = function(content) {
       if (!is.raw(content)) {
@@ -25,13 +26,15 @@ InputStreamFake <- R6Class('InputStreamFake',
     },
     read = function(l = -1L) {
       # l < 0 means read all remaining bytes
-      if (l < 0)
+      if (l < 0) {
         l <- private$length - seek(private$content)
+      }
 
-      if (l == 0)
+      if (l == 0) {
         return(raw())
-      else
+      } else {
         return(readBin(private$content, raw(), l))
+      }
     },
     rewind = function() {
       seek(private$content, 0)
@@ -55,7 +58,8 @@ InputStreamFake <- R6Class('InputStreamFake',
 #'
 #' @noRd
 #'
-NullInputStreamFake <- R6Class('NullInputStreamFake',
+NullInputStreamFake <- R6Class(
+  'NullInputStreamFake',
   public = list(
     read_lines = function(n = -1L) {
       character()
@@ -73,10 +77,11 @@ NullInputStreamFake <- R6Class('NullInputStreamFake',
 #'
 #' @noRd
 #'
-ErrorStreamFake <- R6Class('ErrorStreamFake',
+ErrorStreamFake <- R6Class(
+  'ErrorStreamFake',
   public = list(
-    cat = function(... , sep = " ", fill = FALSE, labels = NULL) {
-      base::cat(..., sep=sep, fill=fill, labels=labels, file=stderr())
+    cat = function(..., sep = " ", fill = FALSE, labels = NULL) {
+      base::cat(..., sep = sep, fill = fill, labels = labels, file = stderr())
     },
     flush = function() {
       base::flush(stderr())
@@ -132,7 +137,15 @@ ErrorStreamFake <- R6Class('ErrorStreamFake',
 #' rm(req)
 #' gc()
 #'
-fake_request <- function(url, method = 'get', app_location = '', content = '', headers = list(), ..., remote_address = "123.123.123.123") {
+fake_request <- function(
+  url,
+  method = 'get',
+  app_location = '',
+  content = '',
+  headers = list(),
+  ...,
+  remote_address = "123.123.123.123"
+) {
   rook <- new.env(parent = emptyenv())
   rook$REQUEST_METHOD <- toupper(method)
 
@@ -145,7 +158,9 @@ fake_request <- function(url, method = 'get', app_location = '', content = '', h
     app_location <- sub('/$', '', app_location)
     appLocReg <- paste0('^', app_location)
     if (!grepl(appLocReg, url$path)) {
-      cli::cli_abort('{.arg app_location} must correspond to the beginning of the path')
+      cli::cli_abort(
+        '{.arg app_location} must correspond to the beginning of the path'
+      )
     }
     rook$SCRIPT_NAME <- app_location
     url$path <- sub(appLocReg, '', url$path)
@@ -163,7 +178,10 @@ fake_request <- function(url, method = 'get', app_location = '', content = '', h
 
   # Headers
   if (length(headers) > 0) {
-    names(headers) <- paste0('HTTP_', sub('^HTTP_', '', toupper(gsub("-", "_", names(headers)))))
+    names(headers) <- paste0(
+      'HTTP_',
+      sub('^HTTP_', '', toupper(gsub("-", "_", names(headers))))
+    )
     for (i in names(headers)) {
       check_scalar(headers[[i]])
       assign(i, as.character(headers[[i]]), envir = rook)
@@ -191,7 +209,7 @@ split_url <- function(url) {
   matches <- stri_match(
     url,
     regex = '^(([^:/?#]+)://)?(([^/?#:]*)(:(\\d+))?)?([^?#]*)(\\?([^#]*))?(#(.*))?'
-  )[1,]
+  )[1, ]
 
   parsedURL <- list(
     scheme = if (is.na(matches[3])) 'http' else matches[3],

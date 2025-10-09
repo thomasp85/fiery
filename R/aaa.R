@@ -65,8 +65,17 @@ session_id_cookie <- function(name = "fiery_id", secure = FALSE) {
       }
     }
     id <- reqres::random_key()
-    request$respond()$set_cookie(name, id, http_only = TRUE, secure = secure, same_site = "Strict")
-    request$origin$HTTP_COOKIE <- paste0(c(request$origin$HTTP_COOKIE, paste0(name, "=", id)), collapse = "; ")
+    request$respond()$set_cookie(
+      name,
+      id,
+      http_only = TRUE,
+      secure = secure,
+      same_site = "Strict"
+    )
+    request$origin$HTTP_COOKIE <- paste0(
+      c(request$origin$HTTP_COOKIE, paste0(name, "=", id)),
+      collapse = "; "
+    )
     id
   }
 }

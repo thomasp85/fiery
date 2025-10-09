@@ -3,7 +3,8 @@ NULL
 
 #' @importFrom R6 R6Class
 #'
-DelayStack <- R6Class('DelayStack',
+DelayStack <- R6Class(
+  'DelayStack',
   public = list(
     # Methods
     initialize = function(server) {
@@ -68,7 +69,8 @@ DelayStack <- R6Class('DelayStack',
 
 #' @importFrom R6 R6Class
 #'
-TimeStack <- R6Class('TimeStack',
+TimeStack <- R6Class(
+  'TimeStack',
   inherit = DelayStack,
   public = list(
     remove = function(id) {
@@ -84,22 +86,34 @@ TimeStack <- R6Class('TimeStack',
     make_promise = function(expr, then, after, loop = FALSE) {
       check_number_decimal(after)
       check_bool(loop)
-      super$make_promise(expr = expr, then = then, after = after,
-                        loop = loop, at = Sys.time() + after)
+      super$make_promise(
+        expr = expr,
+        then = then,
+        after = after,
+        loop = loop,
+        at = Sys.time() + after
+      )
     },
     do_eval = function() {
-      names(private$calls)[vapply(private$calls, function(x) x$at, numeric(1)) < Sys.time()]
+      names(private$calls)[
+        vapply(private$calls, function(x) x$at, numeric(1)) < Sys.time()
+      ]
     },
     clear = function(ids, force = FALSE) {
       if (!force) {
-        remove <- vapply(ids, function(id) {
-          if (private$calls[[id]]$loop && private$calls[[id]]$evaled) {
-            private$calls[[id]]$at <- private$calls[[id]]$at + private$calls[[id]]$after
-            FALSE
-          } else {
-            TRUE
-          }
-        }, logical(1))
+        remove <- vapply(
+          ids,
+          function(id) {
+            if (private$calls[[id]]$loop && private$calls[[id]]$evaled) {
+              private$calls[[id]]$at <- private$calls[[id]]$at +
+                private$calls[[id]]$after
+              FALSE
+            } else {
+              TRUE
+            }
+          },
+          logical(1)
+        )
         ids <- ids[remove]
       }
       super$clear(ids)
@@ -109,7 +123,8 @@ TimeStack <- R6Class('TimeStack',
 
 #' @importFrom R6 R6Class
 #'
-AsyncStack <- R6Class('AsyncStack',
+AsyncStack <- R6Class(
+  'AsyncStack',
   inherit = DelayStack,
   public = list(
     # Methods
@@ -123,7 +138,9 @@ AsyncStack <- R6Class('AsyncStack',
       if (!self$empty()) {
         evalIds <- private$do_eval()
         for (i in evalIds) {
-          res <- private$server$safe_call(future::value(private$calls[[i]]$expr))
+          res <- private$server$safe_call(future::value(
+            private$calls[[i]]$expr
+          ))
           private$server$safe_call(private$calls[[i]]$then(res = res, ...))
         }
         if (length(evalIds) != 0) private$clear(evalIds)
@@ -145,7 +162,11 @@ AsyncStack <- R6Class('AsyncStack',
       )
     },
     do_eval = function() {
-      names(private$calls)[vapply(private$calls, function(x) future::resolved(x$expr, timeout = 0.05), logical(1))]
+      names(private$calls)[vapply(
+        private$calls,
+        function(x) future::resolved(x$expr, timeout = 0.05),
+        logical(1)
+      )]
     }
   )
 )

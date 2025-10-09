@@ -126,7 +126,11 @@ logger_null <- function() {
       if (is_condition(message)) {
         message <- upgrade_condition(message)
         cat(
-          if (is_error(message)) format(message) else cnd_message(message, prefix = event == 'warning'),
+          if (is_error(message)) {
+            format(message)
+          } else {
+            cnd_message(message, prefix = event == 'warning')
+          },
           file = if (is_warning(message)) stderr() else stdout()
         )
       } else {
@@ -148,11 +152,14 @@ logger_console <- function(format = '{time} - {event}: {message}') {
     time <- style_log(time, event, request)
     event <- style_log(event, event, request)
     for (m in msg) {
-      m <- glue_log(list(
-        time = time,
-        event = event,
-        message = m
-      ), format)
+      m <- glue_log(
+        list(
+          time = time,
+          event = event,
+          message = m
+        ),
+        format
+      )
       cat(m, file = stdout(), append = TRUE)
       cat('\n', file = stdout(), append = TRUE)
     }
@@ -167,7 +174,11 @@ style_log <- function(x, event, request = NULL, default = identity) {
     warning = cli::col_yellow(x),
     message = cli::col_blue(x),
     request = {
-      status_group <- as.integer(cut(request$respond()$status, breaks = c(100, 200, 300, 400, 500, 600), right = FALSE))
+      status_group <- as.integer(cut(
+        request$respond()$status,
+        breaks = c(100, 200, 300, 400, 500, 600),
+        right = FALSE
+      ))
       cli::style_bold(switch(
         status_group,
         cli::col_blue(x),
@@ -192,11 +203,14 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
   function(event, message, request = NULL, time = Sys.time(), ...) {
     msg <- cli::ansi_strip(as_log_message(message))
     for (m in msg) {
-      m <- glue_log(list(
-        time = time,
-        event = event,
-        message = m
-      ), format)
+      m <- glue_log(
+        list(
+          time = time,
+          event = event,
+          message = m
+        ),
+        format
+      )
       cat(m, file = file, append = TRUE)
       cat('\n', file = file, append = TRUE)
     }
@@ -205,7 +219,14 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
 #' @rdname loggers
 #' @export
 logger_otel <- function(format = '{time} - {event}: {message}') {
-  function(event, message, request = NULL, time = Sys.time(), session_name = "", ...) {
+  function(
+    event,
+    message,
+    request = NULL,
+    time = Sys.time(),
+    session_name = "",
+    ...
+  ) {
     level <- switch(
       tolower(event),
       trace = ,
@@ -216,13 +237,21 @@ logger_otel <- function(format = '{time} - {event}: {message}') {
       "info"
     )
     msg <- paste0(cli::ansi_strip(as_log_message(message)), collapse = "\n")
-    msg <- glue_log(list(
-      time = time,
-      event = event,
-      message = msg
-    ), format)
-    otel::log(as.character(msg), severity = level, span_context = request$otel,
-              timestamp = time, attributes = list(server.id = session_name))
+    msg <- glue_log(
+      list(
+        time = time,
+        event = event,
+        message = msg
+      ),
+      format
+    )
+    otel::log(
+      as.character(msg),
+      severity = level,
+      span_context = request$otel,
+      timestamp = time,
+      attributes = list(server.id = session_name)
+    )
   }
 }
 #' @rdname loggers
@@ -242,7 +271,10 @@ logger_switch <- function(..., default = logger_null()) {
   is_missing <- vapply(loggers, quo_is_missing, logical(1))
   if (any(is_missing)) {
     fallthrough <- rle(is_missing)
-    fallthrough <- rep(cumsum(fallthrough$lengths)[which(fallthrough$values)] + 1, fallthrough$lengths[which(fallthrough$values)])
+    fallthrough <- rep(
+      cumsum(fallthrough$lengths)[which(fallthrough$values)] + 1,
+      fallthrough$lengths[which(fallthrough$values)]
+    )
     loggers[is_missing] <- loggers[fallthrough]
   }
   loggers <- lapply(loggers, eval_tidy)
@@ -251,7 +283,13 @@ logger_switch <- function(..., default = logger_null()) {
 
   function(event, message, request = NULL, time = Sys.time(), ...) {
     logger <- loggers[[event]] %||% default
-    logger(event = event, message = message, request = request, time = time, ...)
+    logger(
+      event = event,
+      message = message,
+      request = request,
+      time = time,
+      ...
+    )
   }
 }
 
@@ -264,7 +302,16 @@ logger_switch <- function(..., default = logger_null()) {
 logger_logger <- function(default_level = "INFO") {
   check_installed("logger")
   default_level <- logger::as.loglevel(default_level)
-  function(event, message, request = NULL, time = Sys.time(), .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame(), ...) {
+  function(
+    event,
+    message,
+    request = NULL,
+    time = Sys.time(),
+    .logcall = sys.call(),
+    .topcall = sys.call(-1),
+    .topenv = parent.frame(),
+    ...
+  ) {
     if (is_string(event)) {
       level <- switch(
         event,
@@ -284,7 +331,13 @@ logger_logger <- function(default_level = "INFO") {
     }
     msg <- as_log_message(message)
     for (m in msg) {
-      logger::log_level(level, m, .logcall = .logcall, .topcall = .topcall, .topenv = .topenv)
+      logger::log_level(
+        level,
+        m,
+        .logcall = .logcall,
+        .topcall = .topcall,
+        .topenv = .topenv
+      )
     }
   }
 }
@@ -294,7 +347,10 @@ logger_logger <- function(default_level = "INFO") {
 common_log_format <- '{request$ip} - {id} [{format(end_time, "%d/%b/%Y:%T %z")}] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
 #' @rdname loggers
 #' @export
-combined_log_format <- paste0(common_log_format, ' "{request$get_header("Referer") %||% ""}" "{paste(request$get_header("User-Agent"), collapse = ", ") %||% ""}"')
+combined_log_format <- paste0(
+  common_log_format,
+  ' "{request$get_header("Referer") %||% ""}" "{paste(request$get_header("User-Agent"), collapse = ", ") %||% ""}"'
+)
 
 # Helpers -----------------------------------------------------------------
 
@@ -314,7 +370,9 @@ as_log_message <- function(message) {
   if (is_condition(message)) {
     msg <- cnd_message(message)
     msg <- unlist(stringi::stri_split_fixed(msg, "\n"))
-    if (msg[length(msg)] == "") msg <- msg[-length(msg)]
+    if (msg[length(msg)] == "") {
+      msg <- msg[-length(msg)]
+    }
     if (!is.null(message$instance)) {
       msg <- c(
         paste0(" <instance ", message$instance, ">"),
@@ -336,8 +394,14 @@ upgrade_condition <- function(cnd) {
 #' @export
 upgrade_condition.default <- function(cnd) cnd
 #' @export
-upgrade_condition.simpleError <- function(cnd) error_cnd(message = cnd$message, call = cnd$call)
+upgrade_condition.simpleError <- function(cnd) {
+  error_cnd(message = cnd$message, call = cnd$call)
+}
 #' @export
-upgrade_condition.simpleWarning <- function(cnd) warning_cnd(message = cnd$message, call = cnd$call)
+upgrade_condition.simpleWarning <- function(cnd) {
+  warning_cnd(message = cnd$message, call = cnd$call)
+}
 #' @export
-upgrade_condition.simpleMessage <- function(cnd) message_cnd(message = cnd$message, call = cnd$call)
+upgrade_condition.simpleMessage <- function(cnd) {
+  message_cnd(message = cnd$message, call = cnd$call)
+}

@@ -95,7 +95,8 @@ NULL
 #' app$ignite(showcase = TRUE)
 #' }
 #'
-Fire <- R6Class('Fire',
+Fire <- R6Class(
+  'Fire',
   public = list(
     # Methods
     #' @description Create a new `Fire` app
@@ -112,7 +113,9 @@ Fire <- R6Class('Fire',
       private$DELAY <- DelayStack$new(self)
       private$TIME <- TimeStack$new(self)
       private$ASYNC <- AsyncStack$new(self)
-      private$LOG_QUEUE <- DelayStack$new(list(safe_call = function(x, ...) force(x)))
+      private$LOG_QUEUE <- DelayStack$new(list(safe_call = function(x, ...) {
+        force(x)
+      }))
       private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
     },
     #' @description Human readable description of the app
@@ -123,22 +126,41 @@ Fire <- R6Class('Fire',
         '\U0001f525 A fiery webserver',
         '\U0001f525  \U0001f4a5   \U0001f4a5   \U0001f4a5'
       )
-      mat <- matrix(c('Running on', ': ', paste0(self$host, ':', self$port, self$root)), ncol = 3)
+      mat <- matrix(
+        c('Running on', ': ', paste0(self$host, ':', self$port, self$root)),
+        ncol = 3
+      )
       plugins <- names(private$pluginList)
-      if (is.null(plugins)) plugins <- 'none'
+      if (is.null(plugins)) {
+        plugins <- 'none'
+      }
       mat <- rbind(mat, c('Plugins attached', ': ', plugins[1]))
-      mat <- rbind(mat, matrix(c(rep('  ', (length(plugins) - 1)*2), plugins[-1]), ncol = 3))
+      mat <- rbind(
+        mat,
+        matrix(c(rep('  ', (length(plugins) - 1) * 2), plugins[-1]), ncol = 3)
+      )
       handlers <- lapply(private$handlers, function(x) x$length())
       if (length(handlers) == 0) {
         mat <- rbind(mat, c('Event handlers added', ': ', 'none'))
       } else {
         mat <- rbind(mat, c('Event handlers added', '', ''))
         order <- match(names(handlers), private$privateTriggers)
-        order[is.na(order)] <- seq_len(sum(is.na(order))) + max(order, na.rm = TRUE)
+        order[is.na(order)] <- seq_len(sum(is.na(order))) +
+          max(order, na.rm = TRUE)
         handlers <- handlers[order(order)]
-        mat <- rbind(mat, matrix(c(names(handlers), rep(': ', length(handlers)), as.character(unlist(handlers))), ncol = 3))
+        mat <- rbind(
+          mat,
+          matrix(
+            c(
+              names(handlers),
+              rep(': ', length(handlers)),
+              as.character(unlist(handlers))
+            ),
+            ncol = 3
+          )
+        )
       }
-      mat[, 1] <- stri_pad_left(mat[, 1], max(nchar(mat[,1])))
+      mat[, 1] <- stri_pad_left(mat[, 1], max(nchar(mat[, 1])))
       c(text, paste0('\U0001f525 ', apply(mat, 1, paste, collapse = '')))
     },
     #' @description Begin running the server. Will trigger the `start` event
@@ -202,7 +224,9 @@ Fire <- R6Class('Fire',
       }
       check_string(id, allow_null = TRUE)
       if (!is.null(id) && id %in% names(private$handlerMap)) {
-        cli::cli_abort("{.arg id} must be unique. A handler with this id has already been added")
+        cli::cli_abort(
+          "{.arg id} must be unique. A handler with this id has already been added"
+        )
       }
       handlerId <- id %||% reqres::random_key()
       private$handlerMap[[handlerId]] <- event
@@ -225,7 +249,9 @@ Fire <- R6Class('Fire',
     trigger = function(event, ...) {
       check_string(event)
       if (event %in% private$privateTriggers) {
-        cli::cli_abort('{.val {event}} and other protected events cannot be triggered manually')
+        cli::cli_abort(
+          '{.val {event}} and other protected events cannot be triggered manually'
+        )
       } else {
         private$p_trigger(event, server = self, ...)
       }
@@ -255,11 +281,21 @@ Fire <- R6Class('Fire',
     #' @param html_charset The charset to report for serving html files
     #' @param headers A list of headers to add to the response. Will be combined with the global headers of the app
     #' @param validation An optional validation pattern. Presently, the only type of validation supported is an exact string match of a header. For example, if validation is `"abc" = "xyz"`, then HTTP requests must have a header named `abc` (case-insensitive) with the value `"xyz"` (case-sensitive). If a request does not have a matching header, than httpuv will give a 403 Forbidden response. If `character(0)` (the default), then no validation check will be performed.
-    serve_static = function(at, path, use_index = TRUE, fallthrough = FALSE, html_charset = "utf-8", headers = list(), validation = NULL) {
+    serve_static = function(
+      at,
+      path,
+      use_index = TRUE,
+      fallthrough = FALSE,
+      html_charset = "utf-8",
+      headers = list(),
+      validation = NULL
+    ) {
       check_string(at)
       check_string(path)
       if (!file.exists(path) && !dir.exists(path)) {
-        cli::cli_abort("{.arg {path}} does not point to an existing file or directory")
+        cli::cli_abort(
+          "{.arg {path}} does not point to an existing file or directory"
+        )
       }
       check_bool(use_index)
       check_bool(fallthrough)
@@ -311,13 +347,18 @@ Fire <- R6Class('Fire',
         check_character(requires)
         exists <- vapply(requires, self$has_plugin, logical(1))
         if (!all(exists)) {
-          cli::cli_abort('The {.arg {name}} plugin requires the following {cli::qty(requires[!exists])} plugin{?s}: {requires[!exists]}')
+          cli::cli_abort(
+            'The {.arg {name}} plugin requires the following {cli::qty(requires[!exists])} plugin{?s}: {requires[!exists]}'
+          )
         }
       }
       try_fetch(
         plugin$on_attach(self, ...),
         error = function(cnd) {
-          cli::cli_abort('The {.arg {name}} plugin failed to attach to the app', parent = cnd)
+          cli::cli_abort(
+            'The {.arg {name}} plugin failed to attach to the app',
+            parent = cnd
+          )
         }
       )
       private$add_plugin(plugin, name)
@@ -334,7 +375,9 @@ Fire <- R6Class('Fire',
     #' @param value The value of the header. Use `NULL` to remove the global header
     header = function(name, value) {
       check_string(name)
-      if (missing(value)) return(private$headers[[tolower(name)]])
+      if (missing(value)) {
+        return(private$headers[[tolower(name)]])
+      }
       check_string(value, allow_null = TRUE)
       private$headers[[tolower(name)]] <- value
       invisible(NULL)
@@ -368,7 +411,7 @@ Fire <- R6Class('Fire',
     #' @param loop Should `expr` be called repeatedly with the interval given by `after`
     #' @return A unique id identifying the handler
     time = function(expr, then, after, loop = FALSE) {
-      private$TIME$add({{expr}}, then, after, loop)
+      private$TIME$add({{ expr }}, then, after, loop)
     },
     #' @description Remove a timed evaluation
     #' @param id The unique id identifying the handler
@@ -380,7 +423,7 @@ Fire <- R6Class('Fire',
     #' @param then A handler to call once `expr` has been evaluated
     #' @return A unique id identifying the handler
     delay = function(expr, then) {
-      private$DELAY$add({{expr}}, then)
+      private$DELAY$add({{ expr }}, then)
     },
     #' @description Remove a delayed evaluation
     #' @param id The unique id identifying the handler
@@ -392,7 +435,11 @@ Fire <- R6Class('Fire',
     #' @param then A handler to call once `expr` has been evaluated
     #' @return A unique id identifying the handler
     async = function(expr, then) {
-      lifecycle::deprecate_soft("2.0.0", what = "Fire$async()", details = "Use an async evaluation framework of your own choice, such as promises or mirai")
+      lifecycle::deprecate_soft(
+        "2.0.0",
+        what = "Fire$async()",
+        details = "Use an async evaluation framework of your own choice, such as promises or mirai"
+      )
       private$ASYNC$add(substitute(expr), then)
     },
     #' @description Remove an async evaluation
@@ -423,7 +470,15 @@ Fire <- R6Class('Fire',
     #' @param .logcall The call that send the log request
     #' @param .topcall The call in which `.logcall` is called from
     #' @param .topenv The environment associated with `.topcall`
-    log = function(event, message, request = NULL, ..., .logcall = sys.call(), .topcall = sys.call(-1), .topenv = parent.frame()) {
+    log = function(
+      event,
+      message,
+      request = NULL,
+      ...,
+      .logcall = sys.call(),
+      .topcall = sys.call(-1),
+      .topenv = parent.frame()
+    ) {
       time <- Sys.time()
       force(message)
       force(.logcall)
@@ -431,7 +486,12 @@ Fire <- R6Class('Fire',
       force(.topenv)
       log_fun <- function(...) {
         if (!is_condition(message)) {
-          message <- vapply(message, cli::format_inline, character(1), .envir = .topenv)
+          message <- vapply(
+            message,
+            cli::format_inline,
+            character(1),
+            .envir = .topenv
+          )
         }
         private$logger[[1]](
           event,
@@ -478,7 +538,14 @@ Fire <- R6Class('Fire',
             if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
               self$log('error', e)
             } else {
-              self$log('error', e, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+              self$log(
+                'error',
+                e,
+                request = request,
+                .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]],
+                .topcall = topcall,
+                .topenv = sys.frame(topcall_pos)
+              )
             }
           } else {
             self$log('error', e)
@@ -493,7 +560,14 @@ Fire <- R6Class('Fire',
             if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
               self$log('warning', w)
             } else {
-              self$log('warning', w, request = request, .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]], .topcall = topcall, .topenv = sys.frame(topcall_pos))
+              self$log(
+                'warning',
+                w,
+                request = request,
+                .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]],
+                .topcall = topcall,
+                .topenv = sys.frame(topcall_pos)
+              )
             }
           } else {
             self$log("warning", w)
@@ -509,7 +583,14 @@ Fire <- R6Class('Fire',
             if (length(topcall_pos) != 1 || topcall_pos == 0) {
               self$log('message', m, .logcall = logcall)
             } else {
-              self$log('message', m, request = request, .logcall = logcall, .topcall = bt$call[[topcall_pos]], .topenv = sys.frame(topcall_pos))
+              self$log(
+                'message',
+                m,
+                request = request,
+                .logcall = logcall,
+                .topcall = bt$call[[topcall_pos]],
+                .topenv = sys.frame(topcall_pos)
+              )
             }
           } else {
             self$log("message", m)
@@ -527,7 +608,9 @@ Fire <- R6Class('Fire',
     #' @description Send a request directly to the header logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
     test_header = function(request) {
-      on.exit(if (!is.null(request$._REQRES_OBJ)) put_request(request$._REQRES_OBJ))
+      on.exit(
+        if (!is.null(request$._REQRES_OBJ)) put_request(request$._REQRES_OBJ)
+      )
       private$header_logic(request)
     },
     #' @description Send a message directly **to** the message logic of a non-running app. Only intended for testing the websocket logic
@@ -554,8 +637,12 @@ Fire <- R6Class('Fire',
         request = request,
         onMessage = function(func) {},
         onClose = function(func) {},
-        send = function(message) {message(message)},
-        close = function() {message('closing')}
+        send = function(message) {
+          message(message)
+        },
+        close = function() {
+          message('closing')
+        }
       )
       private$websocket_logic(ws)
       self$send(message, private$client_id(private$new_req(request)))
@@ -565,31 +652,41 @@ Fire <- R6Class('Fire',
   active = list(
     #' @field host A string giving a valid IPv4 address owned by the server, or `'0.0.0.0'` to listen on all addresses. The default is `'127.0.0.1'`
     host = function(address) {
-      if (missing(address)) return(private$HOST)
+      if (missing(address)) {
+        return(private$HOST)
+      }
       check_string(address)
       private$HOST <- address
     },
     #' @field port An integer giving the port number the server should listen on (defaults to `8080L`)
     port = function(n) {
-      if (missing(n)) return(private$PORT)
+      if (missing(n)) {
+        return(private$PORT)
+      }
       check_number_whole(n, min = 1)
       private$PORT <- n
     },
     #' @field refresh_rate The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)
     refresh_rate = function(rate) {
-      if (missing(rate)) return(private$REFRESHRATE)
+      if (missing(rate)) {
+        return(private$REFRESHRATE)
+      }
       check_number_decimal(rate)
       private$REFRESHRATE <- rate
     },
     #' @field refresh_rate_nb The interval in seconds between run cycles when running a non-blocking server (defaults to `1`)
     refresh_rate_nb = function(rate) {
-      if (missing(rate)) return(private$REFRESHRATENB)
+      if (missing(rate)) {
+        return(private$REFRESHRATENB)
+      }
       check_number_decimal(rate)
       private$REFRESHRATENB <- rate
     },
     #' @field trigger_dir A valid folder where trigger files can be put when running a blocking server (defaults to `NULL`). See the [*The event cycle in fiery* vignette](https://fiery.data-imaginist.com/articles/events.html) for more information.
     trigger_dir = function(dir) {
-      if (missing(dir)) return(private$TRIGGERDIR)
+      if (missing(dir)) {
+        return(private$TRIGGERDIR)
+      }
       check_dir(dir, allow_null = TRUE)
       private$TRIGGERDIR <- dir
     },
@@ -602,7 +699,9 @@ Fire <- R6Class('Fire',
     },
     #' @field data_store Access the environment that holds the global data store
     data_store = function(value) {
-      if (missing(value)) return(private$data)
+      if (missing(value)) {
+        return(private$data)
+      }
       if (!identical(private$data, value)) {
         cli::cli_abort("It is not allowed to replace the data store")
       }
@@ -610,15 +709,21 @@ Fire <- R6Class('Fire',
     },
     #' @field root The location of the app. Setting this will remove the root value from requests (or decline them with `400` if the request does not match the root). E.g. the path of a request will be changed from `/demo/test` to `/test` if `root == '/demo'`
     root = function(path) {
-      if (missing(path)) return(private$ROOT)
+      if (missing(path)) {
+        return(private$ROOT)
+      }
       check_string(path)
       path <- sub('/$', '', path)
-      if (path != '') path <- paste0('/', sub('^/+', '', path))
+      if (path != '') {
+        path <- paste0('/', sub('^/+', '', path))
+      }
       private$ROOT <- path
     },
     #' @field access_log_format A [glue][glue::glue] string defining how requests will be logged. For standard formats see [common_log_format] and [combined_log_format]. Defaults to the *Common Log Format*
     access_log_format = function(format) {
-      if (missing(format)) return(private$ACCESS_LOG_FORMAT)
+      if (missing(format)) {
+        return(private$ACCESS_LOG_FORMAT)
+      }
       check_string(format)
       private$ACCESS_LOG_FORMAT <- format
     },
@@ -632,11 +737,15 @@ Fire <- R6Class('Fire',
         if (is_string(value)) {
           value <- hex2bin(value)
           if (length(value) == 0) {
-            cli::cli_abort("Malformed key. If given as a string it must be hexadecimal encoded")
+            cli::cli_abort(
+              "Malformed key. If given as a string it must be hexadecimal encoded"
+            )
           }
         }
         if (!is.raw(value)) {
-          cli::cli_abort("Malformed key. It must be provided as either a string, a raw vector or NULL")
+          cli::cli_abort(
+            "Malformed key. It must be provided as either a string, a raw vector or NULL"
+          )
         }
         if (length(value) != 32) {
           cli::cli_abort("Malformed key. The key must be 32 bit")
@@ -647,7 +756,9 @@ Fire <- R6Class('Fire',
     #' @field session_cookie_settings Get or set the session cookie settings
     #'
     session_cookie_settings = function(value) {
-      if (missing(value)) return(private$SESSION_COOKIE)
+      if (missing(value)) {
+        return(private$SESSION_COOKIE)
+      }
       if (!reqres::is_session_cookie_settings(value)) {
         cli::cli_abort(c(
           "{.arg session_cookie_settings} can only be set to a valid settings object",
@@ -659,21 +770,27 @@ Fire <- R6Class('Fire',
     #' @field trust A logical indicating whether incoming requests are trusted.
     #'
     trust = function(value) {
-      if (missing(value)) return(private$TRUST)
+      if (missing(value)) {
+        return(private$TRUST)
+      }
       check_bool(value)
       private$TRUST <- value
     },
     #' @field compression_limit The size threshold in bytes for trying to
     #' compress the response body (it is still dependant on content negotiation)
     compression_limit = function(value) {
-      if (missing(value)) return(private$COMPRESSION_LIMIT)
+      if (missing(value)) {
+        return(private$COMPRESSION_LIMIT)
+      }
       check_number_decimal(value, min = 0, allow_infinite = TRUE)
       private$COMPRESSION_LIMIT <- value
     },
     #' @field query_delim The delimeter used to split array-type query arguments
     #' when parsing the query string
     query_delim = function(value) {
-      if (missing(value)) return(private$QUERY_DELIM)
+      if (missing(value)) {
+        return(private$QUERY_DELIM)
+      }
       check_string(value, allow_null = TRUE)
       private$QUERY_DELIM <- value
     }
@@ -696,11 +813,23 @@ Fire <- R6Class('Fire',
 
     running = FALSE,
     quitting = FALSE,
-    privateTriggers = c('start', 'resume', 'cycle-start', 'header',
-                        'before-request', 'request', 'after-request',
-                        'before-message', 'message', 'after-message',
-                        'websocket-opened', 'websocket-closed', 'send',
-                        'cycle-end', 'end'),
+    privateTriggers = c(
+      'start',
+      'resume',
+      'cycle-start',
+      'header',
+      'before-request',
+      'request',
+      'after-request',
+      'before-message',
+      'message',
+      'after-message',
+      'websocket-opened',
+      'websocket-closed',
+      'send',
+      'cycle-end',
+      'end'
+    ),
     data = NULL,
     headers = list(),
     handlers = NULL,
@@ -718,7 +847,13 @@ Fire <- R6Class('Fire',
     LOG_QUEUE = NULL,
 
     # Methods
-    run = function(block = TRUE, resume = FALSE, showcase = FALSE, ..., silent = FALSE) {
+    run = function(
+      block = TRUE,
+      resume = FALSE,
+      showcase = FALSE,
+      ...,
+      silent = FALSE
+    ) {
       check_bool(block)
       check_bool(resume)
       if (!is_bool(showcase)) {
@@ -731,10 +866,18 @@ Fire <- R6Class('Fire',
         private$p_trigger('start', server = self, ...)
         if (resume) {
           private$p_trigger('resume', server = self, ...)
-          if (!silent) cli::cli_inform('Fire restarted at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})')
+          if (!silent) {
+            cli::cli_inform(
+              'Fire restarted at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})'
+            )
+          }
           self$log('resume', paste0(self$host, ':', self$port, self$root))
         } else {
-          if (!silent) cli::cli_inform('Fire started at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})')
+          if (!silent) {
+            cli::cli_inform(
+              'Fire started at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})'
+            )
+          }
           self$log('start', paste0(self$host, ':', self$port, self$root))
         }
 
@@ -819,9 +962,12 @@ Fire <- R6Class('Fire',
         private$ASYNC$eval(server = self)
         private$LOG_QUEUE$eval(server = self)
         private$p_trigger('cycle-end', server = self)
-        later(function() {
-          private$allowing_cycle()
-        }, private$REFRESHRATENB)
+        later(
+          function() {
+            private$allowing_cycle()
+          },
+          private$REFRESHRATENB
+        )
       }
     },
     mount_request = function(req) {
@@ -832,7 +978,9 @@ Fire <- R6Class('Fire',
         req$PATH_INFO <- sub(paste0('^', self$root, ''), '', req$PATH_INFO)
         req
       } else {
-        cli::cli_abort('URL ({req$PATH_INFO}) not matching mount point ({self$root})')
+        cli::cli_abort(
+          'URL ({req$PATH_INFO}) not matching mount point ({self$root})'
+        )
       }
     },
     request_logic = function(req) {
@@ -840,10 +988,23 @@ Fire <- R6Class('Fire',
       start_time <- req$start_time %||% Sys.time()
       id <- private$client_id(req)
       args <- unlist(
-        unname(private$p_trigger('before-request', server = self, id = id, request = req, .request = req)),
+        unname(private$p_trigger(
+          'before-request',
+          server = self,
+          id = id,
+          request = req,
+          .request = req
+        )),
         recursive = FALSE
       )
-      res <- private$p_trigger('request', server = self, id = id, request = req, arg_list = args, .request = req)
+      res <- private$p_trigger(
+        'request',
+        server = self,
+        id = id,
+        request = req,
+        arg_list = args,
+        .request = req
+      )
       any_promising <- any(vapply(res, promises::is.promising, logical(1)))
       if (any_promising) {
         promises::then(promises::promise_map(res, identity), function(res) {
@@ -876,20 +1037,40 @@ Fire <- R6Class('Fire',
           body = "Internal Server Error"
         )
       }
-      private$p_trigger('after-request', server = self, id = id, request = request, response = request$response, .request = request)
+      private$p_trigger(
+        'after-request',
+        server = self,
+        id = id,
+        request = request,
+        response = request$response,
+        .request = request
+      )
       private$log_request(start_time, request, id)
       response
     },
     log_request = function(start_time, req, id) {
       end_time <- Sys.time()
-      self$log('request', glue_log(
-        list(start_time = start_time, end_time = end_time, request = req, response = req$response, id = id),
-        self$access_log_format
-      ), req)
+      self$log(
+        'request',
+        glue_log(
+          list(
+            start_time = start_time,
+            end_time = end_time,
+            request = req,
+            response = req$response,
+            id = id
+          ),
+          self$access_log_format
+        ),
+        req
+      )
     },
     header_logic = function(req) {
       start_time <- Sys.time()
-      request <- self$safe_call(private$mount_request(req), private$new_req(req, otel = FALSE))
+      request <- self$safe_call(
+        private$mount_request(req),
+        private$new_req(req, otel = FALSE)
+      )
       response <- NULL
       if (is_condition(request)) {
         req <- private$new_req(req, auto_put = FALSE)
@@ -912,7 +1093,13 @@ Fire <- R6Class('Fire',
         # Short-circuit if no header handlers exist
         if (!is.null(private$handlers[["header"]])) {
           id <- private$client_id(req)
-          res <- private$p_trigger('header', server = self, id = id, request = req, .request = req)
+          res <- private$p_trigger(
+            'header',
+            server = self,
+            id = id,
+            request = req,
+            .request = req
+          )
           problems <- vapply(res, reqres::is_reqres_problem, logical(1))
           response <- req$respond()
           if (any(problems)) {
@@ -951,7 +1138,10 @@ Fire <- R6Class('Fire',
       response
     },
     websocket_logic = function(ws) {
-      request <- self$safe_call(private$mount_request(ws$request), private$new_req(ws$request, otel = FALSE))
+      request <- self$safe_call(
+        private$mount_request(ws$request),
+        private$new_req(ws$request, otel = FALSE)
+      )
       if (is_condition(request)) {
         ws$close()
         return()
@@ -961,7 +1151,13 @@ Fire <- R6Class('Fire',
       id <- private$client_id(req)
       private$websockets[[id]] <- ws
       self$log('websocket', paste0('connection established to ', id), req)
-      private$p_trigger('websocket-opened', server = self, id = id, connection = ws, .request = request)
+      private$p_trigger(
+        'websocket-opened',
+        server = self,
+        id = id,
+        connection = ws,
+        .request = request
+      )
       ws$onMessage(private$message_logic(id, req))
       ws$onClose(private$close_ws_logic(id, req))
     },
@@ -972,31 +1168,79 @@ Fire <- R6Class('Fire',
         start <- Sys.time()
         args <- unlist(
           unname(
-            private$p_trigger('before-message', server = self,
-                              id = id, binary = binary,
-                              message = msg, request = request,
-                              .request = request)
+            private$p_trigger(
+              'before-message',
+              server = self,
+              id = id,
+              binary = binary,
+              message = msg,
+              request = request,
+              .request = request
+            )
           ),
           recursive = FALSE
         )
-        if (is.null(args)) args <- structure(list(), names = character())
-        if ('binary' %in% names(args)) binary <- args$binary
-        if ('message' %in% names(args)) msg <- args$message
+        if (is.null(args)) {
+          args <- structure(list(), names = character())
+        }
+        if ('binary' %in% names(args)) {
+          binary <- args$binary
+        }
+        if ('message' %in% names(args)) {
+          msg <- args$message
+        }
         args <- modifyList(args, list(binary = NULL, message = NULL))
 
-        private$p_trigger('message', server = self, id = id, binary = binary, message = msg, request = request, arg_list = args, .request = request)
+        private$p_trigger(
+          'message',
+          server = self,
+          id = id,
+          binary = binary,
+          message = msg,
+          request = request,
+          arg_list = args,
+          .request = request
+        )
 
-        private$p_trigger('after-message', server = self, id = id, binary = binary, message = msg, request = request, .request = request)
+        private$p_trigger(
+          'after-message',
+          server = self,
+          id = id,
+          binary = binary,
+          message = msg,
+          request = request,
+          .request = request
+        )
 
-        self$log('websocket', paste0('from ', id, ' processed in ', format(Sys.time() - start, digits = 3)), request, ws_message = msg)
+        self$log(
+          'websocket',
+          paste0(
+            'from ',
+            id,
+            ' processed in ',
+            format(Sys.time() - start, digits = 3)
+          ),
+          request,
+          ws_message = msg
+        )
       }
     },
     close_ws_logic = function(id, request) {
       force(id)
       force(request)
       function() {
-        private$p_trigger('websocket-closed', server = self, id = id, request = request, .request = request)
-        self$log('websocket', paste0('connection to ', id, ' closed from the client'), request)
+        private$p_trigger(
+          'websocket-closed',
+          server = self,
+          id = id,
+          request = request,
+          .request = request
+        )
+        self$log(
+          'websocket',
+          paste0('connection to ', id, ' closed from the client'),
+          request
+        )
       }
     },
     add_handler = function(event, handler, pos, id) {
@@ -1017,7 +1261,9 @@ Fire <- R6Class('Fire',
         res <- private$handlers[[event]]$dispatch(..., .request = .request)
         res <- lapply(res, function(r) {
           if (promises::is.promising(r)) {
-            if (!is.null(.request)) .request$locked <- TRUE
+            if (!is.null(.request)) {
+              .request$locked <- TRUE
+            }
             promises::catch(r, function(r) {
               self$safe_call(cnd_signal(r), .request)
             })
@@ -1031,22 +1277,42 @@ Fire <- R6Class('Fire',
       res
     },
     external_triggers = function() {
-      if (is.null(private$TRIGGERDIR)) return()
+      if (is.null(private$TRIGGERDIR)) {
+        return()
+      }
 
-      triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
+      triggerFiles <- list.files(
+        private$TRIGGERDIR,
+        pattern = '*.rds',
+        ignore.case = TRUE,
+        full.names = TRUE
+      )
       while (length(triggerFiles) > 0) {
         nextFile <- order(file.info(triggerFiles)$ctime)[1]
-        event <- sub('\\.rds$', '', basename(triggerFiles[nextFile]), ignore.case = TRUE)
+        event <- sub(
+          '\\.rds$',
+          '',
+          basename(triggerFiles[nextFile]),
+          ignore.case = TRUE
+        )
         args <- readRDS(triggerFiles[nextFile])
         unlink(triggerFiles[nextFile])
         if (!is.list(args)) {
-          self$log('warning', 'External triggers must be an rds file containing a list')
+          self$log(
+            'warning',
+            'External triggers must be an rds file containing a list'
+          )
         } else {
           args$event <- event
           args$server <- self
           inject(private$p_trigger(!!!args))
         }
-        triggerFiles <- list.files(private$TRIGGERDIR, pattern = '*.rds', ignore.case = TRUE, full.names = TRUE)
+        triggerFiles <- list.files(
+          private$TRIGGERDIR,
+          pattern = '*.rds',
+          ignore.case = TRUE,
+          full.names = TRUE
+        )
       }
     },
     send_ws = function(message, id) {
@@ -1058,7 +1324,9 @@ Fire <- R6Class('Fire',
       } else {
         id <- intersect(id, names(private$websockets))
       }
-      if (length(id) == 0) return(NULL)
+      if (length(id) == 0) {
+        return(NULL)
+      }
       for (i in id) {
         private$websockets[[i]]$send(message)
       }
@@ -1069,11 +1337,21 @@ Fire <- R6Class('Fire',
       if (!is.null(ws)) {
         try(ws$close(), silent = TRUE)
         private$websockets[[id]] <- NULL
-        self$log('websocket', paste0('connection to ', id, ' closed from the server'))
+        self$log(
+          'websocket',
+          paste0('connection to ', id, ' closed from the server')
+        )
       }
     },
     open_browser = function(path = "") {
-      url <- paste0('http://', private$HOST, ':', private$PORT, '/', sub("^/", "", path))
+      url <- paste0(
+        'http://',
+        private$HOST,
+        ':',
+        private$PORT,
+        '/',
+        sub("^/", "", path)
+      )
       browseURL(url)
     },
     new_req = function(request, otel = TRUE, auto_put = TRUE) {
@@ -1114,14 +1392,18 @@ launch_server <- function(settings, host = NULL, port = NULL, ...) {
   }
 
   if (is.null(server_yml$constructor)) {
-    cli::cli_abort("The {.field constructor} field in {.file {settings}} must be present")
+    cli::cli_abort(
+      "The {.field constructor} field in {.file {settings}} must be present"
+    )
   }
   constructor <- fs::path(
     fs::path_dir(settings),
     server_yml$constructor
   )
   if (!fs::file_exists(constructor)) {
-    cli::cli_abort("The {.field constructor} field in {.file {settings}} must point to an existing file")
+    cli::cli_abort(
+      "The {.field constructor} field in {.file {settings}} must point to an existing file"
+    )
   }
   app <- source(constructor, verbose = FALSE)
   if (!inherits(app, "Fire")) {

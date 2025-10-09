@@ -1,95 +1,128 @@
 test_that('URL parsing works', {
-    req <- fake_request('http://www.example.com')
-    expect_equal(req[['rook.url_scheme']], 'http')
-    req <- fake_request('www.example.com')
-    expect_equal(req[['rook.url_scheme']], 'http')
-    req <- fake_request('https://www.example.com')
-    expect_equal(req[['rook.url_scheme']], 'https')
+  req <- fake_request('http://www.example.com')
+  expect_equal(req[['rook.url_scheme']], 'http')
+  req <- fake_request('www.example.com')
+  expect_equal(req[['rook.url_scheme']], 'http')
+  req <- fake_request('https://www.example.com')
+  expect_equal(req[['rook.url_scheme']], 'https')
 
-    req <- fake_request('http://www.example.com')
-    expect_equal(req[['SERVER_NAME']], 'www.example.com')
-    req <- fake_request('http://www.example.com:80')
-    expect_equal(req[['SERVER_NAME']], 'www.example.com')
-    req <- fake_request('http://www.example.com/new/path/')
-    expect_equal(req[['SERVER_NAME']], 'www.example.com')
-    req <- fake_request('http://www.sub.example.com')
-    expect_equal(req[['SERVER_NAME']], 'www.sub.example.com')
-    req <- fake_request('http://www.example.com?qurey=string')
-    expect_equal(req[['SERVER_NAME']], 'www.example.com')
+  req <- fake_request('http://www.example.com')
+  expect_equal(req[['SERVER_NAME']], 'www.example.com')
+  req <- fake_request('http://www.example.com:80')
+  expect_equal(req[['SERVER_NAME']], 'www.example.com')
+  req <- fake_request('http://www.example.com/new/path/')
+  expect_equal(req[['SERVER_NAME']], 'www.example.com')
+  req <- fake_request('http://www.sub.example.com')
+  expect_equal(req[['SERVER_NAME']], 'www.sub.example.com')
+  req <- fake_request('http://www.example.com?qurey=string')
+  expect_equal(req[['SERVER_NAME']], 'www.example.com')
 
-    req <- fake_request('http://www.example.com')
-    expect_equal(req[['SERVER_PORT']], '80')
-    req <- fake_request('https://www.example.com')
-    expect_equal(req[['SERVER_PORT']], '443')
-    req <- fake_request('http://www.example.com:8080')
-    expect_equal(req[['SERVER_PORT']], '8080')
-    req <- fake_request('http://www.example.com:8080/new/path/')
-    expect_equal(req[['SERVER_PORT']], '8080')
-    req <- fake_request('http://www.example.com:8080?query=string')
-    expect_equal(req[['SERVER_PORT']], '8080')
+  req <- fake_request('http://www.example.com')
+  expect_equal(req[['SERVER_PORT']], '80')
+  req <- fake_request('https://www.example.com')
+  expect_equal(req[['SERVER_PORT']], '443')
+  req <- fake_request('http://www.example.com:8080')
+  expect_equal(req[['SERVER_PORT']], '8080')
+  req <- fake_request('http://www.example.com:8080/new/path/')
+  expect_equal(req[['SERVER_PORT']], '8080')
+  req <- fake_request('http://www.example.com:8080?query=string')
+  expect_equal(req[['SERVER_PORT']], '8080')
 
-    req <- fake_request('http://www.example.com')
-    expect_equal(req[['PATH_INFO']], '/')
-    req <- fake_request('http://www.example.com/')
-    expect_equal(req[['PATH_INFO']], '/')
-    req <- fake_request('http://www.example.com/a/path/')
-    expect_equal(req[['PATH_INFO']], '/a/path/')
-    req <- fake_request('http://www.example.com/a/index.html')
-    expect_equal(req[['PATH_INFO']], '/a/index.html')
-    req <- fake_request('http://www.example.com/a/path/?query=string')
-    expect_equal(req[['PATH_INFO']], '/a/path/')
-    req <- fake_request('http://www.example.com/a/index.html?query=string')
-    expect_equal(req[['PATH_INFO']], '/a/index.html')
-    req <- fake_request('http://www.example.com?query=string')
-    expect_equal(req[['PATH_INFO']], '/')
-    req <- fake_request('http://www.example.com/a/mount/', app_location = '/a/mount/')
-    expect_equal(req[['PATH_INFO']], '/')
-    req <- fake_request('http://www.example.com/a/mount/', app_location = '/a/')
-    expect_equal(req[['PATH_INFO']], '/mount/')
-    expect_snapshot(fake_request('http://www.example.com/a/mount/', app_location = '/wrong/mount/'), error = TRUE)
+  req <- fake_request('http://www.example.com')
+  expect_equal(req[['PATH_INFO']], '/')
+  req <- fake_request('http://www.example.com/')
+  expect_equal(req[['PATH_INFO']], '/')
+  req <- fake_request('http://www.example.com/a/path/')
+  expect_equal(req[['PATH_INFO']], '/a/path/')
+  req <- fake_request('http://www.example.com/a/index.html')
+  expect_equal(req[['PATH_INFO']], '/a/index.html')
+  req <- fake_request('http://www.example.com/a/path/?query=string')
+  expect_equal(req[['PATH_INFO']], '/a/path/')
+  req <- fake_request('http://www.example.com/a/index.html?query=string')
+  expect_equal(req[['PATH_INFO']], '/a/index.html')
+  req <- fake_request('http://www.example.com?query=string')
+  expect_equal(req[['PATH_INFO']], '/')
+  req <- fake_request(
+    'http://www.example.com/a/mount/',
+    app_location = '/a/mount/'
+  )
+  expect_equal(req[['PATH_INFO']], '/')
+  req <- fake_request('http://www.example.com/a/mount/', app_location = '/a/')
+  expect_equal(req[['PATH_INFO']], '/mount/')
+  expect_snapshot(
+    fake_request(
+      'http://www.example.com/a/mount/',
+      app_location = '/wrong/mount/'
+    ),
+    error = TRUE
+  )
 
-    req <- fake_request('http://www.example.com')
-    expect_equal(req[['QUERY_STRING']], '')
-    req <- fake_request('http://www.example.com?query=string')
-    expect_equal(req[['QUERY_STRING']], 'query=string')
-    req <- fake_request('http://www.example.com/a/path/?query=string')
-    expect_equal(req[['QUERY_STRING']], 'query=string')
+  req <- fake_request('http://www.example.com')
+  expect_equal(req[['QUERY_STRING']], '')
+  req <- fake_request('http://www.example.com?query=string')
+  expect_equal(req[['QUERY_STRING']], 'query=string')
+  req <- fake_request('http://www.example.com/a/path/?query=string')
+  expect_equal(req[['QUERY_STRING']], 'query=string')
 })
 
 test_that('Headers are assigned', {
-    req <- fake_request('http://www.example.com', headers = list('accept_encoding' = 'gzip, deflate'))
-    expect_equal(req[['HTTP_ACCEPT_ENCODING']], 'gzip, deflate')
-    expect_snapshot(fake_request('http://www.example.com', headers = list('accept_encoding' = letters[1:4])), error = TRUE)
-    req <- fake_request('http://www.example.com', headers = list('dnt' = 1))
-    expect_equal(req[['HTTP_DNT']], '1')
+  req <- fake_request(
+    'http://www.example.com',
+    headers = list('accept_encoding' = 'gzip, deflate')
+  )
+  expect_equal(req[['HTTP_ACCEPT_ENCODING']], 'gzip, deflate')
+  expect_snapshot(
+    fake_request(
+      'http://www.example.com',
+      headers = list('accept_encoding' = letters[1:4])
+    ),
+    error = TRUE
+  )
+  req <- fake_request('http://www.example.com', headers = list('dnt' = 1))
+  expect_equal(req[['HTTP_DNT']], '1')
 })
 
 test_that('Content gets assigned', {
-    req <- fake_request('http://www.example.com')
-    expect_s3_class(req$rook.input, 'NullInputStreamFake')
-    expect_equal(req$rook.input$read_lines(), character())
-    expect_equal(req$rook.input$read(), raw())
-    expect_null(req$rook.input$rewind())
-    expect_equal(req$rook.input$read(l = 0), raw())
-    expect_null(req$rook.input$close())
+  req <- fake_request('http://www.example.com')
+  expect_s3_class(req$rook.input, 'NullInputStreamFake')
+  expect_equal(req$rook.input$read_lines(), character())
+  expect_equal(req$rook.input$read(), raw())
+  expect_null(req$rook.input$rewind())
+  expect_equal(req$rook.input$read(l = 0), raw())
+  expect_null(req$rook.input$close())
 
-    expect_s3_class(req$rook.errors, 'ErrorStreamFake')
-    expect_null(req$rook.errors$cat())
-    expect_null(req$rook.errors$flush())
+  expect_s3_class(req$rook.errors, 'ErrorStreamFake')
+  expect_null(req$rook.errors$cat())
+  expect_null(req$rook.errors$flush())
 
-    req <- fake_request('http://www.example.com', content = 'Multiple\nlines\nof content')
-    expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
-    expect_equal(req$rook.input$rewind(), 26)
-    expect_equal(rawToChar(req$rook.input$read()), 'Multiple\nlines\nof content\n')
-    expect_equal(req$rook.input$read(l = 0), raw())
-    expect_null(req$rook.input$close())
+  req <- fake_request(
+    'http://www.example.com',
+    content = 'Multiple\nlines\nof content'
+  )
+  expect_equal(
+    req$rook.input$read_lines(),
+    c('Multiple', 'lines', 'of content')
+  )
+  expect_equal(req$rook.input$rewind(), 26)
+  expect_equal(
+    rawToChar(req$rook.input$read()),
+    'Multiple\nlines\nof content\n'
+  )
+  expect_equal(req$rook.input$read(l = 0), raw())
+  expect_null(req$rook.input$close())
 
-    req <- fake_request('http://www.example.com', content = c('Multiple', 'lines', 'of content'))
-    expect_equal(req$rook.input$read_lines(), c('Multiple', 'lines', 'of content'))
-    req$rook.input$close()
+  req <- fake_request(
+    'http://www.example.com',
+    content = c('Multiple', 'lines', 'of content')
+  )
+  expect_equal(
+    req$rook.input$read_lines(),
+    c('Multiple', 'lines', 'of content')
+  )
+  req$rook.input$close()
 })
 
 test_that('ellipsis gets assigned', {
-    req <- fake_request('http://www.example.com', fiery.version = '0.1.0')
-    expect_equal(req$fiery.version, '0.1.0')
+  req <- fake_request('http://www.example.com', fiery.version = '0.1.0')
+  expect_equal(req$fiery.version, '0.1.0')
 })
