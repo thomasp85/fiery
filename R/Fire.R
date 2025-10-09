@@ -1369,6 +1369,8 @@ Fire <- R6Class(
       if (!is.null(req$otel)) {
         req$otel$set_attribute("server.id", private$SESSION_NAME)
         req$otel$set_attribute("server.framework", private$SESSION_FRAMEWORK)
+        req$otel$set_attribute("network.local.address", private$HOST)
+        req$otel$set_attribute("network.local.port", private$PORT)
       }
       if (auto_put) {
         f <- as.call(list(function() put_request(req)))
