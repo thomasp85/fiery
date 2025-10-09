@@ -117,6 +117,7 @@ Fire <- R6Class(
         force(x)
       }))
       private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
+      private$SESSION_FRAMEWORK_VERSION <- utils::packageVersion("fiery")
     },
     #' @description Human readable description of the app
     #' @param ... ignored
@@ -811,6 +812,7 @@ Fire <- R6Class(
     QUERY_DELIM = NULL,
     SESSION_NAME = "",
     SESSION_FRAMEWORK = "fiery",
+    SESSION_FRAMEWORK_VERSION = "",
 
     running = FALSE,
     quitting = FALSE,
@@ -1368,7 +1370,8 @@ Fire <- R6Class(
       )
       if (!is.null(req$otel)) {
         req$otel$set_attribute("server.id", private$SESSION_NAME)
-        req$otel$set_attribute("server.framework", private$SESSION_FRAMEWORK)
+        req$otel$set_attribute("server.framework.name", private$SESSION_FRAMEWORK)
+        req$otel$set_attribute("server.framework.version", private$SESSION_FRAMEWORK_VERSION)
         req$otel$set_attribute("network.local.address", private$HOST)
         req$otel$set_attribute("network.local.port", private$PORT)
       }
