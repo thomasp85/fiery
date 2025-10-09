@@ -810,6 +810,7 @@ Fire <- R6Class(
     COMPRESSION_LIMIT = 0,
     QUERY_DELIM = NULL,
     SESSION_NAME = "",
+    SESSION_FRAMEWORK = "fiery",
 
     running = FALSE,
     quitting = FALSE,
@@ -1367,6 +1368,7 @@ Fire <- R6Class(
       )
       if (!is.null(req$otel)) {
         req$otel$set_attribute("server.id", private$SESSION_NAME)
+        req$otel$set_attribute("server.framework", private$SESSION_FRAMEWORK)
       }
       if (auto_put) {
         f <- as.call(list(function() put_request(req)))
