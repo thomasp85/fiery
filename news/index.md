@@ -1,5 +1,7 @@
 # Changelog
 
+## fiery (development version)
+
 ## fiery 1.4.0
 
 CRAN release: 2025-11-10
