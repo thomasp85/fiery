@@ -102,7 +102,7 @@ app$on('end', function(server) {
 })
 
 app$ignite(showcase = TRUE)
-#> Fire started at <127.0.0.1:8080>
+#> Fire started at <127.0.0.1:8080> (narrow_factional_pygmy)
 #> Goodbye
 ```
 
