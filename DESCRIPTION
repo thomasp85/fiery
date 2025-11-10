@@ -25,7 +25,7 @@ Imports:
     otel,
     promises,
     R6,
-    reqres (>= 1.0.0.9000),
+    reqres (>= 1.1.0),
     rlang (>= 1.1.0),
     sodium,
     stats,
@@ -61,5 +61,3 @@ Collate:
     'request_store.R'
     'zzz.R'
 Config/testthat/edition: 3
-Remotes:
-    thomasp85/reqres
