@@ -1,0 +1,177 @@
+# Changelog
+
+## fiery (development version)
+
+- Add support for OpenTelemetry through the otel package
+- Request/Response object are now persistent across header and request
+  logic ([\#55](https://github.com/thomasp85/fiery/issues/55))
+
+## fiery 1.3.0
+
+CRAN release: 2025-08-20
+
+- Added `serve_static()` method to `Fire` to serve a directory of static
+  files directly outside the request loop
+- Move code over to rlang style programming
+- Full rewrite of condition handling.
+- Added
+  [`logger_logger()`](https://fiery.data-imaginist.com/reference/loggers.md)
+  to use the logger package for logging
+- `Fire$log()` now supports cli syntax in the message
+- Support for the `reqres_problem` conditions
+- `Fire$log()` now supports passing in a condition as message
+- Added `Fire$data_store` field to complement `Fire$get_data()` and
+  friends. It provides direct access to the global data store
+- Allow naming plugins when they are attached
+- `showcase` in `Fire$ignite()`/`Fire$run()` can now take a string
+  giving the path to open the browser at.
+- Improve the default session id handling and added
+  [`session_id_cookie()`](https://fiery.data-imaginist.com/reference/session_id_cookie.md)
+  helper function for constructing session ID extractor
+- Deprecate use of future. `Fire$delay()` and `Fire$time()` now uses
+  quosures and `Fire$async()` has been soft deprecated in favor of
+  letting the user use whatever async framework they like
+- Support returning promises in `request` events, and automated error
+  logging from promises in all events
+- Added `websocket-opened` event that allows the user to add a handler
+  that modifies the WebSocket connection when it is established
+
+## fiery 1.2.1
+
+CRAN release: 2024-02-05
+
+- Fixed a test failure only affecting the CRAN M1 machine
+
+## fiery 1.2.0
+
+CRAN release: 2023-03-17
+
+- Update to work with new future release
+- Move from assertthat to rlang based type checking
+
+## fiery 1.1.4
+
+CRAN release: 2022-08-16
+
+- General upkeep (new CI, redocument, etc)
+
+## fiery 1.1.3
+
+CRAN release: 2020-12-15
+
+- Avoid tests that fails on some CRAN machines due to new testthat
+  version
+
+## fiery 1.1.2
+
+CRAN release: 2019-09-27
+
+- Fix bug where delayed logging would result in wrong message being
+  logged ([\#39](https://github.com/thomasp85/fiery/issues/39))
+- Remove some tests as new later architecture makes certain async
+  operations untestable
+  ([\#40](https://github.com/thomasp85/fiery/issues/40))
+- pkgdown site now available at <https://fiery.data-imaginist.com>
+
+## fiery 1.1.1
+
+CRAN release: 2018-10-22
+
+- Fix bug with root mounting of app where the root would be stripped
+  before checking if it exists.
+- Fix a bug when evaluating multiple futures at once, where the removal
+  of the futures would throw an error
+  ([\#28](https://github.com/thomasp85/fiery/issues/28))
+- Fix a bug preventing setting loggers on cloned apps
+  ([\#30](https://github.com/thomasp85/fiery/issues/30))
+- The call that raises a caught error is now recorded in the log
+  ([\#33](https://github.com/thomasp85/fiery/issues/33))
+
+## fiery 1.1.0
+
+CRAN release: 2017-10-26
+
+- Add logging API. Set custom loggers with `set_logger()` and send
+  messages to the log with [`log()`](https://rdrr.io/r/base/Log.html).
+  Logging is automatically delayed so it doesn’t slow down request and
+  message handling
+  ([\#18](https://github.com/thomasp85/fiery/issues/18)).
+- Added `access_log_format` field to define how requests are logged.
+- Added `is_running()` method to query the state of the server.
+- Capture errors in each handler for events and delayed execution, so
+  that evaluation of the other handlers are unaffected
+  ([\#20](https://github.com/thomasp85/fiery/issues/20)).
+- Document the use of delayed evaluation. See `?delay_doc`
+
+## fiery 1.0.0
+
+CRAN release: 2017-08-16
+
+- `Fire$new()` now takes a port and host argument to set these fields on
+  initialisation. (fixes
+  [\#5](https://github.com/thomasp85/fiery/issues/5))
+- **BREAKING** Results from before-request and before-message events are
+  now passed on to the request and message handlers as a list in the
+  `arg_list` argument rather than as single arguments.
+- The host and port are now advertised when a server is started/resumed
+  ([\#11](https://github.com/thomasp85/fiery/issues/11))
+- Fire objects now has a print method
+  ([\#12](https://github.com/thomasp85/fiery/issues/12))
+- **BREAKING** fiery now uses the `reqres` Request and Response classes
+  for handling http exchange.
+- **BREAKING** [`attach()`](https://rdrr.io/r/base/attach.html) now
+  expect a `on_attach()` method rather than a `onAttach()` method from
+  the plugin. It also expects a `name` field and optionally a `require`
+  field
+- **BREAKING** The `header` event now expect handlers to return a
+  logical, with `TRUE` indicating further processing, and `FALSE`
+  indicating termination.
+- Cycle events are now triggered when running with `block = FALSE`
+  making the two run modes identical in their life cycle events.
+- **BREAKING** The `after-request` event will no longer pass the
+  response to handlers. This can be retrieved from the `request` object.
+- The server can now be mounted at a path, which will strip that path
+  from request paths thus making the app logic independent on mounting.
+  Use the `root` field to access and change the root location.
+- Websocket connections can now be closed from the server by using the
+  `close_ws_con()` method.
+- Better documentation. Events and plugins now has their own
+  documentation entries (fixes
+  [\#10](https://github.com/thomasp85/fiery/issues/10)).
+- Convert roxygen documentation to md format
+- **BREAKING** fields now uses snake_case rather than camelCase for a
+  more consistent interface. This means `refreshRate` -\>
+  `refresh_rate`, `triggerDir` -\> `trigger_dir`.
+- Switch to MIT License
+- Catch errors in start and resume event handlers
+
+## fiery 0.2.3
+
+CRAN release: 2017-06-26
+
+- DelayStack uses `sequential` futures with `lazy = TRUE` because
+  previously used `lazy` futures are deprecated
+
+## fiery 0.2.2
+
+CRAN release: 2017-01-07
+
+- Changed default host to 127.0.0.1
+- Fixed test errors on Windows builders
+
+## fiery 0.2.0
+
+- Added `fake_request` to generate fake, rook-compliant, request
+  objects. Useful for testing
+- Added `header` method to `Fire` for setting global header policies
+- Added standard 4xx responses
+- Added `FutureStack` class and subclasses to capture expressions for
+  later, timed, and async evaluation
+- Added `delay`, `remove_delay`, `time`, `remove_time`, `async`, and
+  `remove_async` methods to `Fire` for adding delayed, timed, and async
+  expressions for evaluation
+
+## fiery 0.1.0
+
+- Added Fire class encapsulating the server runtime
+- Added HandlerStack class to store and trigger event handlers
