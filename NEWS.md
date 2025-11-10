@@ -1,3 +1,5 @@
+# fiery (development version)
+
 # fiery 1.4.0
 
 * Add support for OpenTelemetry through the otel package
