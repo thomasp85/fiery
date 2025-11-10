@@ -11,12 +11,12 @@ Source:
 [`DESCRIPTION`](https://github.com/thomasp85/fiery/blob/main/DESCRIPTION)
 
 Pedersen T (2025). *fiery: A Lightweight and Flexible Web Framework*. R
-package version 1.3.0.9000, <https://fiery.data-imaginist.com>.
+package version 1.4.0, <https://fiery.data-imaginist.com>.
 
     @Manual{,
       title = {fiery: A Lightweight and Flexible Web Framework},
       author = {Thomas Lin Pedersen},
       year = {2025},
-      note = {R package version 1.3.0.9000},
+      note = {R package version 1.4.0},
       url = {https://fiery.data-imaginist.com},
     }
