@@ -2,6 +2,10 @@
 
 ## fiery (development version)
 
+- [`logger_null()`](https://fiery.data-imaginist.com/reference/loggers.md)
+  now truly does nothing. Old behaviour is now in
+  [`logger_conditions()`](https://fiery.data-imaginist.com/reference/loggers.md)
+
 ## fiery 1.4.0
 
 CRAN release: 2025-11-10

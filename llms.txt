@@ -123,6 +123,7 @@ information to without worrying about where and how the logs get
 written.
 
 - [`logger_null()`](https://fiery.data-imaginist.com/reference/loggers.md)
+  [`logger_conditions()`](https://fiery.data-imaginist.com/reference/loggers.md)
   [`logger_console()`](https://fiery.data-imaginist.com/reference/loggers.md)
   [`logger_file()`](https://fiery.data-imaginist.com/reference/loggers.md)
   [`logger_otel()`](https://fiery.data-imaginist.com/reference/loggers.md)

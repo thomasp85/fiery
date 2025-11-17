@@ -13,6 +13,8 @@ response will be send back if any error is encountered.
 ``` r
 logger_null()
 
+logger_conditions()
+
 logger_console(format = "{time} - {event}: {message}")
 
 logger_file(file, format = "{time} - {event}: {message}")
