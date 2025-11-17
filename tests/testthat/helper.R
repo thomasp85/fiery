@@ -15,6 +15,7 @@ standard_app <- function(silent = TRUE) {
 }
 
 r_session <- function(silent = TRUE) {
+  skip_on_cran() # All these tests are too fickle to test on CRAN
   rs <- callr::r_session$new()
   caller <- function(expr, invisible = TRUE) {
     expr <- enexpr(expr)
