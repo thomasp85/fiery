@@ -5,6 +5,7 @@
 \alias{loggers}
 \alias{logging}
 \alias{logger_null}
+\alias{logger_conditions}
 \alias{logger_console}
 \alias{logger_file}
 \alias{logger_otel}
@@ -20,6 +21,8 @@ An object of class \code{character} of length 1.
 }
 \usage{
 logger_null()
+
+logger_conditions()
 
 logger_console(format = "{time} - {event}: {message}")
 

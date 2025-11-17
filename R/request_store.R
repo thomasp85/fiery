@@ -1,9 +1,9 @@
 requests <- new.env(parent = emptyenv())
 requests$counter <- 0
-requests$stack <- rep_len(list(NULL), 100)
+requests$stack <- rep_len(list(NULL), 500)
 
 get_request <- function(...) {
-  if (requests$counter < 1 || requests$counter > 100) {
+  if (requests$counter < 1 || requests$counter > 500) {
     req <- reqres::Request$new(...)
   } else {
     req <- requests$stack[[requests$counter]]
@@ -14,7 +14,7 @@ get_request <- function(...) {
 }
 put_request <- function(req) {
   req$clear()
-  if (requests$counter < 100 && !req$locked) {
+  if (requests$counter < 500 && !req$locked) {
     requests$counter <- requests$counter + 1L
     requests$stack[[requests$counter]] <- req
   }

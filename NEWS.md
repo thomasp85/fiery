@@ -1,5 +1,8 @@
 # fiery (development version)
 
+* `logger_null()` now truly does nothing. Old behaviour is now in
+  `logger_conditions()`
+
 # fiery 1.4.0
 
 * Add support for OpenTelemetry through the otel package

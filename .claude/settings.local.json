@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Rscript:*)",
+      "WebFetch(domain:fiery.data-imaginist.com)",
+      "Bash(tee:*)",
+      "Bash(concurrent_results.txt)",
+      "Bash(logging_results.txt)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
