@@ -4,8 +4,8 @@
 \name{loggers}
 \alias{loggers}
 \alias{logging}
+\alias{logger_silent}
 \alias{logger_null}
-\alias{logger_conditions}
 \alias{logger_console}
 \alias{logger_file}
 \alias{logger_otel}
@@ -20,9 +20,9 @@ An object of class \code{character} of length 1.
 An object of class \code{character} of length 1.
 }
 \usage{
-logger_null()
+logger_silent()
 
-logger_conditions()
+logger_null()
 
 logger_console(format = "{time} - {event}: {message}")
 

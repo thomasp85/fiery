@@ -1,7 +1,6 @@
 # fiery (development version)
 
-* `logger_null()` now truly does nothing. Old behaviour is now in
-  `logger_conditions()`
+* Added `logger_silent()` which does completely nothing
 
 # fiery 1.4.0
 
