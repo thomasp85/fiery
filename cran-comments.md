@@ -1,4 +1,4 @@
-This is a minor release focusing on adding otel support
+This is a patch release requested by cran
 
 ## revdepcheck results
 
