@@ -1,6 +1,6 @@
 # Changelog
 
-## fiery (development version)
+## fiery 1.4.1
 
 - Added
   [`logger_silent()`](https://fiery.data-imaginist.com/reference/loggers.md)
