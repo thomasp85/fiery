@@ -4,8 +4,8 @@
       rs(app$on("test", function(...) 10, id = "testid"))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$on("test", function(...) 10, id = "testid")`:
       ! `id` must be unique. A handler with this id has already been added
 
 # Fire objects are printed
@@ -38,8 +38,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("start")`:
       ! "start" and other protected events cannot be triggered manually
 
 ---
@@ -48,8 +48,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("resume")`:
       ! "resume" and other protected events cannot be triggered manually
 
 ---
@@ -58,8 +58,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("end")`:
       ! "end" and other protected events cannot be triggered manually
 
 ---
@@ -68,8 +68,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("cycle-start")`:
       ! "cycle-start" and other protected events cannot be triggered manually
 
 ---
@@ -78,8 +78,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("cycle-end")`:
       ! "cycle-end" and other protected events cannot be triggered manually
 
 ---
@@ -88,8 +88,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("header")`:
       ! "header" and other protected events cannot be triggered manually
 
 ---
@@ -98,8 +98,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("before-request")`:
       ! "before-request" and other protected events cannot be triggered manually
 
 ---
@@ -108,8 +108,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("request")`:
       ! "request" and other protected events cannot be triggered manually
 
 ---
@@ -118,8 +118,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("after-request")`:
       ! "after-request" and other protected events cannot be triggered manually
 
 ---
@@ -128,8 +128,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("before-message")`:
       ! "before-message" and other protected events cannot be triggered manually
 
 ---
@@ -138,8 +138,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("message")`:
       ! "message" and other protected events cannot be triggered manually
 
 ---
@@ -148,8 +148,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("after-message")`:
       ! "after-message" and other protected events cannot be triggered manually
 
 ---
@@ -158,8 +158,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("websocket-closed")`:
       ! "websocket-closed" and other protected events cannot be triggered manually
 
 ---
@@ -168,8 +168,8 @@
       rs(app$trigger(!!i))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$trigger("send")`:
       ! "send" and other protected events cannot be triggered manually
 
 # data can be set, get and removed
@@ -178,8 +178,8 @@
       rs(app$get_data(1))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$get_data(1)`:
       ! `name` must be a single string, not the number 1.
 
 ---
@@ -188,8 +188,8 @@
       rs(app$get_data(c("test", "test2")))
     Condition
       Error:
-      ! in callr subprocess.
-      Caused by error:
+      ! ! in callr subprocess.
+      Caused by error in `app$get_data(c("test", "test2"))`:
       ! `name` must be a single string, not a character vector.
 
 # plugins are being attached
