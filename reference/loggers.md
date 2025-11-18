@@ -11,9 +11,9 @@ response will be send back if any error is encountered.
 ## Usage
 
 ``` r
-logger_null()
+logger_silent()
 
-logger_conditions()
+logger_null()
 
 logger_console(format = "{time} - {event}: {message}")
 

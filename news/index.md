@@ -2,9 +2,9 @@
 
 ## fiery (development version)
 
-- [`logger_null()`](https://fiery.data-imaginist.com/reference/loggers.md)
-  now truly does nothing. Old behaviour is now in
-  [`logger_conditions()`](https://fiery.data-imaginist.com/reference/loggers.md)
+- Added
+  [`logger_silent()`](https://fiery.data-imaginist.com/reference/loggers.md)
+  which does completely nothing
 
 ## fiery 1.4.0
 
