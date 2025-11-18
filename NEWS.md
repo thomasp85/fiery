@@ -1,3 +1,5 @@
+# fiery (development version)
+
 # fiery 1.4.1
 
 * Added `logger_silent()` which does completely nothing
