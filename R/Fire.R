@@ -118,6 +118,7 @@ Fire <- R6Class(
       }))
       private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
       private$SESSION_FRAMEWORK_VERSION <- utils::packageVersion("fiery")
+      private$logger <- logger_silent()
     },
     #' @description Human readable description of the app
     #' @param ... ignored
@@ -460,7 +461,7 @@ Fire <- R6Class(
     set_logger = function(logger) {
       check_function(logger)
       check_args(logger, c('event', 'message', 'request', '...'))
-      private$logger <- list(logger)
+      private$logger <- logger
       invisible(NULL)
     },
     #' @description Log a message with the logger attached to the app. See [loggers] for build in functionality
@@ -494,7 +495,7 @@ Fire <- R6Class(
             .envir = .topenv
           )
         }
-        private$logger[[1]](
+        private$logger(
           event,
           message,
           request,
@@ -842,7 +843,7 @@ Fire <- R6Class(
     websockets = NULL,
     server = NULL,
     client_id = NULL,
-    logger = list(logger_null()),
+    logger = NULL,
 
     DELAY = NULL,
     TIME = NULL,
