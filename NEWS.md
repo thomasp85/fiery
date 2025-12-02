@@ -1,5 +1,9 @@
 # fiery (development version)
 
+* More performant implementation of HandlerStack, DelayStack, and TimeStack.
+  These internal constructs are now implemented as closures instead of R6
+  classes.
+
 # fiery 1.4.1
 
 * Added `logger_silent()` which does completely nothing

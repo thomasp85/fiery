@@ -110,12 +110,10 @@ Fire <- R6Class(
       private$handlers <- list()
       private$websockets <- list()
       private$client_id <- session_id_cookie()
-      private$DELAY <- DelayStack$new(self)
-      private$TIME <- TimeStack$new(self)
+      private$DELAY <- DelayStack(self)
+      private$TIME <- TimeStack(self)
       private$ASYNC <- AsyncStack$new(self)
-      private$LOG_QUEUE <- DelayStack$new(list(safe_call = function(x, ...) {
-        force(x)
-      }))
+      private$LOG_QUEUE <- DelayStack()
       private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
       private$SESSION_FRAMEWORK_VERSION <- utils::packageVersion("fiery")
       private$logger <- logger_silent()
@@ -530,76 +528,7 @@ Fire <- R6Class(
     #' object is returned instead
     #'
     safe_call = function(expr, request = NULL) {
-      try_fetch(
-        expr,
-        error = function(e) {
-          topcall <- e$call
-          if (MAY_TRACEBACK && !is.null(topcall)) {
-            bt <- e$trace %||% cheap_trace_back()
-            topcall_pos <- which(bt$call == topcall)
-            if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
-              self$log('error', e)
-            } else {
-              self$log(
-                'error',
-                e,
-                request = request,
-                .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]],
-                .topcall = topcall,
-                .topenv = sys.frame(topcall_pos)
-              )
-            }
-          } else {
-            self$log('error', e)
-          }
-          add_otel_exception_event(e)
-        },
-        warning = function(w) {
-          topcall <- w$call
-          if (MAY_TRACEBACK && !is.null(topcall)) {
-            bt <- cheap_trace_back()
-            topcall_pos <- which(bt$call == topcall)
-            if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
-              self$log('warning', w)
-            } else {
-              self$log(
-                'warning',
-                w,
-                request = request,
-                .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]],
-                .topcall = topcall,
-                .topenv = sys.frame(topcall_pos)
-              )
-            }
-          } else {
-            self$log("warning", w)
-          }
-          cnd_muffle(w)
-        },
-        message = function(m) {
-          logcall <- m$call
-          if (MAY_TRACEBACK && !is.null(logcall)) {
-            bt <- cheap_trace_back()
-            logcall_pos <- which(bt$call == logcall)
-            topcall_pos <- bt$parent[logcall_pos]
-            if (length(topcall_pos) != 1 || topcall_pos == 0) {
-              self$log('message', m, .logcall = logcall)
-            } else {
-              self$log(
-                'message',
-                m,
-                request = request,
-                .logcall = logcall,
-                .topcall = bt$call[[topcall_pos]],
-                .topenv = sys.frame(topcall_pos)
-              )
-            }
-          } else {
-            self$log("message", m)
-          }
-          cnd_muffle(m)
-        }
-      )
+      private$p_safe_call(expr, request = request)
     },
     #' @description Send a request directly to the request logic of a non-running app. Only intended for testing the request logic
     #' @param request The request to send
@@ -1031,7 +960,7 @@ Fire <- R6Class(
       } else if (any(vapply(res, is_condition, logical(1)))) {
         response$status_with_text(500L)
       }
-      response <- self$safe_call(response$as_list(), request)
+      response <- private$p_safe_call(response$as_list(), request)
       # On the off-chance that reqres throws an error during conversion of response
       if (is_condition(response)) {
         request$response$status_with_text(500L) # Update the real response first so it gets logged correctly
@@ -1071,7 +1000,7 @@ Fire <- R6Class(
     },
     header_logic = function(req) {
       start_time <- Sys.time()
-      request <- self$safe_call(
+      request <- private$p_safe_call(
         private$mount_request(req),
         private$new_req(req, otel = FALSE)
       )
@@ -1081,7 +1010,7 @@ Fire <- R6Class(
         id <- private$client_id(req)
         response <- req$respond()
         response$status_with_text(400L)
-        response <- self$safe_call(response$as_list(), req)
+        response <- private$p_safe_call(response$as_list(), req)
         # On the off-chance that reqres throws an error during conversion of response
         if (is_condition(response)) {
           req$response$status_with_text(500L) # Update the real response first so it gets logged correctly
@@ -1122,7 +1051,7 @@ Fire <- R6Class(
               response <- NULL
             } else {
               self$log('request', 'denied after header', req)
-              response <- self$safe_call(req$respond()$as_list(), req)
+              response <- private$p_safe_call(req$respond()$as_list(), req)
               if (is_condition(response)) {
                 req$response$status_with_text(500L)
                 response <- list(
@@ -1142,7 +1071,7 @@ Fire <- R6Class(
       response
     },
     websocket_logic = function(ws) {
-      request <- self$safe_call(
+      request <- private$p_safe_call(
         private$mount_request(ws$request),
         private$new_req(ws$request, otel = FALSE)
       )
@@ -1249,7 +1178,7 @@ Fire <- R6Class(
     },
     add_handler = function(event, handler, pos, id) {
       if (is.null(private$handlers[[event]])) {
-        private$handlers[[event]] <- HandlerStack$new(server = self)
+        private$handlers[[event]] <- HandlerStack(server = self)
       }
       private$handlers[[event]]$add(handler, id, pos)
     },
@@ -1269,7 +1198,7 @@ Fire <- R6Class(
               .request$locked <- TRUE
             }
             promises::catch(r, function(r) {
-              self$safe_call(cnd_signal(r), .request)
+              private$p_safe_call(cnd_signal(r), .request)
             })
           } else {
             r
@@ -1279,6 +1208,59 @@ Fire <- R6Class(
         res <- set_names(list())
       }
       res
+    },
+    p_safe_call = function(expr, request = NULL) {
+      try_fetch(
+        expr,
+        error = function(e) {
+          topcall <- e$call
+          if (MAY_TRACEBACK && !is.null(topcall)) {
+            bt <- e$trace %||% cheap_trace_back()
+            topcall_pos <- which(bt$call == topcall)
+            if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
+              private$p_log('error', e)
+            } else {
+              private$p_log(
+                'error',
+                e,
+                request = request,
+                .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]],
+                .topcall = topcall,
+                .topenv = sys.frame(topcall_pos)
+              )
+            }
+          } else {
+            private$p_log('error', e)
+          }
+          add_otel_exception_event(e)
+        },
+        warning = function(w) {
+          topcall <- w$call
+          if (MAY_TRACEBACK && !is.null(topcall)) {
+            bt <- cheap_trace_back()
+            topcall_pos <- which(bt$call == topcall)
+            if (length(topcall_pos) != 1 || !any(bt$parent == topcall_pos)) {
+              private$p_log('warning', w)
+            } else {
+              private$p_log(
+                'warning',
+                w,
+                request = request,
+                .logcall = bt$call[[which(bt$parent == topcall_pos)[1]]],
+                .topcall = topcall,
+                .topenv = sys.frame(topcall_pos)
+              )
+            }
+          } else {
+            private$p_log("warning", w)
+          }
+          cnd_muffle(w)
+        },
+        message = function(m) {
+          private$p_log("message", m)
+          cnd_muffle(m)
+        }
+      )
     },
     external_triggers = function() {
       if (is.null(private$TRIGGERDIR)) {
@@ -1371,8 +1353,14 @@ Fire <- R6Class(
       )
       if (!is.null(req$otel)) {
         req$otel$set_attribute("server.id", private$SESSION_NAME)
-        req$otel$set_attribute("server.framework.name", private$SESSION_FRAMEWORK)
-        req$otel$set_attribute("server.framework.version", private$SESSION_FRAMEWORK_VERSION)
+        req$otel$set_attribute(
+          "server.framework.name",
+          private$SESSION_FRAMEWORK
+        )
+        req$otel$set_attribute(
+          "server.framework.version",
+          private$SESSION_FRAMEWORK_VERSION
+        )
         req$otel$set_attribute("network.local.address", private$HOST)
         req$otel$set_attribute("network.local.port", private$PORT)
       }

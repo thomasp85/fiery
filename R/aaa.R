@@ -93,3 +93,8 @@ cheap_trace_back <- function() {
   parents[recursive] <- 0L
   list(call = calls, parent = parents)
 }
+
+safe_call_server <- function() {
+  private <- list(p_safe_call = function(x, ...) force(x))
+  list(clone = function() {})
+}

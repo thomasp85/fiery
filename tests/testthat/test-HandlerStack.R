@@ -6,7 +6,7 @@ fun2 <- function(...) {
 }
 
 test_that("Handlers can be added and removed", {
-  stack <- HandlerStack$new()
+  stack <- HandlerStack()
   fun1 <- function(...) {
     length(list(...))
   }
@@ -39,7 +39,7 @@ test_that("Handlers can be added and removed", {
 })
 
 test_that('Inserting at position works', {
-  stack <- HandlerStack$new()
+  stack <- HandlerStack()
   stack$add(length, 'length')
   stack$add(str, 'str')
   stack$add(sum, 'sum')
@@ -56,7 +56,7 @@ test_that('Inserting at position works', {
 
 test_that('Assertions throw errors', {
   rs <- r_session()
-  rs(stack <- fiery:::HandlerStack$new())
+  rs(stack <- fiery:::HandlerStack())
   expect_snapshot(rs(stack$add('string', 'id')), error = TRUE)
   expect_snapshot(rs(stack$add(c(min, max), 'id')), error = TRUE)
   expect_snapshot(rs(stack$add(min, 3)), error = TRUE)
@@ -71,7 +71,7 @@ test_that('Assertions throw errors', {
 })
 
 test_that('Dispatch works', {
-  stack <- HandlerStack$new(list(safe_call = function(x, ...) force(x)))
+  stack <- HandlerStack()
   args <- 1:10
   expect_type(stack$dispatch(args), 'list')
   expect_length(stack$dispatch(args), 0)
