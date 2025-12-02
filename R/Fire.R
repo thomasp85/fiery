@@ -117,6 +117,7 @@ Fire <- R6Class(
       private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
       private$SESSION_FRAMEWORK_VERSION <- utils::packageVersion("fiery")
       private$logger <- logger_silent()
+      private$ACCESS_LOG_FORMAT <- common_log_formatter
     },
     #' @description Human readable description of the app
     #' @param ... ignored
@@ -198,7 +199,7 @@ Fire <- R6Class(
           private$p_trigger('end', server = self)
           stopServer(private$server)
           private$server <- NULL
-          self$log('stop', paste0(self$host, ':', self$port, self$root))
+          private$p_log('stop', paste0(self$host, ':', self$port, self$root))
         } else {
           private$quitting <- TRUE
         }
@@ -656,6 +657,11 @@ Fire <- R6Class(
         return(private$ACCESS_LOG_FORMAT)
       }
       check_string(format)
+      if (format == common_log_format) {
+        format <- common_log_formatter
+      } else if (format == combined_log_format) {
+        format <- combined_log_formatter
+      }
       private$ACCESS_LOG_FORMAT <- format
     },
     #' @field key The encryption key to use for request/response encryption
@@ -734,7 +740,7 @@ Fire <- R6Class(
     REFRESHRATENB = 1,
     TRIGGERDIR = NULL,
     ROOT = '',
-    ACCESS_LOG_FORMAT = common_log_format,
+    ACCESS_LOG_FORMAT = NULL,
     KEY = NULL,
     SESSION_COOKIE = NULL,
     TRUST = FALSE,
@@ -804,28 +810,31 @@ Fire <- R6Class(
               'Fire restarted at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})'
             )
           }
-          self$log('resume', paste0(self$host, ':', self$port, self$root))
+          private$p_log('resume', paste0(self$host, ':', self$port, self$root))
         } else {
           if (!silent) {
             cli::cli_inform(
               'Fire started at {.url {self$host}:{self$port}{self$root}} ({private$SESSION_NAME})'
             )
           }
-          self$log('start', paste0(self$host, ':', self$port, self$root))
+          private$p_log('start', paste0(self$host, ':', self$port, self$root))
         }
 
         if (block) {
           on.exit({
             private$running <- FALSE
             private$p_trigger('end', server = self)
-            self$log('stop', paste0(self$host, ':', self$port, self$root))
+            private$p_log('stop', paste0(self$host, ':', self$port, self$root))
           })
           private$run_blocking_server(showcase = showcase)
         } else {
           private$run_allowing_server(showcase = showcase)
         }
       } else {
-        self$log('warning', 'Server is already running and cannot be started')
+        private$p_log(
+          'warning',
+          'Server is already running and cannot be started'
+        )
       }
     },
     run_blocking_server = function(showcase = FALSE) {
@@ -983,20 +992,42 @@ Fire <- R6Class(
     },
     log_request = function(start_time, req, id) {
       end_time <- Sys.time()
-      self$log(
-        'request',
-        glue_log(
-          list(
-            start_time = start_time,
-            end_time = end_time,
-            request = req,
-            response = req$response,
-            id = id
+      format <- private$ACCESS_LOG_FORMAT
+      if (is.character(format)) {
+        private$p_log(
+          'request',
+          glue_log(
+            list(
+              start_time = start_time,
+              end_time = end_time,
+              request = req,
+              response = req$response,
+              id = id
+            ),
+            format
           ),
-          self$access_log_format
-        ),
-        req
-      )
+          req
+        )
+      } else {
+        res <- req$response
+        private$p_log(
+          "request",
+          format(
+            ip = req$ip,
+            id = id,
+            end_time = format(end_time, "%d/%b/%Y:%T %z"),
+            method = toupper(req$method),
+            path = req$path,
+            querystring = req$querystring,
+            protocol = toupper(req$protocol),
+            status = res$status,
+            content_length = res$content_length(),
+            referer = req$get_header("Referer") %||% "",
+            user_agent = req$get_header("User-Agent") %||% ""
+          ),
+          req
+        )
+      }
     },
     header_logic = function(req) {
       start_time <- Sys.time()
@@ -1050,7 +1081,7 @@ Fire <- R6Class(
             if (continue) {
               response <- NULL
             } else {
-              self$log('request', 'denied after header', req)
+              private$p_log('request', 'denied after header', req)
               response <- private$p_safe_call(req$respond()$as_list(), req)
               if (is_condition(response)) {
                 req$response$status_with_text(500L)
@@ -1083,7 +1114,7 @@ Fire <- R6Class(
       }
       id <- private$client_id(req)
       private$websockets[[id]] <- ws
-      self$log('websocket', paste0('connection established to ', id), req)
+      private$p_log('websocket', paste0('connection established to ', id), req)
       private$p_trigger(
         'websocket-opened',
         server = self,
@@ -1145,7 +1176,7 @@ Fire <- R6Class(
           .request = request
         )
 
-        self$log(
+        private$p_log(
           'websocket',
           paste0(
             'from ',
@@ -1169,7 +1200,7 @@ Fire <- R6Class(
           request = request,
           .request = request
         )
-        self$log(
+        private$p_log(
           'websocket',
           paste0('connection to ', id, ' closed from the client'),
           request
@@ -1262,6 +1293,51 @@ Fire <- R6Class(
         }
       )
     },
+    p_log = function(
+      event,
+      message,
+      request = NULL,
+      ...,
+      .logcall = sys.call(),
+      .topcall = sys.call(-1),
+      .topenv = parent.frame()
+    ) {
+      time <- Sys.time()
+      force(message)
+      force(.logcall)
+      force(.topcall)
+      force(.topenv)
+      log_fun <- function(...) {
+        if (!is_condition(message)) {
+          message <- vapply(
+            message,
+            cli::format_inline,
+            character(1),
+            .envir = .topenv
+          )
+        }
+        private$logger(
+          event,
+          message,
+          request,
+          time,
+          .logcall = .logcall,
+          .topcall = .topcall,
+          .topenv = .topenv,
+          .session_name = private$SESSION_NAME,
+          ...
+        )
+      }
+      if (private$running) {
+        private$LOG_QUEUE$add(
+          NULL,
+          log_fun
+        )
+      } else {
+        log_fun()
+      }
+      invisible(NULL)
+    },
     external_triggers = function() {
       if (is.null(private$TRIGGERDIR)) {
         return()
@@ -1284,7 +1360,7 @@ Fire <- R6Class(
         args <- readRDS(triggerFiles[nextFile])
         unlink(triggerFiles[nextFile])
         if (!is.list(args)) {
-          self$log(
+          private$p_log(
             'warning',
             'External triggers must be an rds file containing a list'
           )
@@ -1316,14 +1392,14 @@ Fire <- R6Class(
       for (i in id) {
         private$websockets[[i]]$send(message)
       }
-      self$log('websocket', paste0('send to ', paste(id, collapse = ', ')))
+      private$p_log('websocket', paste0('send to ', paste(id, collapse = ', ')))
     },
     close_ws = function(id) {
       ws <- private$websockets[[id]]
       if (!is.null(ws)) {
         try(ws$close(), silent = TRUE)
         private$websockets[[id]] <- NULL
-        self$log(
+        private$p_log(
           'websocket',
           paste0('connection to ', id, ' closed from the server')
         )

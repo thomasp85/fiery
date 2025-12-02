@@ -1,23 +1,26 @@
 # null logger works
 
     Code
-      rs(logger("error", "error test"))
-    Message
-      error: error test
+      rs(logger("error", error_cnd(message = "error test")))
+    Output
+      <error/rlang_error>
+      Error:
+      ! error test
 
 ---
 
     Code
-      rs(logger("warning", "warning test"))
+      rs(logger("warning", warning_cnd(message = "warning test")))
     Message
-      warning: warning test
+      Warning:
+      warning test
 
 ---
 
     Code
-      rs(logger("message", "message test"))
-    Message
-      message: message test
+      rs(logger("message", message_cnd(message = "message test")))
+    Output
+      message test
 
 # console logger works
 
@@ -100,9 +103,10 @@
 ---
 
     Code
-      rs(logger("warning", "warning test"))
+      rs(logger("warning", warning_cnd(message = "warning test")))
     Message
-      warning: warning test
+      Warning:
+      warning test
 
 # logger logger works
 

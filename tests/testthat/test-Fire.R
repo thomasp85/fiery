@@ -637,7 +637,7 @@ test_that("Logging can be configured", {
   app <- standard_app(FALSE)
   old_format <- app$access_log_format
   app$access_log_format <- combined_log_format
-  expect_equal(app$access_log_format, combined_log_format)
+  expect_equal(app$access_log_format, combined_log_formatter)
   app$on('test', function(server, ...) {
     server$log('test', 'this is a test')
   })

@@ -1,9 +1,9 @@
 test_that("null logger works", {
   rs <- r_session()
   rs(logger <- logger_null())
-  expect_snapshot(rs(logger('error', 'error test')))
-  expect_snapshot(rs(logger('warning', 'warning test')))
-  expect_snapshot(rs(logger('message', 'message test')))
+  expect_snapshot(rs(logger('error', error_cnd(message = 'error test'))))
+  expect_snapshot(rs(logger('warning', warning_cnd(message = 'warning test'))))
+  expect_snapshot(rs(logger('message', message_cnd(message = 'message test'))))
   expect_silent(rs(logger('info', 'info test')))
 })
 
@@ -54,7 +54,7 @@ test_that("switch logger works", {
   })
   expect_snapshot(rs(logger('test', 'test test')))
   expect_snapshot(rs(logger('info', 'info test')))
-  expect_snapshot(rs(logger('warning', 'warning test')))
+  expect_snapshot(rs(logger('warning', warning_cnd(message = 'warning test'))))
   rs(logger('error', 'error test'))
   logs <- rs(readLines(logfile))
   expect_match(logs[1], "error: error test")

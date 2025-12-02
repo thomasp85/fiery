@@ -80,7 +80,7 @@
 #' [glue][glue::glue] expression that has access to the following variables:
 #'
 #' \describe{
-#'  \item{`start_time`}{The time the request was recieved}
+#'  \item{`start_time`}{The time the request was received}
 #'  \item{`end_time`}{The time the response was send back}
 #'  \item{`request`}{The `Request` object}
 #'  \item{`response`}{The `Response` object}
@@ -97,10 +97,9 @@
 #' Apart from the standard logs described above it is also possible to send
 #' messages to the log as you please, e.g. inside event handlers. This is done
 #' through the `log()` method where you at the very least specify an event and a
-#' message. In general it is better to send messages through `log()` rather than
-#' with `warning()` and `stop()` even though the latters will eventually be
-#' caught, as it gives you more control over the logging and what should happen
-#' in the case of an exception.
+#' message. You can also log information using the standard exception mechanism.
+#' Errors, warnings and messages are all caught and logged and since exception
+#' carry more information than a log string, the logging can be richer.
 #'
 #' An example of using `log()` in a handler could be:
 #'
@@ -130,22 +129,16 @@ logger_silent <- function() {
 #' @export
 logger_null <- function() {
   function(event, message, request = NULL, time = Sys.time(), ...) {
-    if (event %in% c('error', 'warning', 'message')) {
-      if (is_condition(message)) {
-        message <- upgrade_condition(message)
-        cat(
-          if (is_error(message)) {
-            format(message)
-          } else {
-            cnd_message(message, prefix = event == 'warning')
-          },
-          file = if (is_warning(message)) stderr() else stdout()
-        )
-      } else {
-        for (m in message) {
-          cli::cli_inform("{.strong {event}}: {m}")
-        }
-      }
+    if (is_condition(message)) {
+      message <- upgrade_condition(message)
+      cat(
+        if (is_error(message)) {
+          format(message)
+        } else {
+          cnd_message(message, prefix = event == 'warning')
+        },
+        file = if (is_warning(message)) stderr() else stdout()
+      )
     }
   }
 }
@@ -154,19 +147,17 @@ logger_null <- function() {
 #'
 #' @export
 logger_console <- function(format = '{time} - {event}: {message}') {
+  formatter <- parse_interp(format)
   col_orange <- cli::make_ansi_style('orange')
   function(event, message, request = NULL, time = Sys.time(), ...) {
     msg <- as_log_message(message)
     time <- style_log(time, event, request)
     event <- style_log(event, event, request)
     for (m in msg) {
-      m <- glue_log(
-        list(
-          time = time,
-          event = event,
-          message = m
-        ),
-        format
+      m <- formatter(
+        time = format(time),
+        event = event,
+        message = m
       )
       cat(m, file = stdout(), append = TRUE)
       cat('\n', file = stdout(), append = TRUE)
@@ -203,21 +194,21 @@ style_log <- function(x, event, request = NULL, default = identity) {
 #' @rdname loggers
 #'
 #' @param file A file or connection to write to
-#' @param format A [glue][glue::glue] string specifying the format of the log entry
+#' @param format A [glue][glue::glue]-like string specifying the format of the
+#' log entry. Only the variables `time`, `event`, and `message` are available
+#' and must be given verbatim
 #'
 #' @export
 logger_file <- function(file, format = '{time} - {event}: {message}') {
   format <- sub('\n$', '', format)
+  formatter <- parse_interp(format)
   function(event, message, request = NULL, time = Sys.time(), ...) {
     msg <- cli::ansi_strip(as_log_message(message))
     for (m in msg) {
-      m <- glue_log(
-        list(
-          time = time,
-          event = event,
-          message = m
-        ),
-        format
+      m <- formatter(
+        time = format(time),
+        event = event,
+        message = m
       )
       cat(m, file = file, append = TRUE)
       cat('\n', file = file, append = TRUE)
@@ -226,7 +217,8 @@ logger_file <- function(file, format = '{time} - {event}: {message}') {
 }
 #' @rdname loggers
 #' @export
-logger_otel <- function(format = '{time} - {event}: {message}') {
+logger_otel <- function(format = '{message}') {
+  formatter <- parse_interp(format)
   function(
     event,
     message,
@@ -245,13 +237,10 @@ logger_otel <- function(format = '{time} - {event}: {message}') {
       "info"
     )
     msg <- paste0(cli::ansi_strip(as_log_message(message)), collapse = "\n")
-    msg <- glue_log(
-      list(
-        time = time,
-        event = event,
-        message = msg
-      ),
-      format
+    msg <- formatter(
+      time = format(time),
+      event = event,
+      message = msg
     )
     otel::log(
       as.character(msg),
@@ -353,6 +342,7 @@ logger_logger <- function(default_level = "INFO") {
 #' @rdname loggers
 #' @export
 common_log_format <- '{request$ip} - {id} [{format(end_time, "%d/%b/%Y:%T %z")}] "{toupper(request$method)} {request$path}{request$querystring} {toupper(request$protocol)}/1.1" {response$status} {response$content_length()}'
+
 #' @rdname loggers
 #' @export
 combined_log_format <- paste0(
@@ -373,6 +363,27 @@ glue_log <- function(.data, ..., .envir = parent.frame()) {
   glue_data(.data, ..., .envir = .envir)
   #glue_data(.data, ..., .transformer = safely_transformer(''), .envir = emptyenv())
 }
+
+parse_interp <- function(format) {
+  between <- strsplit(format, "{.*?}", perl = T)[[1]]
+  names <- stringi::stri_extract_all(format, regex = "\\{.*?\\}")[[1]]
+  names <- gsub("\\{|\\}", "", names, perl = TRUE)
+  interp_fun <- function() {
+    names <- c(as.list(environment())[names], "")
+    paste0(between, names[seq_along(between)], collapse = "")
+  }
+  fn_fmls(interp_fun) <- c(
+    set_names(
+      rep_along(names, list("")),
+      names
+    ),
+    "..." = missing_arg()
+  )
+  interp_fun
+}
+
+common_log_formatter <- parse_interp('{ip} - {id} [{end_time)}] "{method} {path}{querystring} {protocol}/1.1" {status} {content_length}')
+combined_log_formatter <- parse_interp('{ip} - {id} [{end_time)}] "{method} {path}{querystring} {protocol}/1.1" {status} {content_length} "{referer}" "{user_agent}"')
 
 as_log_message <- function(message) {
   if (is_condition(message)) {
