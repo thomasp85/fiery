@@ -2,7 +2,16 @@
 
 ## fiery (development version)
 
+- More performant implementation of HandlerStack, DelayStack, and
+  TimeStack. These internal constructs are now implemented as closures
+  instead of R6 classes.
+- More performant logging. Default is to not log as it is still somewhat
+  expensive. Formatting is now using glue-like formats but not glue and
+  doesn’t allow expressions inside the format string
+
 ## fiery 1.4.1
+
+CRAN release: 2025-11-18
 
 - Added
   [`logger_silent()`](https://fiery.data-imaginist.com/reference/loggers.md)
