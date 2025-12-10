@@ -69,8 +69,9 @@ session_id_cookie <- function(name = "fiery_id", secure = FALSE) {
       name,
       id,
       http_only = TRUE,
+      path = "/",
       secure = secure,
-      same_site = "Strict"
+      same_site = if (secure) "None" else "Strict"
     )
     request$origin$HTTP_COOKIE <- paste0(
       c(request$origin$HTTP_COOKIE, paste0(name, "=", id)),
