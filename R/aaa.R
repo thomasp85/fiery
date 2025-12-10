@@ -10,7 +10,7 @@ globalVariables(
 #' Select a random safe port
 #'
 #' This is a small utility function to get random safe ports to run your
-#' application on. It chooses a port within the range that cannot be registeret
+#' application on. It chooses a port within the range that cannot be registered
 #' to IANA and thus is safe to assume are not in use.
 #'
 #' @return An integer in the range 49152-65535
