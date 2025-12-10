@@ -2,9 +2,10 @@ requests <- new.env(parent = emptyenv())
 requests$counter <- 0
 requests$stack <- rep_len(list(NULL), 500)
 
+#' @importFrom reqres Request unclass_request
 get_request <- function(...) {
   if (requests$counter < 1 || requests$counter > 500) {
-    req <- reqres::Request$new(...)
+    req <- unclass_request(Request$new(...))
   } else {
     req <- requests$stack[[requests$counter]]
     requests$counter <- requests$counter - 1L
