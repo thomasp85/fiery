@@ -597,8 +597,13 @@ Fire <- R6Class(
       check_number_whole(n, min = 1)
       private$PORT <- n
     },
-    #' @field refresh_rate The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)
+    #' @field refresh_rate `r lifecycle::badge('deprecated')` The interval in seconds between run cycles when running a blocking server (defaults to `0.001`)
     refresh_rate = function(rate) {
+      lifecycle::deprecate_soft(
+        "1.5.0",
+        I("Refresh rate for blocking servers"),
+        details = "The loop now runs without any pause"
+      )
       if (missing(rate)) {
         return(private$REFRESHRATE)
       }
@@ -857,7 +862,7 @@ Fire <- R6Class(
         private$open_browser(if (is.character(showcase)) showcase else "")
       }
 
-      while (TRUE) {
+      repeat {
         private$p_trigger('cycle-start', server = self)
         service()
         private$external_triggers()
@@ -870,7 +875,6 @@ Fire <- R6Class(
           private$quitting <- FALSE
           break
         }
-        Sys.sleep(self$refresh_rate)
       }
     },
     run_allowing_server = function(showcase = FALSE) {

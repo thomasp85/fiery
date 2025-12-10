@@ -91,7 +91,7 @@ app$ignite(showcase = TRUE)
 
 \item{\code{port}}{An integer giving the port number the server should listen on (defaults to \code{8080L})}
 
-\item{\code{refresh_rate}}{The interval in seconds between run cycles when running a blocking server (defaults to \code{0.001})}
+\item{\code{refresh_rate}}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} The interval in seconds between run cycles when running a blocking server (defaults to \code{0.001})}
 
 \item{\code{refresh_rate_nb}}{The interval in seconds between run cycles when running a non-blocking server (defaults to \code{1})}
 
