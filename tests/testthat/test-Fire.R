@@ -168,10 +168,7 @@ test_that('active bindings work', {
   app$port <- 10
   expect_equal(app$port, 10)
 
-  expect_snapshot(app$refresh_rate <- 'test', error = TRUE)
-  expect_snapshot(app$refresh_rate <- 1:5, error = TRUE)
-  app$refresh_rate <- 10.5
-  expect_equal(app$refresh_rate, 10.5)
+  lifecycle::expect_deprecated(app$refresh_rate <- 10.5)
 
   expect_snapshot(app$refresh_rate_nb <- 'test', error = TRUE)
   expect_snapshot(app$refresh_rate_nb <- 1:5, error = TRUE)

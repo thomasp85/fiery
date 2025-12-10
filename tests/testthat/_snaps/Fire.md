@@ -295,22 +295,6 @@
 ---
 
     Code
-      app$refresh_rate <- "test"
-    Condition
-      Error:
-      ! `rate` must be a number, not the string "test".
-
----
-
-    Code
-      app$refresh_rate <- 1:5
-    Condition
-      Error:
-      ! `rate` must be a number, not an integer vector.
-
----
-
-    Code
       app$refresh_rate_nb <- "test"
     Condition
       Error:
@@ -611,7 +595,7 @@
       res <- app$test_request(req)
     Output
       error: Error formatting the response body
-      error: Caused by error in `self$formatter()`:
+      error: Caused by error in `private$FORMATTER()`:
       error: ! test
 
 # header handlers handle conditions
@@ -634,7 +618,7 @@
       res <- app$test_header(req)
     Output
       error: Error formatting the response body
-      error: Caused by error in `self$formatter()`:
+      error: Caused by error in `private$FORMATTER()`:
       error: ! test
 
 # static file serving works
