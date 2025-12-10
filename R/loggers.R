@@ -119,10 +119,8 @@ NULL
 
 #' @rdname loggers
 #' @export
-logger_silent <- function() {
-  function(event, message, request = NULL, time = Sys.time(), ...) {
-    invisible(NULL)
-  }
+logger_void <- function(...) {
+  invisible(NULL)
 }
 
 #' @rdname loggers
@@ -382,8 +380,12 @@ parse_interp <- function(format) {
   interp_fun
 }
 
-common_log_formatter <- parse_interp('{ip} - {id} [{end_time)}] "{method} {path}{querystring} {protocol}/1.1" {status} {content_length}')
-combined_log_formatter <- parse_interp('{ip} - {id} [{end_time)}] "{method} {path}{querystring} {protocol}/1.1" {status} {content_length} "{referer}" "{user_agent}"')
+common_log_formatter <- parse_interp(
+  '{ip} - {id} [{end_time)}] "{method} {path}{querystring} {protocol}/1.1" {status} {content_length}'
+)
+combined_log_formatter <- parse_interp(
+  '{ip} - {id} [{end_time)}] "{method} {path}{querystring} {protocol}/1.1" {status} {content_length} "{referer}" "{user_agent}"'
+)
 
 as_log_message <- function(message) {
   if (is_condition(message)) {

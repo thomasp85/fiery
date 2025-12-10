@@ -6,6 +6,8 @@
 * More performant logging. Default is to not log as it is still somewhat
   expensive. Formatting is now using glue-like formats but not glue and doesn't
   allow expressions inside the format string
+* rename `logger_silent()` to `logger_void()``
+* Remove cli formatting of log messages
 
 # fiery 1.4.1
 

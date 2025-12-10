@@ -116,7 +116,7 @@ Fire <- R6Class(
       private$LOG_QUEUE <- DelayStack()
       private$SESSION_NAME <- gsub(" ", "_", cli::hash_animal(runif(1))$hash)
       private$SESSION_FRAMEWORK_VERSION <- utils::packageVersion("fiery")
-      private$logger <- logger_silent()
+      self$set_logger(logger_void)
       private$ACCESS_LOG_FORMAT <- common_log_formatter
     },
     #' @description Human readable description of the app
@@ -459,8 +459,12 @@ Fire <- R6Class(
     #' @param logger A function with the arguments `event`, `message`, `request`, and `...`
     set_logger = function(logger) {
       check_function(logger)
-      check_args(logger, c('event', 'message', 'request', '...'))
-      private$logger <- logger
+      if (identical(logger, logger_void)) {
+        private$logger <- NULL
+      } else  {
+        check_args(logger, c('event', 'message', 'request', '...'))
+        private$logger <- logger
+      }
       invisible(NULL)
     },
     #' @description Log a message with the logger attached to the app. See [loggers] for build in functionality
@@ -480,20 +484,15 @@ Fire <- R6Class(
       .topcall = sys.call(-1),
       .topenv = parent.frame()
     ) {
+      if (is.null(private$logger)) {
+        return(invisible(NULL))
+      }
       time <- Sys.time()
       force(message)
       force(.logcall)
       force(.topcall)
       force(.topenv)
       log_fun <- function(...) {
-        if (!is_condition(message)) {
-          message <- vapply(
-            message,
-            cli::format_inline,
-            character(1),
-            .envir = .topenv
-          )
-        }
         private$logger(
           event,
           message,
@@ -992,8 +991,8 @@ Fire <- R6Class(
     },
     log_request = function(start_time, req, id) {
       end_time <- Sys.time()
-      format <- private$ACCESS_LOG_FORMAT
-      if (is.character(format)) {
+      log_format <- private$ACCESS_LOG_FORMAT
+      if (is.character(log_format)) {
         private$p_log(
           'request',
           glue_log(
@@ -1004,7 +1003,7 @@ Fire <- R6Class(
               response = req$response,
               id = id
             ),
-            format
+            log_format
           ),
           req
         )
@@ -1012,7 +1011,7 @@ Fire <- R6Class(
         res <- req$response
         private$p_log(
           "request",
-          format(
+          log_format(
             ip = req$ip,
             id = id,
             end_time = format(end_time, "%d/%b/%Y:%T %z"),
@@ -1302,20 +1301,15 @@ Fire <- R6Class(
       .topcall = sys.call(-1),
       .topenv = parent.frame()
     ) {
+      if (is.null(private$logger)) {
+        return(invisible(NULL))
+      }
       time <- Sys.time()
       force(message)
       force(.logcall)
       force(.topcall)
       force(.topenv)
       log_fun <- function(...) {
-        if (!is_condition(message)) {
-          message <- vapply(
-            message,
-            cli::format_inline,
-            character(1),
-            .envir = .topenv
-          )
-        }
         private$logger(
           event,
           message,

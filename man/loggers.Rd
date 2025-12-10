@@ -4,7 +4,7 @@
 \name{loggers}
 \alias{loggers}
 \alias{logging}
-\alias{logger_silent}
+\alias{logger_void}
 \alias{logger_null}
 \alias{logger_console}
 \alias{logger_file}
@@ -20,7 +20,7 @@ An object of class \code{character} of length 1.
 An object of class \code{character} of length 1.
 }
 \usage{
-logger_silent()
+logger_void(...)
 
 logger_null()
 
@@ -28,7 +28,7 @@ logger_console(format = "{time} - {event}: {message}")
 
 logger_file(file, format = "{time} - {event}: {message}")
 
-logger_otel(format = "{time} - {event}: {message}")
+logger_otel(format = "{message}")
 
 logger_switch(..., default = logger_null())
 
@@ -39,13 +39,15 @@ common_log_format
 combined_log_format
 }
 \arguments{
-\item{format}{A \link[glue:glue]{glue} string specifying the format of the log entry}
-
-\item{file}{A file or connection to write to}
-
 \item{...}{A named list of loggers to use for different events. The same
 semantics as \link[base:switch]{switch} is used so it is possible to let events
 \emph{fall through} e.g. \code{logger_switch(error =, warning = logger_file('errors.log'))}.}
+
+\item{format}{A \link[glue:glue]{glue}-like string specifying the format of the
+log entry. Only the variables \code{time}, \code{event}, and \code{message} are available
+and must be given verbatim}
+
+\item{file}{A file or connection to write to}
 
 \item{default}{A catch-all logger for use with events not defined in \code{...}}
 
@@ -134,7 +136,7 @@ but this can be modified by setting the \code{access_log_format} field to a
 \link[glue:glue]{glue} expression that has access to the following variables:
 
 \describe{
-\item{\code{start_time}}{The time the request was recieved}
+\item{\code{start_time}}{The time the request was received}
 \item{\code{end_time}}{The time the response was send back}
 \item{\code{request}}{The \code{Request} object}
 \item{\code{response}}{The \code{Response} object}
@@ -152,10 +154,9 @@ To change the format:
 Apart from the standard logs described above it is also possible to send
 messages to the log as you please, e.g. inside event handlers. This is done
 through the \code{log()} method where you at the very least specify an event and a
-message. In general it is better to send messages through \code{log()} rather than
-with \code{warning()} and \code{stop()} even though the latters will eventually be
-caught, as it gives you more control over the logging and what should happen
-in the case of an exception.
+message. You can also log information using the standard exception mechanism.
+Errors, warnings and messages are all caught and logged and since exception
+carry more information than a log string, the logging can be richer.
 
 An example of using \code{log()} in a handler could be:
 
