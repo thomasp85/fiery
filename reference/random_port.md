@@ -2,7 +2,7 @@
 
 This is a small utility function to get random safe ports to run your
 application on. It chooses a port within the range that cannot be
-registeret to IANA and thus is safe to assume are not in use.
+registered to IANA and thus is safe to assume are not in use.
 
 ## Usage
 

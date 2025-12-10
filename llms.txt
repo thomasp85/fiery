@@ -122,7 +122,7 @@ logging facility where callbacks and handlers can send logging
 information to without worrying about where and how the logs get
 written.
 
-- [`logger_silent()`](https://fiery.data-imaginist.com/reference/loggers.md)
+- [`logger_void()`](https://fiery.data-imaginist.com/reference/loggers.md)
   [`logger_null()`](https://fiery.data-imaginist.com/reference/loggers.md)
   [`logger_console()`](https://fiery.data-imaginist.com/reference/loggers.md)
   [`logger_file()`](https://fiery.data-imaginist.com/reference/loggers.md)

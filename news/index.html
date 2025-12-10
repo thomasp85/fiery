@@ -50,10 +50,12 @@
 <h2 class="pkg-version" data-toc-text="development version" id="fiery-development-version">fiery (development version)<a class="anchor" aria-label="anchor" href="#fiery-development-version"></a></h2>
 <ul><li>More performant implementation of HandlerStack, DelayStack, and TimeStack. These internal constructs are now implemented as closures instead of R6 classes.</li>
 <li>More performant logging. Default is to not log as it is still somewhat expensive. Formatting is now using glue-like formats but not glue and doesn’t allow expressions inside the format string</li>
+<li>rename <code>logger_silent()</code> to `logger_void()``</li>
+<li>Remove cli formatting of log messages</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.1" id="fiery-141">fiery 1.4.1<a class="anchor" aria-label="anchor" href="#fiery-141"></a></h2><p class="text-muted">CRAN release: 2025-11-18</p>
-<ul><li>Added <code><a href="../reference/loggers.html">logger_silent()</a></code> which does completely nothing</li>
+<ul><li>Added <code>logger_silent()</code> which does completely nothing</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.0" id="fiery-140">fiery 1.4.0<a class="anchor" aria-label="anchor" href="#fiery-140"></a></h2><p class="text-muted">CRAN release: 2025-11-10</p>

@@ -11,7 +11,7 @@ response will be send back if any error is encountered.
 ## Usage
 
 ``` r
-logger_silent()
+logger_void(...)
 
 logger_null()
 
@@ -19,7 +19,7 @@ logger_console(format = "{time} - {event}: {message}")
 
 logger_file(file, format = "{time} - {event}: {message}")
 
-logger_otel(format = "{time} - {event}: {message}")
+logger_otel(format = "{message}")
 
 logger_switch(..., default = logger_null())
 
@@ -38,21 +38,22 @@ An object of class `character` of length 1.
 
 ## Arguments
 
-- format:
-
-  A [glue](https://glue.tidyverse.org/reference/glue.html) string
-  specifying the format of the log entry
-
-- file:
-
-  A file or connection to write to
-
 - ...:
 
   A named list of loggers to use for different events. The same
   semantics as [switch](https://rdrr.io/r/base/switch.html) is used so
   it is possible to let events *fall through* e.g.
   `logger_switch(error =, warning = logger_file('errors.log'))`.
+
+- format:
+
+  A [glue](https://glue.tidyverse.org/reference/glue.html)-like string
+  specifying the format of the log entry. Only the variables `time`,
+  `event`, and `message` are available and must be given verbatim
+
+- file:
+
+  A file or connection to write to
 
 - default:
 
@@ -158,7 +159,7 @@ has access to the following variables:
 
 - `start_time`:
 
-  The time the request was recieved
+  The time the request was received
 
 - `end_time`:
 
@@ -185,13 +186,10 @@ To change the format:
 Apart from the standard logs described above it is also possible to send
 messages to the log as you please, e.g. inside event handlers. This is
 done through the [`log()`](https://rdrr.io/r/base/Log.html) method where
-you at the very least specify an event and a message. In general it is
-better to send messages through
-[`log()`](https://rdrr.io/r/base/Log.html) rather than with
-[`warning()`](https://rdrr.io/r/base/warning.html) and
-[`stop()`](https://rdrr.io/r/base/stop.html) even though the latters
-will eventually be caught, as it gives you more control over the logging
-and what should happen in the case of an exception.
+you at the very least specify an event and a message. You can also log
+information using the standard exception mechanism. Errors, warnings and
+messages are all caught and logged and since exception carry more
+information than a log string, the logging can be richer.
 
 An example of using [`log()`](https://rdrr.io/r/base/Log.html) in a
 handler could be:

@@ -42,8 +42,8 @@ of a `Fire` object is desired, use the `clone()` method.
 
 - `refresh_rate`:
 
-  The interval in seconds between run cycles when running a blocking
-  server (defaults to `0.001`)
+  **\[deprecated\]** The interval in seconds between run cycles when
+  running a blocking server (defaults to `0.001`)
 
 - `refresh_rate_nb`:
 

@@ -71,7 +71,7 @@ if any error is encountered.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">logger_silent</span><span class="op">(</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">logger_void</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">logger_null</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -79,7 +79,7 @@ if any error is encountered.</p>
 <span></span>
 <span><span class="fu">logger_file</span><span class="op">(</span><span class="va">file</span>, format <span class="op">=</span> <span class="st">"{time} - {event}: {message}"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">logger_otel</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"{time} - {event}: {message}"</span><span class="op">)</span></span>
+<span><span class="fu">logger_otel</span><span class="op">(</span>format <span class="op">=</span> <span class="st">"{message}"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">logger_switch</span><span class="op">(</span><span class="va">...</span>, default <span class="op">=</span> <span class="fu">logger_null</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -99,18 +99,20 @@ if any error is encountered.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
-<dd><p>A <a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a> string specifying the format of the log entry</p></dd>
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>A named list of loggers to use for different events. The same
+semantics as <a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a> is used so it is possible to let events
+<em>fall through</em> e.g. <code>logger_switch(error =, warning = logger_file('errors.log'))</code>.</p></dd>
+
+
+<dt id="arg-format">format<a class="anchor" aria-label="anchor" href="#arg-format"></a></dt>
+<dd><p>A <a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a>-like string specifying the format of the
+log entry. Only the variables <code>time</code>, <code>event</code>, and <code>message</code> are available
+and must be given verbatim</p></dd>
 
 
 <dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
 <dd><p>A file or connection to write to</p></dd>
-
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>A named list of loggers to use for different events. The same
-semantics as <a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a> is used so it is possible to let events
-<em>fall through</em> e.g. <code>logger_switch(error =, warning = logger_file('errors.log'))</code>.</p></dd>
 
 
 <dt id="arg-default">default<a class="anchor" aria-label="anchor" href="#arg-default"></a></dt>
@@ -198,7 +200,7 @@ for how requests are logged. <code>fiery</code> uses the <em>Common Log Format</
 but this can be modified by setting the <code>access_log_format</code> field to a
 <a href="https://glue.tidyverse.org/reference/glue.html" class="external-link">glue</a> expression that has access to the following variables:</p>
 <dl><dt><code>start_time</code></dt>
-<dd><p>The time the request was recieved</p></dd>
+<dd><p>The time the request was received</p></dd>
 
 <dt><code>end_time</code></dt>
 <dd><p>The time the response was send back</p></dd>
@@ -223,10 +225,9 @@ but this can be modified by setting the <code>access_log_format</code> field to 
 <p>Apart from the standard logs described above it is also possible to send
 messages to the log as you please, e.g. inside event handlers. This is done
 through the <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> method where you at the very least specify an event and a
-message. In general it is better to send messages through <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> rather than
-with <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning()</a></code> and <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code> even though the latters will eventually be
-caught, as it gives you more control over the logging and what should happen
-in the case of an exception.</p>
+message. You can also log information using the standard exception mechanism.
+Errors, warnings and messages are all caught and logged and since exception
+carry more information than a log string, the logging can be richer.</p>
 <p>An example of using <code><a href="https://rdrr.io/r/base/Log.html" class="external-link">log()</a></code> in a handler could be:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>app<span class="sc">$</span><span class="fu">on</span>(<span class="st">'header'</span>, <span class="cf">function</span>(server, id, request) {</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  server<span class="sc">$</span><span class="fu">log</span>(<span class="st">'info'</span>, <span class="fu">paste0</span>(<span class="st">'request from '</span>, id, <span class="st">' received'</span>), request)</span>
