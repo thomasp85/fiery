@@ -102,8 +102,7 @@ app$on('end', function(server) {
 })
 
 app$ignite(showcase = TRUE)
-#> Fire started at <127.0.0.1:8080> (narrow_factional_pygmy)
-#> Goodbye
+#> Fire started at <127.0.0.1:8080> (forest_sacrificial_boa)
 ```
 
 In general much of the logic will happen in the `request` and `message`
