@@ -52,6 +52,7 @@
 <li>More performant logging. Default is to not log as it is still somewhat expensive. Formatting is now using glue-like formats but not glue and doesn’t allow expressions inside the format string</li>
 <li>rename <code>logger_silent()</code> to `logger_void()``</li>
 <li>Remove cli formatting of log messages</li>
+<li>Request and Response objects are now unclassed before sending them to the handlers. This will break code that checks the class of these. Use <code><a href="https://reqres.data-imaginist.com/reference/maybe_request.html" class="external-link">reqres::maybe_request()</a></code> to check for likeliness to Request objects instead.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.1" id="fiery-141">fiery 1.4.1<a class="anchor" aria-label="anchor" href="#fiery-141"></a></h2><p class="text-muted">CRAN release: 2025-11-18</p>

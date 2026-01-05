@@ -10,6 +10,10 @@
   doesn’t allow expressions inside the format string
 - rename `logger_silent()` to \`logger_void()\`\`
 - Remove cli formatting of log messages
+- Request and Response objects are now unclassed before sending them to
+  the handlers. This will break code that checks the class of these. Use
+  [`reqres::maybe_request()`](https://reqres.data-imaginist.com/reference/maybe_request.html)
+  to check for likeliness to Request objects instead.
 
 ## fiery 1.4.1
 
