@@ -168,8 +168,6 @@ test_that('active bindings work', {
   app$port <- 10
   expect_equal(app$port, 10)
 
-  lifecycle::expect_deprecated(app$refresh_rate <- 10.5)
-
   expect_snapshot(app$refresh_rate_nb <- 'test', error = TRUE)
   expect_snapshot(app$refresh_rate_nb <- 1:5, error = TRUE)
   app$refresh_rate_nb <- 10.5
@@ -180,6 +178,9 @@ test_that('active bindings work', {
   dir <- tempdir()
   app$trigger_dir <- dir
   expect_equal(app$trigger_dir, dir)
+
+  skip_on_cran()
+  lifecycle::expect_deprecated(app$refresh_rate <- 10.5)
 })
 
 test_that('life cycle events get fired', {
