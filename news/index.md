@@ -1,6 +1,8 @@
 # Changelog
 
-## fiery (development version)
+## fiery 1.5.0
+
+CRAN release: 2026-01-12
 
 - More performant implementation of HandlerStack, DelayStack, and
   TimeStack. These internal constructs are now implemented as closures
